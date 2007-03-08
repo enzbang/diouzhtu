@@ -19,9 +19,9 @@
 --  Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.       --
 ------------------------------------------------------------------------------
 
-package Diouzhtu.Block_Level is
+package Diouzhtu.Block is
 
    procedure Register;
    --  Register all block level treatment
 
-end Diouzhtu.Block_Level;
+end Diouzhtu.Block;

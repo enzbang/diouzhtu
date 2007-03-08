@@ -26,3 +26,5 @@ all:
 clean:
 	-$(RM) -r gen src/v2p-template_defs*
 	-gnat clean -r -Pdiouzhtu
+
+check:

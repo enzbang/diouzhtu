@@ -22,28 +22,27 @@
 with Diouzhtu.Attribute;
 with GNAT.Regpat;
 with Ada.Strings.Unbounded;
-with Ada.Text_IO;
 
-package body Diouzhtu.Block_Level is
+package body Diouzhtu.Block is
 
    use GNAT.Regpat;
    use Ada.Strings.Unbounded;
    use Diouzhtu;
 
-   function Blockquote (Block : in String) return String;
+   function Blockquote (Index : Positive; Block : String) return String;
    --  <blockquote> element
 
-   function Header (Block : in String) return String;
+   function Header (Index : Positive; Block : String) return String;
    --  <h1>, <h2>, ... element
 
-   function Paragraph (Block : in String) return String;
+   function Paragraph (Index : Positive; Block : String) return String;
    --  <p> element
 
    ----------------
    -- Blockquote --
    ----------------
 
-   function Blockquote (Block : in String) return String is
+   function Blockquote (Index : Positive; Block : String) return String is
       Extract : constant Pattern_Matcher :=
                   Compile ("^bq" & Attribute.Get_Pattern & "\.\s(.*)$",
                            Case_Insensitive + Single_Line);
@@ -53,7 +52,7 @@ package body Diouzhtu.Block_Level is
    begin
       Match (Extract, Block, Matches);
       if Matches (0) = No_Match then
-         return "";
+         return Parse (Block_Level, Block, Index);
       end if;
 
       Result := To_Unbounded_String ("<blockquote");
@@ -65,8 +64,9 @@ package body Diouzhtu.Block_Level is
 
       if Matches (Count) /= No_Match then
          Append (Result, ">" &
-                 Block (Matches (Count).First .. Matches (Count).Last) &
-                 "<\blockquote>" & ASCII.Lf);
+           Parse (Inline_Level,
+             Block (Matches (Count).First .. Matches (Count).Last)) &
+                 "</blockquote>" & ASCII.Lf);
       end if;
       return To_String (Result);
 
@@ -76,7 +76,7 @@ package body Diouzhtu.Block_Level is
    -- Header --
    ------------
 
-   function Header (Block : in String) return String is
+   function Header (Index : Positive; Block : String) return String is
       Extract : constant Pattern_Matcher :=
                   Compile ("^h(\d)" & Attribute.Get_Pattern & "\.\s(.*)$",
                            Case_Insensitive + Single_Line);
@@ -89,8 +89,7 @@ package body Diouzhtu.Block_Level is
       --   Search for block level
       Match (Extract, Block, Matches);
       if Matches (0) = No_Match then
-         Ada.Text_IO.Put_Line (Block);
-         return "";
+         return Parse (Block_Level, Block, Index);
       end if;
 
       Result := To_Unbounded_String
@@ -103,7 +102,8 @@ package body Diouzhtu.Block_Level is
 
       if Matches (Count) /= No_Match then
          Append (Result, ">" &
-                 Block (Matches (Count).First .. Matches (Count).Last) &
+           Parse (Inline_Level,
+             Block (Matches (Count).First .. Matches (Count).Last)) &
                  "</h1>" & ASCII.Lf);
       end if;
 
@@ -114,9 +114,36 @@ package body Diouzhtu.Block_Level is
    -- Paragraph --
    ---------------
 
-   function Paragraph (Block : in String) return String is
+   function Paragraph (Index : Positive; Block : String) return String is
+      pragma Unreferenced (Index);
+      Extract : constant Pattern_Matcher :=
+                  Compile ("^p" & Attribute.Get_Pattern & "\.\s(.*)$",
+                           Case_Insensitive + Single_Line);
+      Count   : constant Match_Count := Paren_Count (Extract);
+      Matches : Match_Array (0 .. Paren_Count (Extract));
+      Result  : Unbounded_String := Null_Unbounded_String;
    begin
-      return "<p>" & Block & "</p>" & ASCII.Lf;
+      Match (Extract, Block, Matches);
+      if Matches (0) = No_Match then
+         return "<p>" & Parse (Inline_Level, Block) & "</p>" & ASCII.Lf;
+      end if;
+
+      Result := To_Unbounded_String ("<p");
+
+      if Matches (1) /= No_Match then
+         Append (Result, Attribute.Extract
+                 (Block (Matches (1).First .. Matches (1).Last)));
+      end if;
+
+      if Matches (Count) /= No_Match then
+
+         Append
+           (Result, ">" &
+            Parse (Inline_Level,
+              Block (Matches (Count).First .. Matches (Count).Last))
+            & "</p>" & ASCII.Lf);
+      end if;
+      return To_String (Result);
    end Paragraph;
 
    --------------
@@ -125,9 +152,9 @@ package body Diouzhtu.Block_Level is
 
    procedure Register is
    begin
-      Register (Header'Access);
-      Register (Blockquote'Access);
-      Register (Paragraph'Access);
+      Register (Block_Level, Header'Access);
+      Register (Block_Level, Blockquote'Access);
+      Register (Block_Level, Paragraph'Access);
    end Register;
 
-end Diouzhtu.Block_Level;
+end Diouzhtu.Block;

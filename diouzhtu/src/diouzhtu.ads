@@ -21,11 +21,19 @@
 
 package Diouzhtu is
 
-   function Block_Processing (Block : in String) return String;
-   --  Try all block callbacks and returns the formatted result
+   type Register_Level is (Block_Level, Inline_Level);
+
+   function Parse
+     (Level   : Register_Level;
+      Content : String;
+      Index   : Natural := 0)
+      return String;
+   --  Parse using all registered callbacks
 
    procedure Register
-     (To_HTML : access function (Block : String) return String);
-   --  Register a new callback
+     (Level   : Register_Level;
+      To_HTML : access
+        function (Index : Positive; Content : String) return String);
+   --  Register a new recursive callback
 
 end Diouzhtu;

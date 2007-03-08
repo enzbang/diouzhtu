@@ -29,11 +29,21 @@ procedure Diouzhtu2Html is
    use Ada.Text_IO;
 begin
 
-   if Argument_Count /= 1 then
+   if Argument_Count = 1 then
+      Put_Line (To_HTML (Argument (1)));
+   elsif Argument_Count = 2 then
+      declare
+         File : File_Type;
+      begin
+         Create (File, Out_File, Argument (2));
+         Put (File, To_HTML (Argument (1)));
+         Close (File);
+      end;
+   else
       Put_Line ("Usage : " & Command_Name & " [FILENAME]");
       Set_Exit_Status (Failure);
-   else
-      Put_Line (To_HTML (Argument (1)));
    end if;
 
+exception
+   when others => Put_Line ("Usage : " & Command_Name & " [FILENAME]");
 end Diouzhtu2Html;

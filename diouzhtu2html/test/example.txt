@@ -1,0 +1,30 @@
+h1. Header 1
+
+h2. Header 2
+
+h3. Header _3_
+
+h1(#id). An HTML first-level heading
+
+h1(class). An HTML first-level heading
+
+h1(class#id). _An_ HTML *first-level* heading
+
+*This* is a _default_ paragraph
+
+p(example1). An example
+
+p(#big-red). Red here
+
+p(example1#big-red2). Red here
+
+bq. This *_is* a_ blockquote
+
+bq(#id). The blockquote
+End of the blockquote
+
+bq(#id). The blockquote
+
+bq(class#id). _Another_ blockquote
+
+p(example1#big-red2). Red _here_ and _there_

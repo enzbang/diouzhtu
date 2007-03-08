@@ -25,6 +25,11 @@ all:
 
 clean:
 	-$(RM) -r gen src/v2p-template_defs*
-	-gnat clean -r -Pdiouzhtuweb
+	-gnat clean -r -Pdiouzhtu2html
+
+check:
+	-$(RM) tmp/example_gen.html
+	./bin/diouzhtu2html test/example.txt test/example_gen.html
+	diff test/example_gen.html test/example.html
 
 

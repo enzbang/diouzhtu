@@ -25,6 +25,8 @@ CP=cp -p
 MKDIR=mkdir -p
 RM=rm -f
 
+OPTIONS = MODE="$(MODE)" CP="$(CP)" MKDIR="$(MKDIR)" RM="$(RM)"
+
 # Modules support
 
 MODULES = diouzhtu2html diouzhtu
@@ -33,14 +35,21 @@ MODULES_BUILD = ${MODULES:%=%_build}
 
 MODULES_CLEAN = ${MODULES:%=%_clean}
 
+MODULES_CHECK = ${MODULES:%=%_check}
+
 # Targets
 
 all: $(MODULES_BUILD)
 
 clean: $(MODULES_CLEAN)
 
+check :$(MODULES_CHECK)
+
 ${MODULES_BUILD}:
 	${MAKE} -C ${@:%_build=%} $(OPTIONS)
 
 ${MODULES_CLEAN}:
 	${MAKE} -C ${@:%_clean=%} clean $(OPTIONS)
+
+${MODULES_CHECK}:
+	${MAKE} -C ${@:%_check=%} check $(OPTIONS)

@@ -20,7 +20,6 @@
 ------------------------------------------------------------------------------
 
 with Ada.Strings.Unbounded;
-with Ada.Text_IO;
 with GNAT.Regpat;
 
 package body Diouzhtu.Attribute is
@@ -28,7 +27,11 @@ package body Diouzhtu.Attribute is
    use GNAT.Regpat;
    use Ada.Strings.Unbounded;
 
-   Pattern : constant String := "\((\w+?)??((#\w+?)??)\)";
+   Pattern : constant String := "\(([\w-_]+?)??((#[\w-_]+?)??)\)";
+
+   -------------
+   -- Extract --
+   -------------
 
    function Extract (Content : String) return String is
       PM : constant Pattern_Matcher :=
@@ -42,7 +45,6 @@ package body Diouzhtu.Attribute is
    begin
       Match (PM, Content, Matches);
       if Matches (0) = No_Match then
-         Ada.Text_IO.Put_Line ("No match for " & Content);
          return "";
       end if;
 
@@ -61,7 +63,6 @@ package body Diouzhtu.Attribute is
                     Content (Matches (2).First + 1 .. Matches (2).Last) &
                     "'");
          end if;
-         Ada.Text_IO.Put_Line (To_String (Result));
          return To_String (Result);
       end;
    end Extract;

@@ -20,52 +20,76 @@
 ------------------------------------------------------------------------------
 
 with Ada.Containers.Vectors;
+with Ada.Strings.Unbounded;
 
 package body Diouzhtu is
 
    use Ada;
+   use Ada.Strings.Unbounded;
 
-   type Block_Callback is record
-      To_HTML : access function (Block : String) return String;
+   type Callback is record
+      To_HTML : access
+        function (Index : Positive; Block : String) return String;
    end record;
 
-   package Block_Callbacks is new Containers.Vectors
-     (Positive, Block_Callback, "=");
-   use Block_Callbacks;
+   package Callbacks is new Containers.Vectors
+     (Positive, Callback, "=");
+   use Callbacks;
 
-   Blocks : Vector;
+   Blocks  : Vector;
+   Inlines : Vector;
 
-   ----------------------
-   -- Block_Processing --
-   ----------------------
+   -----------
+   -- Parse --
+   -----------
 
-   function Block_Processing (Block : in String) return String is
-      BO_Cursor : Cursor := Blocks.First;
+   function Parse
+     (Level   : Register_Level;
+      Content : String;
+      Index   : Natural := 0)
+      return String
+   is
+      Text      : Unbounded_String := To_Unbounded_String (Content);
+      Current   : Positive;
+      Container : Vector;
    begin
-      while Has_Element (BO_Cursor) loop
-         declare
-            Result : constant String := Element (BO_Cursor).To_HTML (Block);
-         begin
-            if Result /= "" then
-               return Result;
-            end if;
-            Next (BO_Cursor);
-         end;
-      end loop;
-      return "";
-   end Block_Processing;
+      if Level = Block_Level then
+         Container := Blocks;
+      else
+         Container := Inlines;
+      end if;
+
+      if Index = 0  then
+         Current := Container.First_Index;
+      else
+         Current := Index + 1;
+      end if;
+
+      if Last_Index (Container) >= Current then
+         return Element (Container, Current).To_HTML
+           (Current, To_String (Text));
+      end if;
+
+      return To_String (Text);
+   end Parse;
 
    --------------
    -- Register --
    --------------
 
    procedure Register
-     (To_HTML : access function (Block : String) return String)
+     (Level   : Register_Level;
+      To_HTML : access
+        function (Index : Positive; Content : String) return String)
    is
-      BC : Block_Callback;
+      Register_Callback : Callback;
    begin
-      BC.To_HTML := To_HTML;
-      Blocks.Append (BC);
+      Register_Callback.To_HTML := To_HTML;
+      if Level = Block_Level then
+         Blocks.Append (Register_Callback);
+      else
+         Inlines.Append (Register_Callback);
+      end if;
    end Register;
 
 end Diouzhtu;
