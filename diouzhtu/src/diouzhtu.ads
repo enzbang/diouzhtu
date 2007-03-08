@@ -27,13 +27,13 @@ package Diouzhtu is
      (Level   : Register_Level;
       Content : String;
       Index   : Natural := 0)
-      return String;
+     return String;
    --  Parse using all registered callbacks
 
    procedure Register
      (Level   : Register_Level;
       To_HTML : access
-        function (Index : Positive; Content : String) return String);
+      function (Index : Positive; Content : String) return String);
    --  Register a new recursive callback
 
 end Diouzhtu;

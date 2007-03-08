@@ -44,8 +44,8 @@ package body Diouzhtu.Block is
 
    function Blockquote (Index : Positive; Block : String) return String is
       Extract : constant Pattern_Matcher :=
-                  Compile ("^bq" & Attribute.Get_Pattern & "\.\s(.*)$",
-                           Case_Insensitive + Single_Line);
+        Compile ("^bq" & Attribute.Get_Pattern & "\.\s(.*)$",
+                 Case_Insensitive + Single_Line);
       Count   : constant Match_Count := Paren_Count (Extract);
       Matches : Match_Array (0 .. Paren_Count (Extract));
       Result  : Unbounded_String := Null_Unbounded_String;
@@ -59,14 +59,15 @@ package body Diouzhtu.Block is
 
       if Matches (1) /= No_Match then
          Append (Result, Attribute.Extract
-                 (Block (Matches (1).First .. Matches (1).Last)));
+                   (Block (Matches (1).First .. Matches (1).Last)));
       end if;
 
       if Matches (Count) /= No_Match then
          Append (Result, ">" &
-           Parse (Inline_Level,
-             Block (Matches (Count).First .. Matches (Count).Last)) &
-                 "</blockquote>" & ASCII.Lf);
+                   Parse (Inline_Level,
+                          Block
+                            (Matches (Count).First .. Matches (Count).Last)) &
+                   "</blockquote>" & ASCII.Lf);
       end if;
       return To_String (Result);
 
@@ -78,8 +79,8 @@ package body Diouzhtu.Block is
 
    function Header (Index : Positive; Block : String) return String is
       Extract : constant Pattern_Matcher :=
-                  Compile ("^h(\d)" & Attribute.Get_Pattern & "\.\s(.*)$",
-                           Case_Insensitive + Single_Line);
+        Compile ("^h(\d)" & Attribute.Get_Pattern & "\.\s(.*)$",
+                 Case_Insensitive + Single_Line);
 
       --  Get all hn.
       Count   : constant Match_Count := Paren_Count (Extract);
@@ -97,14 +98,15 @@ package body Diouzhtu.Block is
 
       if Matches (2) /= No_Match then
          Append (Result, Attribute.Extract
-                 (Block (Matches (2).First .. Matches (2).Last)));
+                   (Block (Matches (2).First .. Matches (2).Last)));
       end if;
 
       if Matches (Count) /= No_Match then
          Append (Result, ">" &
-           Parse (Inline_Level,
-             Block (Matches (Count).First .. Matches (Count).Last)) &
-                 "</h1>" & ASCII.Lf);
+                   Parse (Inline_Level,
+                          Block (Matches
+                                   (Count).First .. Matches (Count).Last)) &
+                   "</h1>" & ASCII.Lf);
       end if;
 
       return To_String (Result);
@@ -117,8 +119,8 @@ package body Diouzhtu.Block is
    function Paragraph (Index : Positive; Block : String) return String is
       pragma Unreferenced (Index);
       Extract : constant Pattern_Matcher :=
-                  Compile ("^p" & Attribute.Get_Pattern & "\.\s(.*)$",
-                           Case_Insensitive + Single_Line);
+        Compile ("^p" & Attribute.Get_Pattern & "\.\s(.*)$",
+                 Case_Insensitive + Single_Line);
       Count   : constant Match_Count := Paren_Count (Extract);
       Matches : Match_Array (0 .. Paren_Count (Extract));
       Result  : Unbounded_String := Null_Unbounded_String;
@@ -132,16 +134,16 @@ package body Diouzhtu.Block is
 
       if Matches (1) /= No_Match then
          Append (Result, Attribute.Extract
-                 (Block (Matches (1).First .. Matches (1).Last)));
+                   (Block (Matches (1).First .. Matches (1).Last)));
       end if;
 
       if Matches (Count) /= No_Match then
 
          Append
            (Result, ">" &
-            Parse (Inline_Level,
-              Block (Matches (Count).First .. Matches (Count).Last))
-            & "</p>" & ASCII.Lf);
+              Parse (Inline_Level,
+                     Block (Matches (Count).First .. Matches (Count).Last))
+              & "</p>" & ASCII.Lf);
       end if;
       return To_String (Result);
    end Paragraph;

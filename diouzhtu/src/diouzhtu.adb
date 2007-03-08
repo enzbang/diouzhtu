@@ -47,7 +47,7 @@ package body Diouzhtu is
      (Level   : Register_Level;
       Content : String;
       Index   : Natural := 0)
-      return String
+     return String
    is
       Text      : Unbounded_String := To_Unbounded_String (Content);
       Current   : Positive;

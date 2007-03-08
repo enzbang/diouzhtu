@@ -114,22 +114,22 @@ package body Diouzhtu.To_HTML is
             To_Skip := To_Skip - 1;
          else
             case S (I) is
-            when '&'    =>
-               for K in I + 1 .. S'Last loop
-                  if not Ada.Characters.Handling.Is_Letter (S (K)) then
-                     if S (K) /= ';' then
-                        Append_To_Result ("&amp;", Last, I - 1);
-                     else
-                        --  Allow xml entities &copy; &reg; &quot; ...
-                        To_Skip := K - I;
+               when '&'    =>
+                  for K in I + 1 .. S'Last loop
+                     if not Ada.Characters.Handling.Is_Letter (S (K)) then
+                        if S (K) /= ';' then
+                           Append_To_Result ("&amp;", Last, I - 1);
+                        else
+                           --  Allow xml entities &copy; &reg; &quot; ...
+                           To_Skip := K - I;
+                        end if;
+                        exit;
                      end if;
-                     exit;
-                  end if;
-               end loop;
-            when '>'    => Append_To_Result ("&gt;", Last, I - 1);
-            when '<'    => Append_To_Result ("&lt;", Last, I - 1);
-            when '"'    => Append_To_Result ("&quot;", Last, I - 1);
-            when others => null;
+                  end loop;
+               when '>'    => Append_To_Result ("&gt;", Last, I - 1);
+               when '<'    => Append_To_Result ("&lt;", Last, I - 1);
+               when '"'    => Append_To_Result ("&quot;", Last, I - 1);
+               when others => null;
             end case;
          end if;
       end loop;

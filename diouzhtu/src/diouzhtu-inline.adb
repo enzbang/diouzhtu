@@ -76,27 +76,31 @@ package body Diouzhtu.Inline is
             To_Skip := To_Skip - 1;
          else
             case S (I) is
-            when '-' =>
-               if S'First < I + 1 and then I < S'Last - 2 then
-                  if S (I - 1 .. I + 1) = " - " then
-                     Append_To_Result ("&ndash;", Last, I - 1);
-                     To_Skip := 1;
-                  elsif S (I - 1 .. I + 2) = " -- " then
-                     Append_To_Result ("&mdash;", Last, I - 1);
-                     To_Skip := 2;
+               when '-' =>
+                  if S'First < I + 1 and then I < S'Last - 2 then
+                     if S (I - 1 .. I + 1) = " - " then
+                        Append_To_Result ("&ndash;", Last, I - 1);
+                        To_Skip := 1;
+                     elsif S (I - 1 .. I + 2) = " -- " then
+                        Append_To_Result ("&mdash;", Last, I - 1);
+                        To_Skip := 2;
+                        Last := Last + 1;
+                     end if;
                   end if;
-               end if;
-            when '.' =>
-               if I < S'Last - 3 and then S (I .. I + 3) = "..." then
-                  Append_To_Result ("&hellip;", Last, I - 1);
-                  To_Skip := 2;
-               end if;
-            when 'x' =>
+               when '.' =>
+                  if I < S'Last - 1 then
+                     if S (I .. I + 2) = "..." then
+                        Append_To_Result ("&hellip;", Last, I - 1);
+                        To_Skip := 2;
+                        Last := Last + To_Skip;
+                     end if;
+                  end if;
+               when 'x' =>
                   if S'First + 1 < I and then I < S'Last - 2
                     and then S (I - 1 .. I + 1) = " x " then
                      Append_To_Result ("&times;", Last, I - 1);
                   end if;
-            when others => null;
+               when others => null;
             end case;
          end if;
       end loop;
@@ -114,7 +118,7 @@ package body Diouzhtu.Inline is
 
    function Emphasis (Index : Positive; S : String) return String is
       Extract  : constant Pattern_Matcher :=
-                   Compile ("_(.*?)_", Case_Insensitive);
+        Compile ("_(.*?)_", Case_Insensitive);
       Matches  : Match_Array (0 .. 1);
       Current  : Natural := S'First;
       Result   : Unbounded_String := Null_Unbounded_String;
@@ -127,11 +131,17 @@ package body Diouzhtu.Inline is
             Append
               (Result,
                Parse (Inline_Level,
-                 S (Current .. Matches (1).First - 2), Index));
+                      S (Current .. Matches (1).First - 2), Index));
          end if;
 
-         Append (Result,
-                 "<em>" & S (Matches (1).First .. Matches (1).Last) & "</em>");
+         declare
+            In_Content : constant String :=
+              Parse (Inline_Level,
+                     S (Matches (1).First .. Matches (1).Last),
+                     Index);
+         begin
+            Append (Result, "<em>" & In_Content & "</em>");
+         end;
          Current := Matches (1).Last + 2;
       end loop;
 
@@ -160,7 +170,7 @@ package body Diouzhtu.Inline is
 
    function Strong (Index : Positive; S : String) return String is
       Extract  : constant Pattern_Matcher :=
-                   Compile ("\*(.*?)\*", Case_Insensitive);
+        Compile ("\*(.*?)\*", Case_Insensitive);
       Matches  : Match_Array (0 .. 1);
       Current  : Natural := S'First;
       Result   : Unbounded_String := Null_Unbounded_String;
@@ -171,15 +181,18 @@ package body Diouzhtu.Inline is
 
          if Matches (1).First > Current + 1 then
             Append
-              (Result,
-               Parse (Inline_Level,
-                 S (Current .. Matches (1).First - 2), Index));
+              (Result, Parse
+                 (Inline_Level, S (Current .. Matches (1).First - 2), Index));
          end if;
 
-         Append (Result,
-                 "<strong>" &
-                 S (Matches (1).First .. Matches (1).Last) &
-                 "</strong>");
+         declare
+            In_Content : constant String :=
+              Parse (Inline_Level,
+                     S (Matches (1).First .. Matches (1).Last),
+                     Index);
+         begin
+            Append (Result, "<strong>" & In_Content & "</strong>");
+         end;
          Current := Matches (1).Last + 2;
       end loop;
 

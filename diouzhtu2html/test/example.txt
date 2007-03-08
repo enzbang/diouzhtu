@@ -28,3 +28,7 @@ bq(#id). The blockquote
 bq(class#id). _Another_ blockquote
 
 p(example1#big-red2). Red _here_ and _there_
+
+&copy; &eacute; & &_ &! a - b a -- b a- b-- ...
+
+* It is a -- dash*

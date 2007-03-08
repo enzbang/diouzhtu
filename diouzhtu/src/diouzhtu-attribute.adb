@@ -35,7 +35,7 @@ package body Diouzhtu.Attribute is
 
    function Extract (Content : String) return String is
       PM : constant Pattern_Matcher :=
-             Compile (Pattern, Case_Insensitive);
+        Compile (Pattern, Case_Insensitive);
       Matches : Match_Array (0 .. 3);
       Result  : Unbounded_String := Null_Unbounded_String;
 
@@ -60,8 +60,8 @@ package body Diouzhtu.Attribute is
          end if;
          if Matches (2) /= No_Match and then Id_Length > 0 then
             Append (Result, Id_Attr &
-                    Content (Matches (2).First + 1 .. Matches (2).Last) &
-                    "'");
+                      Content (Matches (2).First + 1 .. Matches (2).Last) &
+                      "'");
          end if;
          return To_String (Result);
       end;
