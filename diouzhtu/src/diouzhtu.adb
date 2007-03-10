@@ -39,6 +39,25 @@ package body Diouzhtu is
    Blocks  : Vector;
    Inlines : Vector;
 
+   -----------------------
+   -- Internal_Register --
+   -----------------------
+
+   procedure Internal_Register
+     (Level   : Register_Level;
+      To_HTML : access
+        function (Index : Positive; Content : String) return String)
+   is
+      Register_Callback : Callback;
+   begin
+      Register_Callback.To_HTML := To_HTML;
+      if Level = Block_Level then
+         Blocks.Append (Register_Callback);
+      else
+         Inlines.Append (Register_Callback);
+      end if;
+   end Internal_Register;
+
    -----------
    -- Parse --
    -----------
@@ -86,9 +105,15 @@ package body Diouzhtu is
    begin
       Register_Callback.To_HTML := To_HTML;
       if Level = Block_Level then
-         Blocks.Append (Register_Callback);
+         Blocks.Prepend (Register_Callback);
       else
-         Inlines.Append (Register_Callback);
+         --  ???
+         --  First Inlines callback is code and user callback should
+         --  not erase this.
+         --  Insert them after code callback
+
+         Inlines.Insert (Before   => Next (Inlines.First),
+                         New_Item => Register_Callback);
       end if;
    end Register;
 

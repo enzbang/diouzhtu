@@ -141,7 +141,6 @@ package body Diouzhtu.To_HTML is
       return To_String (Result);
    end Web_Escape;
 
-
 begin
    Diouzhtu.Block.Register;
    Diouzhtu.Inline.Register;

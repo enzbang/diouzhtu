@@ -23,17 +23,25 @@ package Diouzhtu is
 
    type Register_Level is (Block_Level, Inline_Level);
 
+   procedure Register
+     (Level    : Register_Level;
+      To_HTML  : access
+        function (Index : Positive; Content : String) return String);
+   --  Register a new recursive callback
+
+private
+
+   procedure Internal_Register
+     (Level   : Register_Level;
+      To_HTML : access
+        function (Index : Positive; Content : String) return String);
+   --  Register a new recursive callback
+
    function Parse
      (Level   : Register_Level;
       Content : String;
       Index   : Natural := 0)
      return String;
    --  Parse using all registered callbacks
-
-   procedure Register
-     (Level   : Register_Level;
-      To_HTML : access
-      function (Index : Positive; Content : String) return String);
-   --  Register a new recursive callback
 
 end Diouzhtu;

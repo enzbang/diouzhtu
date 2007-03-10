@@ -240,11 +240,11 @@ package body Diouzhtu.Block is
 
    procedure Register is
    begin
-      Register (Block_Level, Header'Access);
-      Register (Block_Level, List'Access);
-      Register (Block_Level, Blockquote'Access);
-      Register (Block_Level, Table'Access);
-      Register (Block_Level, Paragraph'Access);
+      Internal_Register (Block_Level, Header'Access);
+      Internal_Register (Block_Level, List'Access);
+      Internal_Register (Block_Level, Blockquote'Access);
+      Internal_Register (Block_Level, Table'Access);
+      Internal_Register (Block_Level, Paragraph'Access);
    end Register;
 
    function Table (Index : Positive; Block : String) return String is

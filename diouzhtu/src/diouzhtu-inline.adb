@@ -199,10 +199,10 @@ package body Diouzhtu.Inline is
 
    procedure Register is
    begin
-      Diouzhtu.Register (Inline_Level, Code'Access);
-      Diouzhtu.Register (Inline_Level, Emphasis'Access);
-      Diouzhtu.Register (Inline_Level, Strong'Access);
-      Diouzhtu.Register (Inline_Level, Default'Access);
+      Diouzhtu.Internal_Register (Inline_Level, Code'Access);
+      Diouzhtu.Internal_Register (Inline_Level, Emphasis'Access);
+      Diouzhtu.Internal_Register (Inline_Level, Strong'Access);
+      Diouzhtu.Internal_Register (Inline_Level, Default'Access);
    end Register;
 
    ------------
