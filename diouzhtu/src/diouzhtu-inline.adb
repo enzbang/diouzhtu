@@ -28,14 +28,54 @@ package body Diouzhtu.Inline is
    use GNAT.Regpat;
    use Ada.Strings.Unbounded;
 
+   function Code (Index : Positive; S : String) return String;
+   --  Code phrases can be surrounded by @.
+   --  @code@
+
    function Default (Index : Positive; S : String) return String;
    --  Default callback
 
    function Emphasis (Index : Positive; S : String) return String;
    --  Emphasis to text is added by surrounding a phrase with underscores.
+   --  _emphasized_ (e.g., italics)
 
    function Strong (Index : Positive; S : String) return String;
    --  Strength can be give to text by surrounding with asterisks.
+   --  *strongly emphasized* (e.g., boldface)
+
+   function Code (Index : Positive; S : String) return String is
+      Extract  : constant Pattern_Matcher :=
+                   Compile ("@(.*?)@", Case_Insensitive);
+      Matches  : Match_Array (0 .. 1);
+      Current  : Natural := S'First;
+      Result   : Unbounded_String := Null_Unbounded_String;
+   begin
+      loop
+         Match (Extract, S, Matches, Current);
+         exit when Matches (0) = No_Match;
+
+         if Matches (1).First > Current + 1 then
+            Append
+              (Result,
+               Parse (Inline_Level,
+                      S (Current .. Matches (1).First - 2), Index));
+         end if;
+
+         --  Do not parse content between @
+
+         Append (Result, "<code>" &
+                 S (Matches (1).First .. Matches (1).Last) &
+                 "</code>");
+         Current := Matches (1).Last + 2;
+      end loop;
+
+      if Current = S'First then
+         --  No match, try next inline callback
+         return Parse (Inline_Level, S, Index);
+      end if;
+      Append (Result, Parse (Inline_Level, S (Current .. S'Last), Index));
+      return To_String (Result);
+   end Code;
 
    -------------
    -- Default --
@@ -159,6 +199,7 @@ package body Diouzhtu.Inline is
 
    procedure Register is
    begin
+      Diouzhtu.Register (Inline_Level, Code'Access);
       Diouzhtu.Register (Inline_Level, Emphasis'Access);
       Diouzhtu.Register (Inline_Level, Strong'Access);
       Diouzhtu.Register (Inline_Level, Default'Access);

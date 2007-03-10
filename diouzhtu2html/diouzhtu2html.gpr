@@ -24,18 +24,16 @@ with "../diouzhtu/diouzhtu";
 
 project Diouzhtu2Html is
 
-   for Languages use ("Ada");
-
-   for Source_Dirs use ("src");
+   for Source_Dirs use ("src", "test");
    for Object_Dir use "obj";
    for Exec_Dir use "bin";
    for Main use ("diouzhtu2html");
 
-   -------------
-   -- Builder --
-   -------------
+   ------------
+   -- Binder --
+   ------------
 
-   package Builder renames Shared.Builder;
+   package Binder renames Shared.Binder;
 
    --------------
    -- Compiler --
@@ -43,11 +41,11 @@ project Diouzhtu2Html is
 
    package Compiler renames Shared.Compiler;
 
-   ------------
-   -- Binder --
-   ------------
+   -------------
+   -- Builder --
+   -------------
 
-   package Binder renames Shared.Binder;
+   package Builder renames Shared.Builder;
 
    ------------
    -- Linker --
@@ -56,3 +54,4 @@ project Diouzhtu2Html is
    package Linker renames Shared.Linker;
 
 end Diouzhtu2Html;
+

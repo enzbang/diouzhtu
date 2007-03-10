@@ -41,6 +41,9 @@ package body Diouzhtu.Block is
    function Paragraph (Index : Positive; Block : String) return String;
    --  <p> element
 
+   function Table (Index : Positive; Block : String) return String;
+   --  table element
+
    ----------------
    -- Blockquote --
    ----------------
@@ -138,7 +141,7 @@ package body Diouzhtu.Block is
 
       declare
          Last_Level    : Positive := 1;
-         Current_Level : Natural := 0;
+         Current_Level : Natural  := 0;
          Start_Line    : Positive := 1;
          Last          : Positive;
          Begin_List    : constant String :=
@@ -169,9 +172,10 @@ package body Diouzhtu.Block is
 
                if Current_Level /= 0 then
                   if Current_Level > Last_Level then
-                     Append (Result, Begin_List);
+                     Append (Result,
+                             (Current_Level - Last_Level) * Begin_List);
                   elsif Current_Level < Last_Level then
-                     Append (Result, End_List);
+                     Append (Result, (Last_Level - Current_Level) * End_List);
                   end if;
                   if I = Block'Last then
                      Last := I;
@@ -239,7 +243,104 @@ package body Diouzhtu.Block is
       Register (Block_Level, Header'Access);
       Register (Block_Level, List'Access);
       Register (Block_Level, Blockquote'Access);
+      Register (Block_Level, Table'Access);
       Register (Block_Level, Paragraph'Access);
    end Register;
+
+   function Table (Index : Positive; Block : String) return String is
+
+      Nb_Cols     : Natural          := 0;
+      Nb_Rows     : Natural          := 0;
+      Table_Block : String           := Block;
+      Result      : Unbounded_String := Null_Unbounded_String;
+
+      procedure Get_Dimension;
+      --  Get maximum of cols and number of rows
+
+      procedure Get_Dimension is
+         Line_Nb_Cols  : Natural := 0;
+      begin
+         for I in Table_Block'Range loop
+            if Table_Block (I) = ASCII.Lf then
+               if I > Table_Block'First + 1
+                 and then Table_Block (I - 2 .. I - 1) /= " |" then
+                  --  A table line MUST end with |
+                  return;
+               end if;
+               if I < Table_Block'Last - 1
+                 and then Table_Block (I + 1 .. I + 2) /= "| " then
+                  --  A table line MUST begin with |
+                  return;
+               end if;
+               if Line_Nb_Cols > Nb_Cols then
+                  Nb_Cols := Line_Nb_Cols;
+               end if;
+               Nb_Rows := Nb_Rows + 1;
+               Line_Nb_Cols := 0;
+            end if;
+
+            if Table_Block (I) = '|' then
+               if (I = Table_Block'First or else
+                     Table_Block (I - 1) = ' ' or else
+                       Table_Block (I - 1) = ASCII.Lf) and then
+                 (I = Table_Block'Last or else
+                    Table_Block (I + 1) = ' ' or else
+                      Table_Block (I + 1) = ASCII.Lf)
+               then
+                  Line_Nb_Cols := Line_Nb_Cols + 1;
+               else
+                  Table_Block (I) := ' ';
+               end if;
+            end if;
+         end loop;
+      end Get_Dimension;
+
+   begin
+      Get_Dimension;
+
+      if Nb_Cols = 0 or else Nb_Rows = 0 then
+         return Parse (Block_Level, Table_Block, Index);
+      end if;
+
+      declare
+         Line_Cols     : Natural := 0;
+         Last_Position : Natural := 0;
+      begin
+         for K in Table_Block'Range loop
+            if Table_Block (K) = '|' then
+               if Line_Cols > 0 and then Last_Position + 2 < K - 2 then
+                  Append
+                    (Result, Parse (Inline_Level,
+                     Table_Block (Last_Position + 2 .. K - 2)));
+                  Append (Result, "</td>" & ASCII.Lf);
+               end if;
+               if Line_Cols < Nb_Cols - 1 then
+                  Append (Result, "<td>");
+               end if;
+               Line_Cols := Line_Cols + 1;
+               Last_Position := K;
+            end if;
+            if Table_Block (K) = ASCII.Lf or else K = Table_Block'Last then
+               if Line_Cols < Nb_Cols then
+                  declare
+                     Nb_Empty_Cols : constant Natural := Nb_Cols - Line_Cols;
+                     Empty_Col     : constant String := "<td></td>" & ASCII.Lf;
+                  begin
+                     Append (Result, "</td>" & ASCII.Lf &
+                             (Nb_Empty_Cols - 1) * Empty_Col);
+                  end;
+               end if;
+               if K /= Table_Block'Last then
+                  Append (Result, "</tr>" & ASCII.Lf & "<tr>" & ASCII.Lf);
+               else
+                  Append (Result, "</tr>" & ASCII.Lf);
+               end if;
+               Line_Cols := 0;
+            end if;
+         end loop;
+      end;
+      return "<table>" & ASCII.Lf & "<tr>" & ASCII.Lf
+        & To_String (Result) & "</table>" & ASCII.Lf;
+   end Table;
 
 end Diouzhtu.Block;
