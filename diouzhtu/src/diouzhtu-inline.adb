@@ -39,6 +39,9 @@ package body Diouzhtu.Inline is
    --  Emphasis to text is added by surrounding a phrase with underscores.
    --  _emphasized_ (e.g., italics)
 
+   function Link (Index : Positive; S : String) return String;
+   --  "(class)link name(tooltip)" : Http ://u.r.l
+
    function Strong (Index : Positive; S : String) return String;
    --  Strength can be give to text by surrounding with asterisks.
    --  *strongly emphasized* (e.g., boldface)
@@ -193,6 +196,56 @@ package body Diouzhtu.Inline is
       return To_String (Result);
    end Emphasis;
 
+   function Link (Index : Positive; S : String) return String is
+      Extract  : constant Pattern_Matcher
+        := Compile ('(' & '"' & "(\([a-zA-Z-_]+\))??(.*)?(\([a-zA-Z-_]+\))??"
+                    & '"' & ":(http://[a-zA-Z._-]+?)\G)",
+                    Case_Insensitive);
+      Matches  : Match_Array (0 .. 5);
+      Current  : Natural := S'First;
+      Result   : Unbounded_String := Null_Unbounded_String;
+   begin
+      loop
+         Match (Extract, S, Matches, Current);
+         exit when Matches (0) = No_Match;
+
+         if Matches (1).First > Current + 1 then
+            Append
+              (Result,
+               Parse (Inline_Level,
+                      S (Current .. Matches (1).First - 2), Index));
+         end if;
+
+         Append
+           (Result, "<a href='" & Parse (Inline_Level,
+            S (Matches (5).First .. Matches (5).Last)) & "'");
+
+         if Matches (2) /= No_Match then
+            Append
+              (Result, " class='"
+               & S (Matches (2).First .. Matches (2).Last) & "'");
+         end if;
+
+         if Matches (4) /= No_Match then
+            Append
+              (Result, " title='"
+               & S (Matches (4).First .. Matches (4).Last) & "'");
+         end if;
+
+         Append
+           (Result, '>' & Parse (Inline_Level,
+            S (Matches (3).First .. Matches (3).Last)) & "</a>");
+         Current := Matches (1).Last + 2;
+      end loop;
+
+      if Current = S'First then
+         --  No match, try next inline callback
+         return Parse (Inline_Level, S, Index);
+      end if;
+      Append (Result, Parse (Inline_Level, S (Current .. S'Last), Index));
+      return To_String (Result);
+   end Link;
+
    --------------
    -- Register --
    --------------
@@ -202,6 +255,7 @@ package body Diouzhtu.Inline is
       Diouzhtu.Internal_Register (Inline_Level, Code'Access);
       Diouzhtu.Internal_Register (Inline_Level, Emphasis'Access);
       Diouzhtu.Internal_Register (Inline_Level, Strong'Access);
+      Diouzhtu.Internal_Register (Inline_Level, Link'Access);
       Diouzhtu.Internal_Register (Inline_Level, Default'Access);
    end Register;
 

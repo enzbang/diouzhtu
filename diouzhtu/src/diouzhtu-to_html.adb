@@ -128,7 +128,7 @@ package body Diouzhtu.To_HTML is
                   end loop;
                when '>'    => Append_To_Result ("&gt;", Last, I - 1);
                when '<'    => Append_To_Result ("&lt;", Last, I - 1);
-               when '"'    => Append_To_Result ("&quot;", Last, I - 1);
+               --  when '"'    => Append_To_Result ("&quot;", Last, I - 1);
                when others => null;
             end case;
          end if;
