@@ -19,6 +19,8 @@
 --  Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.       --
 ------------------------------------------------------------------------------
 
+private with Ada.Strings.Unbounded;
+
 package Diouzhtu is
 
    type Register_Level is (Block_Level, Inline_Level);
@@ -29,7 +31,12 @@ package Diouzhtu is
         function (Index : Positive; Content : String) return String);
    --  Register a new recursive callback
 
+   procedure Set_Base_URL (Base_URL : in String);
+   --  Set diouzhtu base URL ( "/" by default)
+
 private
+   Diouzhtu_Base_URL : Ada.Strings.Unbounded.Unbounded_String :=
+                         Ada.Strings.Unbounded.To_Unbounded_String ("/");
 
    procedure Internal_Register
      (Level   : Register_Level;

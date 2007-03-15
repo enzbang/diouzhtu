@@ -20,7 +20,6 @@
 ------------------------------------------------------------------------------
 
 with Ada.Containers.Vectors;
-with Ada.Strings.Unbounded;
 
 package body Diouzhtu is
 
@@ -116,5 +115,10 @@ package body Diouzhtu is
                          New_Item => Register_Callback);
       end if;
    end Register;
+
+   procedure Set_Base_URL (Base_URL : in String) is
+   begin
+      Diouzhtu_Base_URL := To_Unbounded_String (Base_URL);
+   end Set_Base_URL;
 
 end Diouzhtu;

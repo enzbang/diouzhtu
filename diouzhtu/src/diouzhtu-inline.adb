@@ -40,7 +40,8 @@ package body Diouzhtu.Inline is
    --  _emphasized_ (e.g., italics)
 
    function Link (Index : Positive; S : String) return String;
-   --  "(class)link name(tooltip)" : Http ://u.r.l
+   --  "(class)link name(tooltip)":http ://u.r.l
+   --  "(class)link name(tooltip)":relative/url
 
    function Strong (Index : Positive; S : String) return String;
    --  Strength can be give to text by surrounding with asterisks.
@@ -198,8 +199,8 @@ package body Diouzhtu.Inline is
 
    function Link (Index : Positive; S : String) return String is
       Extract  : constant Pattern_Matcher
-        := Compile ('(' & '"' & "(\([a-zA-Z-_]+\))??(.*)?(\([a-zA-Z-_]+\))??"
-                    & '"' & ":(http://[a-zA-Z._-]+?)\G)",
+        := Compile ('(' & '"' & "(\([\w-_]+?\))??([^()/]*)?(\([\w-_]+\))??"
+                    & '"' & ":((http://)??[\w._-]+?)\G)",
                     Case_Insensitive);
       Matches  : Match_Array (0 .. 5);
       Current  : Natural := S'First;
@@ -216,20 +217,31 @@ package body Diouzhtu.Inline is
                       S (Current .. Matches (1).First - 2), Index));
          end if;
 
-         Append
-           (Result, "<a href='" & Parse (Inline_Level,
-            S (Matches (5).First .. Matches (5).Last)) & "'");
+         declare
+            URL         : constant String :=
+                            Parse (Inline_Level,
+                                   S (Matches (5).First .. Matches (5).Last));
+            Http_Prefix : constant String := "http://";
+         begin
+            if URL'Length >= Http_Prefix'Length and then
+              URL (URL'First ..
+                     URL'First + Http_Prefix'Length - 1) = Http_Prefix then
+               Append (Result, "<a href='" & URL & "'");
+            else
+               Append (Result, "<a href='" & Diouzhtu_Base_URL & URL & "'");
+            end if;
+         end;
 
          if Matches (2) /= No_Match then
             Append
               (Result, " class='"
-               & S (Matches (2).First .. Matches (2).Last) & "'");
+               & S (Matches (2).First + 1 .. Matches (2).Last - 1) & "'");
          end if;
 
          if Matches (4) /= No_Match then
             Append
               (Result, " title='"
-               & S (Matches (4).First .. Matches (4).Last) & "'");
+               & S (Matches (4).First + 1 .. Matches (4).Last - 1) & "'");
          end if;
 
          Append

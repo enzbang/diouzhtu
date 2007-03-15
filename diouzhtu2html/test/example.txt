@@ -52,3 +52,4 @@ p(example1#big-red2). Red _here_ and _there_
 
 "Une url de test":http://diouzhtu.org
 
+"(class)Une url de test(title)":page2
