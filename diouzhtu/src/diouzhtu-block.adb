@@ -30,7 +30,7 @@ package body Diouzhtu.Block is
    use Diouzhtu;
 
    function Blockquote (Index : Positive; Block : String) return String;
-   --  <blockquote> element
+   --  bq. Blockquote element
 
    function Header (Index : Positive; Block : String) return String;
    --  <h1>, <h2>, ... element

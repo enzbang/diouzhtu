@@ -21,11 +21,14 @@
 
 with GNAT.Regpat;
 with Ada.Strings.Unbounded;
+with Ada.Exceptions;
+with Ada.Text_IO;
 with Diouzhtu;
 
 package body Diouzhtu.Inline is
 
    use GNAT.Regpat;
+   use Ada.Exceptions;
    use Ada.Strings.Unbounded;
 
    function Code (Index : Positive; S : String) return String;
@@ -39,6 +42,10 @@ package body Diouzhtu.Inline is
    --  Emphasis to text is added by surrounding a phrase with underscores.
    --  _emphasized_ (e.g., italics)
 
+   function Image (Index : Positive; S : String) return String;
+   --  !(class)image.url(tooltip)!
+   --  The tooltip act as alt text
+
    function Link (Index : Positive; S : String) return String;
    --  "(class)link name(tooltip)":http ://u.r.l
    --  "(class)link name(tooltip)":relative/url
@@ -49,7 +56,7 @@ package body Diouzhtu.Inline is
 
    function Code (Index : Positive; S : String) return String is
       Extract  : constant Pattern_Matcher :=
-                   Compile ("@(.*?)@", Case_Insensitive);
+        Compile ("@(.*?)@", Case_Insensitive);
       Matches  : Match_Array (0 .. 1);
       Current  : Natural := S'First;
       Result   : Unbounded_String := Null_Unbounded_String;
@@ -68,8 +75,8 @@ package body Diouzhtu.Inline is
          --  Do not parse content between @
 
          Append (Result, "<code>" &
-                 S (Matches (1).First .. Matches (1).Last) &
-                 "</code>");
+                   S (Matches (1).First .. Matches (1).Last) &
+                   "</code>");
          Current := Matches (1).Last + 2;
       end loop;
 
@@ -197,10 +204,13 @@ package body Diouzhtu.Inline is
       return To_String (Result);
    end Emphasis;
 
-   function Link (Index : Positive; S : String) return String is
+   -----------
+   -- Image --
+   -----------
+
+   function Image (Index : Positive; S : String) return String is
       Extract  : constant Pattern_Matcher
-        := Compile ('(' & '"' & "(\([\w-_]+?\))??([^()/]*)?(\([\w-_]+\))??"
-                    & '"' & ":((http://)??[\w._-]+?)\G)",
+        := Compile ("!(\([\w-_]+?\))??((http://)??[\w._-]+?)(\([\w-_]+?\))??!",
                     Case_Insensitive);
       Matches  : Match_Array (0 .. 5);
       Current  : Natural := S'First;
@@ -210,17 +220,89 @@ package body Diouzhtu.Inline is
          Match (Extract, S, Matches, Current);
          exit when Matches (0) = No_Match;
 
-         if Matches (1).First > Current + 1 then
+         if Matches (0).First > Current + 1 then
             Append
               (Result,
                Parse (Inline_Level,
-                      S (Current .. Matches (1).First - 2), Index));
+                      S (Current .. Matches (0).First - 1), Index));
          end if;
 
          declare
             URL         : constant String :=
-                            Parse (Inline_Level,
-                                   S (Matches (5).First .. Matches (5).Last));
+              Parse (Inline_Level,
+                     S (Matches (2).First .. Matches (2).Last));
+            Http_Prefix : constant String := "http://";
+         begin
+            if URL'Length >= Http_Prefix'Length and then
+              URL (URL'First ..
+                     URL'First + Http_Prefix'Length - 1) = Http_Prefix then
+               Append (Result, "<img src='" & URL & "'");
+            else
+               Append (Result, "<img src='" & Diouzhtu_Base_URL & URL & "'");
+            end if;
+         end;
+
+         if Matches (1) /= No_Match then
+            Append
+              (Result, " class='"
+                 & S (Matches (1).First + 1 .. Matches (1).Last - 1) & "'");
+         end if;
+
+         if Matches (5) /= No_Match then
+            Append
+              (Result, " title='"
+                 & S (Matches (5).First + 1 .. Matches (5).Last - 1) & "'");
+            Append
+              (Result, " alt='"
+                 & S (Matches (5).First + 1 .. Matches (5).Last - 1) & "'");
+         end if;
+
+         Append
+           (Result, '>');
+         Current := Matches (0).Last + 1;
+      end loop;
+
+      if Current = S'First then
+         --  No match, try next inline callback
+         return Parse (Inline_Level, S, Index);
+      end if;
+      Append (Result, Parse (Inline_Level, S (Current .. S'Last), Index));
+      return To_String (Result);
+   end Image;
+
+   ----------
+   -- Link --
+   ----------
+
+   function Link (Index : Positive; S : String) return String is
+      Extract  : constant Pattern_Matcher :=
+        Compile ("""(\([\w-_]+?\))??([^\(\)]+?)(\(.*\))??"":" &
+                 "((http://)??[^ \s\[\]]+)(\s|$)",
+                 Case_Insensitive + Single_Line);
+      --          :=
+      --  Compile ('(' & '"' & "(\([\w-_]+?\))??([^()/]*)?(\([\w-_]+\))??"
+      --                        & """:([^ \s\[\]]+))",
+      --                      Case_Insensitive);
+      --  & '"' & ":""((http://)??[\w._-]+?)\G)",
+      Matches  : Match_Array (0 .. 6);
+      Current  : Natural := S'First;
+      Result   : Unbounded_String := Null_Unbounded_String;
+   begin
+      loop
+         Match (Extract, S, Matches, Current);
+         exit when Matches (0) = No_Match;
+
+         if Matches (0).First > Current + 1 then
+            Append
+              (Result,
+               Parse (Inline_Level,
+                      S (Current .. Matches (0).First - 1), Index));
+         end if;
+
+         declare
+            URL         : constant String :=
+              Parse (Inline_Level,
+                     S (Matches (4).First .. Matches (4).Last));
             Http_Prefix : constant String := "http://";
          begin
             if URL'Length >= Http_Prefix'Length and then
@@ -232,22 +314,25 @@ package body Diouzhtu.Inline is
             end if;
          end;
 
-         if Matches (2) /= No_Match then
+         if Matches (1) /= No_Match then
             Append
               (Result, " class='"
-               & S (Matches (2).First + 1 .. Matches (2).Last - 1) & "'");
+                 & S (Matches (1).First + 1 .. Matches (1).Last - 1) & "'");
          end if;
 
-         if Matches (4) /= No_Match then
+         if Matches (3) /= No_Match then
             Append
               (Result, " title='"
-               & S (Matches (4).First + 1 .. Matches (4).Last - 1) & "'");
+                 & S (Matches (3).First + 1 .. Matches (3).Last - 1) & "'");
          end if;
 
-         Append
-           (Result, '>' & Parse (Inline_Level,
-            S (Matches (3).First .. Matches (3).Last)) & "</a>");
-         Current := Matches (1).Last + 2;
+         if Matches (2) /= No_Match then
+            Append
+              (Result, '>' & Parse
+                 (Inline_Level,
+                  S (Matches (2).First .. Matches (2).Last)) & "</a> ");
+         end if;
+         Current := Matches (0).Last + 1;
       end loop;
 
       if Current = S'First then
@@ -256,6 +341,9 @@ package body Diouzhtu.Inline is
       end if;
       Append (Result, Parse (Inline_Level, S (Current .. S'Last), Index));
       return To_String (Result);
+   exception
+      when E : others => Ada.Text_IO.Put_Line (Exception_Information (E));
+         return "";
    end Link;
 
    --------------
@@ -268,6 +356,7 @@ package body Diouzhtu.Inline is
       Diouzhtu.Internal_Register (Inline_Level, Emphasis'Access);
       Diouzhtu.Internal_Register (Inline_Level, Strong'Access);
       Diouzhtu.Internal_Register (Inline_Level, Link'Access);
+      Diouzhtu.Internal_Register (Inline_Level, Image'Access);
       Diouzhtu.Internal_Register (Inline_Level, Default'Access);
    end Register;
 
@@ -308,3 +397,4 @@ package body Diouzhtu.Inline is
    end Strong;
 
 end Diouzhtu.Inline;
+
