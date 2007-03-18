@@ -1,6 +1,6 @@
 <h1>Header 1</h1>
-<h2>Header 2</h1>
-<h3>Header <em>3</em></h1>
+<h2>Header 2</h2>
+<h3>Header <em>3</em></h3>
 <h1 id='id'>An HTML first-level heading</h1>
 <h1 class='class'>An HTML first-level heading</h1>
 <h1 class='class' id='id'><em>An</em> HTML <strong>first-level</strong> heading</h1>
@@ -8,28 +8,34 @@
 <p class='example1'>An example</p>
 <p id='big-red'>Red here</p>
 <p class='example1' id='big-red2'>Red here</p>
-<blockquote>This *<em>is* a</em> blockquote</blockquote>
-<blockquote id='id'>The blockquote
-End of the blockquote</blockquote>
-<blockquote id='id'>The blockquote</blockquote>
-<blockquote class='class' id='id'><em>Another</em> blockquote</blockquote>
+<blockquote><p>This *<em>is* a</em> blockquote</p></blockquote>
+<blockquote id='id'><p>The blockquote
+End of the blockquote</p></blockquote>
+<blockquote id='id'><p>The blockquote</p></blockquote>
+<blockquote class='class' id='id'><p><em>Another</em> blockquote</p></blockquote>
 <p class='example1' id='big-red2'>Red <em>here</em> and <em>there</em></p>
 <p>&copy; &eacute; &amp; &amp;_ &amp;! a &ndash; b a &mdash; b a- b-- &hellip;</p>
 <p><strong>It is a &mdash; dash</strong></p>
 <ol>
-<li>First</li>
-<ol>
-<li>sub 1</li>
-</ol>
-<li>Second</li>
-<ol>
-<li>sub 2</li>
-<li>sub 3</li>
-<ol>
-<li>other</li>
-</ol>
-</ol>
-<li>Third</li>
+  <li>First</li>
+  <li>
+    <ol>
+      <li>sub 1</li>
+    </ol>
+  </li>
+  <li>Second</li>
+  <li>
+    <ol>
+      <li>sub 2</li>
+      <li>sub 3</li>
+      <li>
+        <ol>
+          <li>other</li>
+        </ol>
+      </li>
+    </ol>
+  </li>
+  <li>Third</li>
 </ol>
 <p><code>code block</code></p>
 <p><code> -- !test! "url":http://url &amp; &lt;&gt; *this* and _that_ </code></p>

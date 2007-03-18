@@ -31,19 +31,39 @@ begin
 
    if Argument_Count = 1 then
       Put_Line (To_HTML (Argument (1)));
-   elsif Argument_Count = 2 then
+   elsif Argument_Count >= 2 then
       declare
          File : File_Type;
       begin
          Create (File, Out_File, Argument (2));
+         if Argument_Count = 5 and then Argument (3) = "-create-all-page" then
+            declare
+               Header_File : File_Type;
+            begin
+               Open (Header_File, In_File, Argument (4));
+               while not End_Of_File (Header_File) loop
+                  Put (File, Get_Line (Header_File));
+               end loop;
+            end;
+         end if;
          Put (File, To_HTML (Argument (1)));
-         Close (File);
+         if Argument_Count = 5 then
+            declare
+               Footer_File : File_Type;
+            begin
+               Open (Footer_File, In_File, Argument (5));
+               while not End_Of_File (Footer_File) loop
+                  Put (File, Get_Line (Footer_File));
+               end loop;
+            end;
+            Close (File);
+         end if;
       end;
    else
       Put_Line ("Usage : " & Command_Name & " [FILENAME]");
       Set_Exit_Status (Failure);
    end if;
 
-exception
-   when others => Put_Line ("Usage : " & Command_Name & " [FILENAME]");
+--  exception
+--     when others => Put_Line ("Usage : " & Command_Name & " [FILENAME]");
 end Diouzhtu2Html;

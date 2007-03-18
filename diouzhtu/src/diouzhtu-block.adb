@@ -69,11 +69,11 @@ package body Diouzhtu.Block is
       end if;
 
       if Matches (Count) /= No_Match then
-         Append (Result, ">" &
+         Append (Result, "><p>" &
                    Parse (Inline_Level,
                           Block
                             (Matches (Count).First .. Matches (Count).Last)) &
-                   "</blockquote>" & ASCII.Lf);
+                   "</p></blockquote>" & ASCII.Lf);
       end if;
       return To_String (Result);
 
@@ -92,6 +92,7 @@ package body Diouzhtu.Block is
       Count   : constant Match_Count := Paren_Count (Extract);
       Matches : Match_Array (0 .. Paren_Count (Extract));
       Result  : Unbounded_String := Null_Unbounded_String;
+      Header  : Character;
    begin
       --   Search for block level
       Match (Extract, Block, Matches);
@@ -99,8 +100,10 @@ package body Diouzhtu.Block is
          return Parse (Block_Level, Block, Index);
       end if;
 
+      Header := Block (Matches (1).First);
+
       Result := To_Unbounded_String
-        ("<h" & Block (Matches (1).First .. Matches (1).Last));
+        ("<h" & Header);
 
       if Matches (2) /= No_Match then
          Append (Result, Attribute.Extract
@@ -112,88 +115,141 @@ package body Diouzhtu.Block is
                    Parse (Inline_Level,
                           Block (Matches
                                    (Count).First .. Matches (Count).Last)) &
-                   "</h1>" & ASCII.Lf);
+                   "</h" & Header & ">" & ASCII.Lf);
       end if;
 
       return To_String (Result);
    end Header;
 
    function List (Index : Positive; Block : String) return String is
-      Element  : constant array (1 .. 2) of String (1 .. 2) := ("ol", "ul");
-      Tag      : constant array (1 .. 2) of String (1 .. 2) := ("# ", "* ");
-      Get_Tag  : String (1 .. 2);
-      Position : Natural := 0;
-      Result   : Unbounded_String := Null_Unbounded_String;
+      Element     : constant array (1 .. 2) of String (1 .. 2) := ("ol", "ul");
+      Tag         : constant array (1 .. 2) of Character := ('#', '*');
+      Indentation : constant String := "  ";
+
+      Get_Element : String (1 .. 2);
+      Get_Tag     : Character;
+      Result      : Unbounded_String := Null_Unbounded_String;
+
+      type List_Level is new Natural;
+
+      procedure Parse_Line
+        (Line       : in String;
+         Level      : in out List_Level;
+         Line_Level : in List_Level);
+
+      function Get_Current_Level (Line : String) return List_Level;
+
+      function Indent (Level : List_Level) return String;
+
+      -----------------------
+      -- Get_Current_Level --
+      -----------------------
+
+      function Get_Current_Level (Line : String) return List_Level is
+         Level : List_Level := 0;
+      begin
+         for K in Line'Range loop
+            exit when Block (K) /= Get_Tag;
+            Level := Level + 1;
+         end loop;
+         return Level;
+      end Get_Current_Level;
+
+      ------------
+      -- Indent --
+      ------------
+
+      function Indent (Level : List_Level) return String is
+         pragma Warnings (Off);
+         N : Natural;
+      begin
+         if Level > 0 then
+            N := 2 * (Positive (Level) - 1);
+            return To_String (N * Indentation);
+         end if;
+         return "";
+      end Indent;
+
+      ----------------
+      -- Parse_Line --
+      ----------------
+
+      procedure Parse_Line
+        (Line       : in String;
+         Level      : in out List_Level;
+         Line_Level : in List_Level) is
+         pragma Warnings (Off);
+      begin
+         if Line_Level > Level then
+            if Line_Level > 1 then
+               Append (Result, Indent (Level) & Indentation);
+               Append (Result, "<li>" & ASCII.Lf);
+            end if;
+            Level := Level + 1;
+            Append (Result, Indent (Level)
+                      & '<' & Get_Element & '>' & ASCII.Lf);
+            Parse_Line (Line, Level, Line_Level);
+         elsif Line_Level < Level then
+            Append (Result, Indent (Level)
+                      & "</" & Get_Element & '>' & ASCII.Lf);
+            if Level > 1 then
+               Level := Level - 1;
+               Append (Result, Indent (Level) & Indentation
+                         & "</li>" & ASCII.Lf);
+               Parse_Line (Line, Level, Line_Level);
+            end if;
+         else
+            if Line = "" then
+               return;
+            end if;
+            Append (Result, Indent (Level) & Indentation);
+            declare
+               Content_First : constant Positive :=
+                 Line'First + Natural (Level) + 1;
+               Content_Last  : Positive := Line'Last;
+            begin
+               if Line (Content_Last) = ASCII.Lf then
+                  Content_Last := Content_Last - 1;
+               end if;
+               Append (Result, "<li>" &
+                         Parse (Inline_Level,
+                                Line (Content_First .. Content_Last))
+                         &  "</li>" & ASCII.Lf);
+            end;
+         end if;
+      end Parse_Line;
+
    begin
       if Block'Length < 3 then
          return Parse (Block_Level, Block, Index);
       end if;
 
-      Get_Tag := Block (Block'First .. Block'First + 1);
+      Get_Tag := Block (Block'First);
 
-      if Get_Tag = Tag (1) then
-         Position := 1;
-      elsif Get_Tag = Tag (2) then
-         Position := 2;
+      if Block (Block'First .. Block'First + 1) = Tag (1) & ' ' then
+         Get_Element := Element (1);
+      elsif Block (Block'First .. Block'First + 1) = Tag (2) & ' ' then
+         Get_Element := Element (2);
       else
          return Parse (Block_Level, Block, Index);
       end if;
 
       declare
-         Last_Level    : Positive := 1;
-         Current_Level : Natural  := 0;
-         Start_Line    : Positive := 1;
-         Last          : Positive;
-         Begin_List    : constant String :=
-           '<' & Element (Position) & '>' & ASCII.Lf;
-         End_List      : constant String :=
-           "</" & Element (Position) & '>' & ASCII.Lf;
-         Begin_Item    : constant String := "<li>";
-         End_Item      : constant String := "</li>" & ASCII.Lf;
+         Last       : Positive   := Block'First;
+         Last_Level : List_Level := 0; -- List_Level'First
       begin
-         Append (Result, Begin_List);
-         for I in Block'First + 2 .. Block'Last loop
-            if Block (I - 1) = ASCII.Lf or else I = Block'Last then
-               --  Count number of # or * at the beginning of line
-               Current_Level := 0;
-               for K in Start_Line .. I - 2 loop
-                  if Block (K) = Get_Tag (1) then
-                     Current_Level := Current_Level + 1;
-                  end if;
-               end loop;
-
-               --  If current_level = 0
-               --  consider this is the same line
-               --
-               --  ex:
-               --  # begin of list with a line too
-               --  long
-               --  # second element
-
-               if Current_Level /= 0 then
-                  if Current_Level > Last_Level then
-                     Append (Result,
-                             (Current_Level - Last_Level) * Begin_List);
-                  elsif Current_Level < Last_Level then
-                     Append (Result, (Last_Level - Current_Level) * End_List);
-                  end if;
-                  if I = Block'Last then
-                     Last := I;
-                  else
-                     --  Does not add the tag
-                     Last := I - 2;
-                  end if;
-                  Append (Result, Begin_Item & Parse
-                          (Inline_Level,
-                           Block (Start_Line + Current_Level + 1 .. Last)) &
-                           End_Item);
-                  Last_Level := Current_Level;
-                  Start_Line := I;
-               end if;
+         for K in Block'Range loop
+            if Block (K) = ASCII.Lf or else K = Block'Last then
+               declare
+                  Line       : constant String := Block (Last .. K);
+                  Line_Level : constant List_Level := Get_Current_Level (Line);
+               begin
+                  Parse_Line (Line, Last_Level, Line_Level);
+                  Last := K + 1;
+               end;
             end if;
          end loop;
-
-         Append (Result, End_List);
+         Parse_Line ("", Last_Level, 0);
       end;
       return To_String (Result);
    end List;
