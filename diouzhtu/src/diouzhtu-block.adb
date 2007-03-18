@@ -32,6 +32,9 @@ package body Diouzhtu.Block is
    function Blockquote (Index : Positive; Block : String) return String;
    --  bq. Blockquote element
 
+   function Code (Index : Positive; Block : String) return String;
+   --  code. code element
+
    function Header (Index : Positive; Block : String) return String;
    --  <h1>, <h2>, ... element
 
@@ -78,6 +81,37 @@ package body Diouzhtu.Block is
       return To_String (Result);
 
    end Blockquote;
+
+   function Code (Index : Positive; Block : String) return String is
+      Extract  : constant Pattern_Matcher :=
+        Compile ("^code" & Attribute.Get_Pattern & "\.\s(.*?)$",
+                 Case_Insensitive + Single_Line);
+      Count   : constant Match_Count := Paren_Count (Extract);
+      Matches : Match_Array (0 .. Paren_Count (Extract));
+      Result  : Unbounded_String := Null_Unbounded_String;
+   begin
+      Match (Extract, Block, Matches);
+      if Matches (0) = No_Match then
+         return Parse (Block_Level, Block, Index);
+      end if;
+
+      Result := To_Unbounded_String ("<p><code");
+
+      if Matches (1) /= No_Match then
+         Append (Result, Attribute.Extract
+                   (Block (Matches (1).First .. Matches (1).Last)));
+      end if;
+
+      if Matches (Count) /= No_Match then
+         --  Do not parse content
+
+         Append (Result, ">" &
+                   Block
+                   (Matches (Count).First .. Matches (Count).Last) &
+                   "</code></p>" & ASCII.Lf);
+      end if;
+      return To_String (Result);
+   end Code;
 
    ------------
    -- Header --
@@ -296,6 +330,7 @@ package body Diouzhtu.Block is
 
    procedure Register is
    begin
+      Internal_Register (Block_Level, Code'Access);
       Internal_Register (Block_Level, Header'Access);
       Internal_Register (Block_Level, List'Access);
       Internal_Register (Block_Level, Blockquote'Access);

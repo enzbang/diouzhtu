@@ -57,3 +57,9 @@ Un lien vers "une url de test":http://diouzhtu.org
 "(class)Une url de test(title)":page2
 
 An image !diouzhtu.png! in png format
+
+code. @code@
+
+code. "(class)Une url de test(title)":page2
+
+Insert @@@@ for writting @@

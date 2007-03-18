@@ -72,11 +72,15 @@ package body Diouzhtu.Inline is
                       S (Current .. Matches (1).First - 2), Index));
          end if;
 
-         --  Do not parse content between @
+         if Matches (1).First = Matches (1).Last + 1 then
+            Append (Result, "@");
+         else
+            --  Do not parse content between @
 
-         Append (Result, "<code>" &
-                   S (Matches (1).First .. Matches (1).Last) &
-                   "</code>");
+            Append (Result, "<code>" &
+                      S (Matches (1).First .. Matches (1).Last) &
+                      "</code>");
+         end if;
          Current := Matches (1).Last + 2;
       end loop;
 
