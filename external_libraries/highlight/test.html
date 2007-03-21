@@ -1,0 +1,448 @@
+﻿<!DOCTYPE html>
+<head>
+  <title>Highlight</title>
+  <style>
+    code[class]:after {
+      content: 'highlight: ' attr(class);
+      display: block; text-align: right;
+      font-size: smaller;
+      color: #CCC; background: white;
+      border-top: solid 1px;
+      padding-top: 0.5em;
+    }
+    
+    code {
+      display: block;
+      background: #F0F0F0;
+    }
+    
+    .string,
+    .function .title,
+    .class .title, 
+    .tag .attribute .value,
+    .css .rules .value,
+    .cpp .preprocessor,
+    .ruby .symbol,
+    .vbscript .built_in {
+      color: #800;
+    }
+    
+    .comment,
+    .python .decorator,
+    .java .annotation {
+      color: #888;
+    }
+    
+    .number,
+    .regexp,
+    .javascript .literal {
+      color: #080;
+    }
+    
+    .javadoc,
+    .ruby .string {
+      color: #88F;
+    }
+    
+    .keyword,
+    .css .id,
+    .phpdoc,
+    .function .title,
+    .class .title,
+    .vbscript .built_in {
+      font-weight: bold;
+    }
+  </style>
+  
+  <script type="text/javascript" src="highlight.js"></script>
+  <script type="text/javascript">
+    initHighlightingOnLoad();
+  </script>
+
+<body>
+
+<p>Some Python code:
+
+<pre><code>@requires_authorization
+def somefunc(param1, param2):
+  '''A docstring'''
+  if param1 > param2: # interesting
+    print 'Gre\'ater'
+    print ''
+  return param2 - param1 + 1
+  
+class SomeClass:<br>    pass
+</code></pre>
+
+<p>Short sample of Ruby:
+
+<pre><code># Ruby support for highlight.js
+  
+class CategoriesController &lt; ApplicationController
+  layout "core"
+
+  before_filter :login_required
+  before_filter :xhr_required, :only =&gt; [:create, :update]
+  before_filter :admin_privileges_required, :except =&gt; [:show]
+
+=begin
+  This method creates a category. Very difficult to understand, huh?
+=end
+
+  def create
+    @category = Category.create(params[:category])
+    flash[:notice] = "Category was successfully created"
+  end
+end
+</code></pre>
+
+<p>A bit of Perl:
+
+<pre><code># loads object
+sub load
+{
+  my $c = shift;
+  my $id = shift;
+  
+  my $flds = $c-&gt;db_load($id,@_) || do { Carp::carp "Can`t load (class: $c, id: $id): '$!'"; return undef };
+  
+  my $o = $c-&gt;_perl_new();
+  
+  $id12 = $id;
+  $o-&gt;{'ID'} = $id12 + 123;
+  
+  $o-&gt;{'PAPA'} = $flds-&gt;{'PAPA'};
+  #$o-&gt;{'SHCUT'} = $flds-&gt;{'SHCUT'};
+  
+  my $p = $o-&gt;props;
+  
+  #if($o-&gt;{'SHCUT'})
+  #{
+  #  $flds = $o-&gt;db_load($o-&gt;{'SHCUT'},@_);
+  #}
+  
+  my $vt;
+  for my $key (keys %$p)
+  {
+    if(${$vt.'::property'})
+    {
+      $o-&gt;{$key . '_real'} = $flds-&gt;{$key};
+      tie $o-&gt;{$key}, 'CMSBuilder::Property', $o, $key;
+    }
+    else
+    {
+      $o-&gt;{$key} = $flds-&gt;{$key};
+    }
+  }
+  
+  $o-&gt;save if delete $o-&gt;{'_save_after_load'};
+  
+  return $o;
+}
+</code></pre>
+
+<p>A chunk of PHP:
+
+<pre><code>require_once 'Zend.php';
+require_once 'Zend/Uri/Exception.php';
+require_once 'Zend/Uri/Http.php';
+
+/**
+ * Zend_Uri_Mailto
+ */
+require_once 'Zend/Uri/Mailto.php';
+
+
+/**
+ * @category   Zend
+ * @package    Zend_Uri
+ * @copyright  Copyright (c) 2006 Zend Technologies USA Inc. (http://www.zend.com)
+ * @license    http://framework.zend.com/license/new-bsd     New BSD License
+ */
+abstract class Zend_Uri
+{
+
+
+	/**
+	 * Scheme of this URI (http, ftp, etc.)
+	 * @var string
+	 */
+	protected $_scheme = "";
+
+
+    /**
+     * Return a string representation of this URI.
+     *
+     * @see     getUri()
+     * @return  string
+     */
+    public function __toString()
+    {
+        return $this-&gt;getUri();
+    }
+
+
+    static public function check($uri)
+    {
+        try {
+            $uri = self::factory($uri);
+        } catch (Exception $e) {
+            return false;
+        }
+
+        return $uri-&gt;valid();
+    }
+
+
+    /**
+     * Create a new Zend_Uri object for a URI.  If building a new URI, then $uri should contain
+     * only the scheme (http, ftp, etc).  Otherwise, supply $uri with the complete URI.
+     *
+     * @param string $uri
+     * @throws Zend_Uri_Exception
+     * @return Zend_Uri
+     */
+    static public function factory($uri = 'http')
+    {
+        /**
+         * Separate the scheme from the scheme-specific parts
+         * @link http://www.faqs.org/rfcs/rfc2396.html
+         */
+        $uri = explode(':', $uri, 2);
+        $scheme = strtolower($uri[0]);
+        $schemeSpecific = isset($uri[1]) ? $uri[1] : '';
+
+        if (!strlen($scheme)) {
+            throw new Zend_Uri_Exception('An empty string was supplied for the scheme');
+        }
+
+        // Security check: $scheme is used to load a class file, so only alphanumerics are allowed.
+        if (!ctype_alnum($scheme)) {
+            throw new Zend_Uri_Exception('Illegal scheme supplied, only alphanumeric characters are permitted');
+        }
+}
+</code></pre>
+
+<p>Some HTML code:
+
+<pre><code>&lt;head&gt;
+  &lt;title&gt;Title&lt;/title&gt;
+&lt;body&gt;
+  &lt;p class="something"&gt;Something&lt;/p&gt;
+  &lt;p class=something&gt;Something&lt;/p&gt;
+  &lt;!-- comment --&gt;
+  &lt;p class&gt;Something&lt;/p&gt;
+  &lt;p class="something" title="p"&gt;Something&lt;/p&gt;
+&lt;/body&gt;
+</code></pre>
+
+<p>Some CSS code:
+
+<pre><code>body, 
+html {
+  font: Tahoma, Arial, san-serif;
+}
+
+#content {
+  width: 100%; /* комментарий */
+  height: 100%
+}
+
+p[lang=ru] {
+  color: red;
+}
+</pre></code>
+
+<p>Javascript here too (right from the source, mind you): 
+
+<pre><code>function initHighlight(block) {
+  if (block.className.search(/\bno\-highlight\b/) != -1)
+    return false;
+  try {
+    blockText(block);
+  } catch (e) {
+    if (e == 'Complex markup')
+      return;
+  }//try
+  var classes = block.className.split(/\s+/);
+  for (var i = 0; i &lt; classes.length; i++) {
+    if (LANGUAGES[classes[i]]) {
+      highlightLanguage(block, classes[i]);
+      return;
+    }//if
+  }//for
+  highlightAuto(block);
+}//initHighlight</code></pre>
+
+<p>VBScript
+
+<pre><code>' creating configuration storage and initializing with default values
+Set cfg = CreateObject("Scripting.Dictionary")
+cfg.add "dest", ""
+cfg.add "dest_gz", ""
+cfg.add "gzip_exe", ""
+cfg.add "perl_exe", ""
+cfg.add "uncompressed_postfix", ""
+
+' reading ini file
+for i = 0 to ubound(ini_strings)
+    s = trim(ini_strings(i))
+
+    ' skipping empty strings and comments
+    if mid(s, 1, 1) &lt;&gt; "#" and len(s) > 0 then 
+      ' obtaining key and value
+      parts = split(s, "=", -1, 1)
+
+      if ubound(parts)+1 = 2 then
+        parts(0) = trim(parts(0))
+        parts(1) = trim(parts(1))
+
+        ' reading configuration and filenames
+        select case lcase(parts(0))
+          case "dest"                 cfg.item("dest") = parts(1)
+          case "dest_gz"              cfg.item("dest_gz") = parts(1)
+          case "gzip_exe"             cfg.item("gzip_exe") = parts(1)
+          case "perl_exe"             cfg.item("perl_exe") = parts(1)
+          case "uncompressed_postfix" cfg.item("uncompressed_postfix") = parts(1)
+          case "f"
+                    options = split(parts(1), "|", -1, 1)
+                    if ubound(options)+1 = 2 then
+                      ' 0: filename,  1: options
+                      ff.add trim(options(0)), trim(options(1))
+                    end if
+        end select
+      end if
+    end if
+next</code></pre>
+
+<P>Delphi code
+
+<pre><code>TList=Class(TObject) 
+Private
+  Some: String;
+Public
+  Procedure Inside;
+End;{TList}
+
+Procedure CopyFile(InFileName,var OutFileName:String);
+Const
+  BufSize=4096; (* Huh? *)
+Var
+  InFile,OutFile:TStream;
+  Buffer:Array[1..BufSize] Of Byte;
+  ReadBufSize:Integer;
+Begin
+  InFile:=Nil;
+  OutFile:=Nil;
+  Try
+    InFile:=TFileStream.Create(InFileName,fmOpenRead);
+    OutFile:=TFileStream.Create(OutFileName,fmCreate);
+    Repeat
+      ReadBufSize:=InFile.Read(Buffer,BufSize);
+      OutFile.Write(Buffer,ReadBufSize);
+    Until ReadBufSize&lt;&gt;BufSize;
+    Log('File '''+InFileName+''' copied');
+  Finally
+    InFile.Free;
+    OutFile.Free;
+  End;{Try}
+End;{CopyFile}
+</code></pre>
+
+<p>From Java world:
+
+<pre><code>package l2f.gameserver.model;
+
+import java.util.ArrayList;
+
+/**
+ * Mother class of all character objects of the world (PC, NPC...)&lt;BR&gt;&lt;BR&gt;
+ *
+ */
+public abstract class L2Character extends L2Object
+{
+	protected static final Logger _log = Logger.getLogger(L2Character.class.getName());
+
+	public static final Short ABNORMAL_EFFECT_BLEEDING = 0x0001; // not sure
+	public static final Short ABNORMAL_EFFECT_POISON = 0x0002;
+
+	/**
+	 * Cancel the AI.&lt;BR&gt;&lt;BR&gt;
+	 */
+	public void detachAI()
+	{
+		_ai = null;
+		//jbf = null;
+		if (1 > 5)
+		{
+			return;
+		}
+	}
+
+	public void moveTo(int x, int y, int z)
+	{
+		moveTo(x, y, z, 0);
+	}
+
+	/** Task of AI notification */
+	@SuppressWarnings( { "nls", "unqualified-field-access", "boxing" })
+	public class NotifyAITask implements Runnable
+	{
+		private final CtrlEvent _evt;
+
+		public NotifyAITask(CtrlEvent evt)
+		{
+			this._evt = evt;
+		}
+
+		public void run()
+		{
+			try
+			{
+				getAI().notifyEvent(_evt, null, null);
+			}
+			catch (Throwable t)
+			{
+				_log.warning("Exception " + t);
+				t.printStackTrace();
+			}
+		}
+	}
+
+	private static final int HP_REGEN_FLAG = 1;
+	private static final int MP_REGEN_FLAG = 2;
+	private static final int CP_REGEN_FLAG = 4;
+
+	/** The table containing the List of all stacked effect in progress for each Stack group Identifier */
+	private ConcurrentHashMap&lt;String, Short&gt; _stackedEffects = null;
+}
+</code></pre>
+
+<p>C++:
+
+<pre><code>#include &lt;iostream&gt;
+
+int main(int argc, char *argv[]) {
+  
+  /* An annoying "Hello World" example */
+  for (unsigned i = 0; i &lt; 0xFFFF; i++)
+    cout &lt;&lt; "Hello, World!" &lt;&lt; endl;
+  
+  c = '\n'; // just a test 
+}
+</code></pre>
+
+<hr>
+
+<p>Explicit Python highlight:
+
+<pre><code class="python">for x in [1, 2, 3]:
+  count(x)
+</code></pre>
+
+<p>Disabled highlighting:
+
+<pre><code class="no-highlight">&lt;div id="contents"&gt;
+  &lt;p&gt;Hello, World!
+&lt;/div&gt;
+</code></pre>
