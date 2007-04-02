@@ -73,8 +73,15 @@ package body Diouzhtu.To_HTML is
          Append (Result, Parse (Block_Level, To_String (Content)));
       end if;
 
-      return To_String (Result);
+      Close (Diouzhtu_File);
 
+      return To_String (Result);
+   exception
+      when others =>
+         if Is_Open (Diouzhtu_File) then
+            Close (Diouzhtu_File);
+         end if;
+         return "";
    end To_HTML;
 
    ----------------
