@@ -20,16 +20,13 @@
 ##############################################################################
 
 # Options
-MODE=Debug
-CP=cp -p
-MKDIR=mkdir -p
-RM=rm -f
+include mk.config
 
-OPTIONS = MODE="$(MODE)" CP="$(CP)" MKDIR="$(MKDIR)" RM="$(RM)"
+OPTIONS = MODE="$(MODE)" CP="$(CP)" MKDIR="$(MKDIR)" RM="$(RM)" LIB_KIND="$(LIB_KIND)"
 
 # Modules support
 
-MODULES = diouzhtu2html diouzhtu
+MODULES = diouzhtu diouzhtu2html
 
 MODULES_BUILD = ${MODULES:%=%_build}
 
@@ -45,6 +42,13 @@ clean: $(MODULES_CLEAN)
 
 check :$(MODULES_CHECK)
 
+# Install directories
+
+I_BIN	= $(INSTALL)/bin
+I_INC	= $(INSTALL)/include/diouzhtu
+I_LIB	= $(INSTALL)/lib/diouzhtu
+I_GPR	= $(INSTALL)/lib/gnat
+
 ${MODULES_BUILD}:
 	${MAKE} -C ${@:%_build=%} $(OPTIONS)
 
@@ -53,3 +57,20 @@ ${MODULES_CLEAN}:
 
 ${MODULES_CHECK}:
 	${MAKE} -C ${@:%_check=%} check $(OPTIONS)
+
+install_clean:
+	$(RM) -fr $(I_INC)
+	$(RM) -fr $(I_LIB)
+	$(RM) -f $(I_GPR)/diouzhtu.gpr
+
+install_dirs: install_clean
+	$(MKDIR) $(I_BIN)
+	$(MKDIR) $(I_INC)
+	$(MKDIR) $(I_LIB)
+	$(MKDIR) $(I_GPR)
+
+install: install_dirs
+	$(CP) diouzhtu/src/*.ad[sb] $(I_INC)
+	$(CP) diouzhtu/lib/* $(I_LIB)
+	$(CP) config/projects/diouzhtu.gpr $(I_GPR)
+

@@ -27,8 +27,15 @@ project Diouzhtu is
    for Object_Dir use "obj";
    for Library_Dir use "lib";
    for Library_Name use "diouzhtu";
-   for Library_Kind use "static";
 
+   case Shared.Lib_Kind is
+      when "Dynamic" =>
+         for Library_Kind use "dynamic";
+      when "Static" =>
+         for Library_Kind use "static";
+   end case;
+
+   package Ide renames Shared.Ide;
    package Compiler renames Shared.Compiler;
 
 end Diouzhtu;

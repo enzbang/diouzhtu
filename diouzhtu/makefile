@@ -20,8 +20,8 @@
 ##############################################################################
 
 all:
-	gnat make -XPRJ_BUILD=$(MODE) -Pdiouzhtu
-	gnat make -XPRJ_BUILD=$(MODE) -Pdiouzhtu
+	gnat make -XPRJ_BUILD=$(MODE) -XPRJ_LIB_KIND=$(LIB_KIND) -Pdiouzhtu
+	gnat make -XPRJ_BUILD=$(MODE) -XPRJ_LIB_KIND=$(LIB_KIND) -Pdiouzhtu
 
 clean:
 	-$(RM) -r gen src/v2p-template_defs*
