@@ -337,6 +337,8 @@ package body Diouzhtu.Inline is
               URL (URL'First ..
                      URL'First + Http_Prefix'Length - 1) = Http_Prefix then
                Append (Result, "<a href='" & URL & "'");
+            elsif URL (URL'First) = '#' then
+               Append (Result, "<a href='" & URL & "'");
             else
                Append (Result, "<a href='"
                        & Wiki.Base_URL & "/" & URL & "'");
