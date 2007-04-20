@@ -2,7 +2,7 @@
 
 @@IF@@ @_VIEW_@ /= ""
 @_VIEW_@
-@@ELSE@@
+@@ELSIF@@ @_URI_@ /= ""
 <h2>Index of @_URI_@</h2>
 <p>Select the file to edit</p>
 
@@ -17,5 +17,7 @@
 @@END_IF@@
 @@END_TABLE@@
 </ul>
+@@ELSE@@
+This page does not exist ! <a href="/wiki/edit/@_FILENAME_@">Create it ?</a>
 @@END_IF@@
 

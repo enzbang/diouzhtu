@@ -64,7 +64,11 @@ package body Wiki_Website.ECWF_Callbacks is
       HTML_Text : Unbounded_String := Null_Unbounded_String;
       HTML_File : File_Type;
    begin
-      Ada.Text_IO.Put_Line (HTML_Filename);
+
+      Templates.Insert
+        (Translations,
+         Templates.Assoc (Template_Defs.Block_View.FILENAME, Filename));
+
       if Exists (HTML_Filename) then
          if Kind (HTML_Filename) /= Ordinary_File then
             if Kind (HTML_Filename) = Directory then
