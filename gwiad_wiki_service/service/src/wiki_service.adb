@@ -68,11 +68,14 @@ package body Wiki_Service is
    overriding procedure Initialize
      (S              : in out Wiki_Service;
       Text_Directory : in     String;
-      Base_URL       : in     String)
+      Base_URL       : in     String;
+      Img_Base_URL   : in     String)
    is
       Wiki : Diouzhtu.Wiki_Information :=
-               Diouzhtu.Initialize (Base_URL => Base_URL,
-                           Text_Directory  => Text_Directory);
+               Diouzhtu.Initialize
+                 (Base_URL       => Base_URL,
+                  Img_Base_URL   => Img_Base_URL,
+                  Text_Directory => Text_Directory);
    begin
       S.Information := Wiki;
    end Initialize;

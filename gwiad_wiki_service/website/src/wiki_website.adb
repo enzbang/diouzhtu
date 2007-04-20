@@ -20,7 +20,10 @@
 ------------------------------------------------------------------------------
 
 with Ada.Text_IO;
+with Ada.Directories;
 
+with AWS.Status;
+with AWS.Response;
 with AWS.Services.Dispatchers.URI;
 with AWS.Dispatchers.Callback;
 with AWS.Services.ECWF.Registry;
@@ -50,6 +53,9 @@ package body Wiki_Website is
 
    Main_Dispatcher : AWS.Services.Dispatchers.URI.Handler;
 
+   function Image_Callback (Request : in Status.Data) return Response.Data;
+   --  Image callback
+
    procedure Unregister;
    --  Unregister website
 
@@ -70,8 +76,10 @@ package body Wiki_Website is
          Get_Service               : GW_Service'Class :=
                                        Wiki_World_Service_Access.all;
       begin
-         Get_Service.Initialize (Base_URL       => Wiki_Web_Root,
-                                 Text_Directory => Wiki_Text_Dir);
+         Get_Service.Initialize
+           (Base_URL       => Wiki_Web_Root,
+            Img_Base_URL   => Wiki_Web_Root & "/" & Wiki_Web_Image,
+            Text_Directory => Wiki_Text_Dir);
 
          Wiki_Service_Id := Gwiad.Services.Register.Set
            (Wiki_Service_Name, Service_Access (Wiki_World_Service_Access));
@@ -99,6 +107,26 @@ package body Wiki_Website is
 --        end;
    end Get_Wiki_Service;
 
+   --------------------
+   -- Image_Callback --
+   --------------------
+
+   function Image_Callback (Request : in Status.Data) return Response.Data is
+      URI  : constant String := Status.URI (Request);
+      File : constant String :=
+               Wiki_Root & "/" & Image_Dir & "/"
+                 & URI (URI'First + Wiki_Web_Root'Length
+                        + Wiki_Web_Image'Length + 2 .. URI'Last);
+   begin
+      if Ada.Directories.Exists (File) then
+         return Response.File (MIME.Content_Type (File), File);
+      else
+         return Response.Build
+           (Content_Type  => MIME.Text_HTML,
+            Message_Body  => "<p>Error</p>");
+      end if;
+   end Image_Callback;
+
    ----------------
    -- Unregister --
    ----------------
@@ -110,6 +138,12 @@ package body Wiki_Website is
    end Unregister;
 
 begin
+
+   AWS.Services.Dispatchers.URI.Register
+     (Main_Dispatcher,
+      Wiki_Web_Root & "/" & Wiki_Web_Image,
+      Action => Dispatchers.Callback.Create (Image_Callback'Access),
+      Prefix => True);
 
    AWS.Services.Dispatchers.URI.Register_Default_Callback
      (Main_Dispatcher,

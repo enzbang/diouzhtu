@@ -30,7 +30,8 @@ package Wiki_Interface is
    procedure Initialize
      (S              : in out Wiki2HTML_Interface;
       Text_Directory : in     String;
-      Base_URL       : in     String) is abstract;
+      Base_URL       : in     String;
+      Img_Base_URL   : in     String) is abstract;
 
    function HTML_Preview
      (S : Wiki2HTML_Interface; Text : String) return String is abstract;

@@ -263,7 +263,7 @@ package body Diouzhtu.Inline is
                Append (Result, "<img src='" & URL & "'");
             else
                Append (Result, "<img src='"
-                       & Wiki.Base_URL & URL & "'");
+                       & Wiki.Img_Base_URL & "/" & URL & "'");
             end if;
          end;
 
@@ -339,7 +339,7 @@ package body Diouzhtu.Inline is
                Append (Result, "<a href='" & URL & "'");
             else
                Append (Result, "<a href='"
-                       & Wiki.Base_URL & URL & "'");
+                       & Wiki.Base_URL & "/" & URL & "'");
             end if;
          end;
 

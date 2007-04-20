@@ -34,7 +34,8 @@ package Wiki_Service is
    overriding procedure Initialize
      (S              : in out Wiki_Service;
       Text_Directory : in     String;
-      Base_URL       : in     String);
+      Base_URL       : in     String;
+      Img_Base_URL   : in     String);
 
    overriding function HTML_Preview
      (S : Wiki_Service; Text : String) return String;

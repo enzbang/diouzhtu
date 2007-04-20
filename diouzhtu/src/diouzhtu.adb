@@ -41,9 +41,11 @@ package body Diouzhtu is
    Inlines : Vector;
 
    function Initialize
-     (Base_URL : String; Text_Directory : String) return Wiki_Information is
+     (Base_URL : String; Img_Base_URL : String; Text_Directory : String)
+      return Wiki_Information is
    begin
       return (Base_URL       => To_Unbounded_String (Base_URL),
+              Img_Base_URL   => To_Unbounded_String (Img_Base_URL),
               Text_Directory => To_Unbounded_String (Text_Directory));
    end Initialize;
 

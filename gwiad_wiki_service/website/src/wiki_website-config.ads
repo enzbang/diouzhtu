@@ -24,10 +24,13 @@ private package Wiki_Website.Config is
    Wiki_Service_Name   : constant String := "wiki_service";
    --  Gwiad wiki Service name
 
+   Wiki_Web_Image   : constant String := "img";
    Wiki_Web_Edit    : constant String := "edit";
    Wiki_Web_Preview : constant String := "preview";
+
    Text_Dir         : constant String := "text";
    HTML_Dir         : constant String := "html";
+   Image_Dir        : constant String := "img";
 
    Wiki_Root        : constant String := "data/wiki_website";
    Wiki_Web_Root    : constant String := "/wiki";

@@ -26,7 +26,8 @@ package Diouzhtu is
    type Wiki_Information is private;
 
    function Initialize
-     (Base_URL : String; Text_Directory : String) return Wiki_Information;
+     (Base_URL : String; Img_Base_URL : String; Text_Directory : String)
+      return Wiki_Information;
    --  Creates a new wiki
 
    type Register_Level is (Block_Level, Inline_Level);
@@ -44,6 +45,7 @@ private
 
    type Wiki_Information is record
       Base_URL       : Ada.Strings.Unbounded.Unbounded_String;
+      Img_Base_URL   : Ada.Strings.Unbounded.Unbounded_String;
       Text_Directory : Ada.Strings.Unbounded.Unbounded_String;
    end record;
 
