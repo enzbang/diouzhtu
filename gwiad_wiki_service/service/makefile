@@ -21,7 +21,7 @@
 
 all:
 # Workaround for GNAT bug with ali directory
-	-gnat clean -r -Pwiki_service
+	chmod -R a+w lib/
 ##  When building without cleaning first. Build failed to delete old ALI files
 	gnat make -XPRJ_BUILD=$(MODE) -Pwiki_service
 	gnat make -XPRJ_BUILD=$(MODE) -Pwiki_service
