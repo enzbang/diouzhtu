@@ -28,3 +28,4 @@ clean:
 	-gnat clean -r -Pdiouzhtu
 
 check:
+setup:
