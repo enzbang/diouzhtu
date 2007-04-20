@@ -33,7 +33,8 @@ package body Diouzhtu.Attribute is
    -- Extract --
    -------------
 
-   function Extract (Content : String) return String is
+   function Extract
+     (Content : String; Add_Class : String := "") return String is
       PM : constant Pattern_Matcher :=
         Compile (Pattern, Case_Insensitive);
       Matches : Match_Array (0 .. 3);
@@ -45,7 +46,11 @@ package body Diouzhtu.Attribute is
    begin
       Match (PM, Content, Matches);
       if Matches (0) = No_Match then
-         return "";
+         if Add_Class /= "" then
+            return Class_Attr & "'" & Add_Class & "'";
+         else
+            return "";
+         end if;
       end if;
 
       declare
@@ -56,7 +61,13 @@ package body Diouzhtu.Attribute is
       begin
          if Matches (1) /= No_Match and then Class_Length > 0 then
             Append (Result, Class_Attr &
-                      Content (Matches (1).First .. Matches (1).Last) & "'");
+                      Content (Matches (1).First .. Matches (1).Last));
+            if Add_Class /= "" then
+               Append (Result, " " & Add_Class);
+            end if;
+            Append (Result, "'");
+         elsif Add_Class /= "" then
+            Append (Result, Class_Attr & Add_Class & "'");
          end if;
          if Matches (2) /= No_Match and then Id_Length > 0 then
             Append (Result, Id_Attr &

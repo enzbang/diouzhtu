@@ -7,11 +7,12 @@ Author: Ivan Sagalaev <Maniac@SoftwareManiacs.Org>
 
 Contributors:
 
-- Peter Leonov <gojpeg@gmail.com> 
+- Peter Leonov <gojpeg@gmail.com>
 - Victor Karamzin <Victor.Karamzin@enterra-inc.com>
 - Vsevolod Solovyov <vsevolod.solovyov@gmail.com>
 - Anton Kovalyov <anton@kovalyov.net>
 - Nikita Ledyaev <lenikita@yandex.ru>
+- Olivier Ramonat <enzbang@ramonat.fr>
 
 License (BSD):
 
@@ -237,7 +238,7 @@ LANGUAGES.css = {
     C_BLOCK_COMMENT_MODE,
     {
       className: 'value',
-      begin: ':', end: ';', endsWithParent: true, 
+      begin: ':', end: ';', endsWithParent: true,
       excludeBegin: true, excludeEnd: true
     }
   ]
@@ -359,13 +360,13 @@ LANGUAGES.perl = {
       begin: '`', end: '(^|[^\\\\])`',
       relevance: 0
     },
-    
+
     // operators
     {
       className: 'operator',
       begin: '\\s-\\w', end: '^'
     },
-  
+
     // regexps
     {
       className: 'regexp',
@@ -405,7 +406,7 @@ LANGUAGES.perl = {
 
     // comments
     HASH_COMMENT_MODE,
-    
+
     // pod
     {
       className: 'pod',
@@ -469,7 +470,7 @@ LANGUAGES.java  = {
     {
       className: 'class',
       lexems: [UNDERSCORE_IDENT_RE],
-      begin: '(class |interface )', end: '{', 
+      begin: '(class |interface )', end: '{',
       illegal: ':',
       keywords: {'class': 1, 'interface': 1},
       contains: ['inheritance', 'title']
@@ -559,13 +560,13 @@ LANGUAGES.ruby = {
       keywords: {'def': 1},
       contains: ['title', 'comment'],
       relevance: 10
-    },    
-    { 
+    },
+    {
       className: 'class',
       lexems: [IDENT_RE],
       begin: 'class ', end: '$',
       illegal: '[{\\:]',
-      contains: ['title', 'comment'],      
+      contains: ['title', 'comment'],
       keywords: {'class': 1}
     },
     {
@@ -655,6 +656,114 @@ LANGUAGES.vbscript = {
   ]
 };//vbscript
 
+/*
+
+Ada definition (c) Olivier Ramonat <enzbang@ramonat.fr>
+
+*/
+
+LANGUAGES.ada = {
+  defaultMode: {
+    lexems: [UNDERSCORE_IDENT_RE],
+    contains: ['tag', 'comment', 'string'],
+    keywords: {
+          'abort' : 1, 'else' : 1, 'new' : 1, 'return' : 1,
+          'abs' : 1, 'elsif' : 1, 'not' : 1, 'reverse' : 1,
+          'abstract' : 1, 'end' : 1, 'null' : 1,
+          'accept' : 1, 'entry' : 1, 'select' : 1,
+          'access' : 1, 'exception' : 1, 'of' : 1, 'separate' : 1,
+          'aliased' : 1, 'exit' : 1, 'or' : 1, 'subtype' : 1,
+          'all' : 1, 'others' : 1, 'synchronized' : 1,
+          'and' : 1, 'for' : 1, 'out' : 1,
+          'array' : 1, 'function' : 1, 'overriding' : 1, 'tagged' : 1,
+          'at' : 1, 'task' : 1, 'generic' : 1,  'terminate' : 1,
+          'begin' : 1, 'goto' : 1, 'pragma' : 1, 'then' : 1,
+          'body' : 1, 'private' : 1, 'type' : 1,
+          'if' : 1, 'procedure' : 1, 'package': 1,
+          'case' : 1, 'in' : 1, 'protected' : 1, 'until' : 1,
+          'constant' : 1, 'interface' : 1, 'use' : 1,
+          'is' : 1, 'raise' : 1,
+          'declare' : 1, 'range' : 1, 'when' : 1,
+          'delay' : 1, 'limited' : 1, 'record' : 1, 'while' : 1,
+          'delta' : 1, 'loop' : 1, 'rem' : 1, 'with' : 1,
+          'digits' : 1, 'renames' : 1,
+          'do' : 1, 'mod' : 1, 'requeue' : 1, 'xor' : 1}
+  },
+  case_insensitive: true,
+  modes: [
+    {
+      className: 'comment',
+      begin: '--', end: '$'
+    },
+    {
+      className: 'string',
+      begin: '\'', end: '[^\\\\]\'',
+      illegal: '[^\\\\][^\']'
+    },
+    QUOTE_STRING_MODE,
+    {
+      className: 'title',
+      illegal: '[^\\(]',
+      begin: UNDERSCORE_IDENT_RE, end: '^'
+    }
+  ]
+};
+
+/*
+
+Lisp definition (c) Olivier Ramonat <enzbang@ramonat.fr>
+
+*/
+
+LANGUAGES.lisp = {
+  defaultMode: {
+    lexems: ['[a-zA-Z_-][a-zA-Z0-9_-]*'],
+    contains: ['tag', 'comment', 'string'],
+    keywords: { 'not' : 1, 'defun' : 1, 'princ' : 1,
+       'eval' : 1,'apply' : 1,'funcall' : 1,'quote' : 1,'identity' : 1,
+       'function' : 1, 'complement' : 1,'backquote' : 1,'lambda' : 1,
+       'set' : 1,'setq' : 1,'setf' : 1, 'defun' : 1,'defmacro' : 1,
+       'gensym' : 1,'make' : 1,'symbol' : 1,'intern' : 1,
+       'symbol' : 1,'name' : 1,'symbol' : 1,'value' : 1,'symbol' : 1,
+       'plist' : 1,'get' : 1, 'getf' : 1,'putprop' : 1,'remprop' : 1,
+       'hash' : 1,'make' : 1,'array' : 1,'aref' : 1, 'car' : 1,'cdr' : 1,
+       'caar' : 1,'cadr' : 1,'cdar' : 1,'cddr' : 1,'caaar' : 1,
+       'caadr' : 1,'cadar' : 1, 'caddr' : 1,'cdaar' : 1,'cdadr' : 1,
+       'cddar' : 1,'cdddr' : 1,'caaaar' : 1,'caaadr' : 1,
+       'caadar' : 1,'caaddr' : 1,'cadaar' : 1,'cadadr' : 1,
+       'caddar' : 1,'cadddr' : 1, 'cdaaar' : 1,'cdaadr' : 1,
+       'cdadar' : 1,'cdaddr' : 1,'cddaar' : 1,'cddadr' : 1,
+       'cdddar' : 1,'cddddr' : 1,'cons' : 1,'list' : 1,'append' : 1,
+       'reverse' : 1,'last' : 1,'nth' : 1, 'nthcdr' : 1,'member' : 1,
+       'assoc' : 1,'subst' : 1,'sublis' : 1,'nsubst' : 1,
+       'nsublis' : 1,'remove' : 1,'length' : 1,'list' : 1,'length' : 1,
+       'mapc' : 1,'mapcar' : 1,'mapl' : 1,'maplist' : 1,'mapcan' : 1,
+       'mapcon' : 1,'rplaca' : 1, 'rplacd' : 1,'nconc' : 1,'delete' : 1,
+       'atom' : 1,'symbolp' : 1,'numberp' : 1, 'boundp' : 1,'null' : 1,
+       'listp' : 1,'consp' : 1,'minusp' : 1,'zerop' : 1,'plusp' : 1,
+       'evenp' : 1,'oddp' : 1,'eq' : 1,'eql' : 1,'equal' : 1,'cond' : 1,
+       'case' : 1,'and' : 1,'or' : 1, 'let' : 1,'l' : 1,'if' : 1,
+       'prog' : 1,'prog1' : 1,'prog2' : 1,'progn' : 1,'go' : 1,'return' : 1,
+       'do' : 1,'dolist' : 1,'dotimes' : 1,'catch' : 1,'throw' : 1,
+       'error' : 1,'cerror' : 1,'break' : 1, 'continue' : 1,
+       'errset' : 1,'baktrace' : 1,'evalhook' : 1,'truncate' : 1,
+       'float' : 1, 'rem' : 1,'min' : 1,'max' : 1,'abs' : 1,'sin' : 1,
+       'cos' : 1,'tan' : 1,'expt' : 1,'exp' : 1,'sqrt' : 1,
+       'random' : 1,'logand' : 1,'logior' : 1,'logxor' : 1,
+       'lognot' : 1,'bignums' : 1,'logeqv' : 1, 'lognand' : 1,
+       'lognor' : 1,'logorc2' : 1,'logtest' : 1,'logbitp' : 1,'logcount' : 1,
+       'integer' : 1,'length' : 1,'nil' : 1}
+},
+  case_insensitive: false,
+  modes: [
+    {
+      className: 'comment',
+      begin: ';', end: '$'
+    },
+    QUOTE_STRING_MODE
+  ]
+};
+
 function langRe(language, value, global) {
   var mode =  'm' + (language.case_insensitive ? 'i' : '') + (global ? 'g' : '');
   return new RegExp(value, mode);
@@ -679,7 +788,7 @@ function Highlighter(language_name, value) {
   currentMode = function(){
     return modes[modes.length - 1];
   }//currentMode
-  
+
   function subMode(lexem) {
     if (!currentMode().contains)
       return null;
@@ -698,7 +807,7 @@ function Highlighter(language_name, value) {
     }//if
     return 0;
   }//endOfMode
-  
+
   function isIllegal(lexem) {
     if (!currentMode().illegalRe)
       return false;
@@ -708,25 +817,25 @@ function Highlighter(language_name, value) {
   function eatModeChunk(value, index) {
     if (!currentMode().terminators) {
       var terminators = [];
-      
+
       if (currentMode().contains)
         for (var key in language.modes) {
           if (contains(currentMode().contains, language.modes[key].className) &&
               !contains(terminators, language.modes[key].begin))
             terminators[terminators.length] = language.modes[key].begin;
         }//for
-      
+
       var mode_index = modes.length - 1;
       do {
         if (modes[mode_index].end && !contains(terminators, modes[mode_index].end))
           terminators[terminators.length] = modes[mode_index].end;
         mode_index--;
       } while (modes[mode_index + 1].endsWithParent);
-      
+
       if (currentMode().illegal)
         if (!contains(terminators, currentMode().illegal))
           terminators[terminators.length] = currentMode().illegal;
-      
+
       var terminator_re = '(' + terminators[0];
       for (var i = 0; i < terminators.length; i++)
         terminator_re += '|' + terminators[i];
@@ -735,18 +844,18 @@ function Highlighter(language_name, value) {
     }//if
     value = value.substr(index);
     var match = currentMode().terminators.exec(value);
-    if (!match) 
+    if (!match)
       return [value, '', true];
     if (match.index == 0)
       return ['', match[0], false];
     else
       return [value.substr(0, match.index), match[0], false];
   }//eatModeChunk
-  
+
   function escape(value) {
     return value.replace(/&/gm, '&amp;').replace(/</gm, '&lt;').replace(/>/gm, '&gt;');
   }//escape
-  
+
   function processKeywords(buffer) {
     var mode = currentMode();
     if (!mode.keywords || !mode.lexems)
@@ -780,7 +889,7 @@ function Highlighter(language_name, value) {
     result += escape(buffer.substr(last_index, buffer.length - last_index));
     return result;
   }//processKeywords
-  
+
   function processModeInfo(buffer, lexem, end) {
     if (end) {
       result += processKeywords(currentMode().buffer + buffer);
@@ -832,7 +941,7 @@ function Highlighter(language_name, value) {
     if(modes.length > 1)
       throw 'Illegal';
   }//highlight
-  
+
   this.language_name = language_name;
   var language = LANGUAGES[language_name];
   var modes = [language.defaultMode];
@@ -903,7 +1012,7 @@ function highlightLanguage(block, language) {
   var environment = block.parentNode.parentNode;
   environment.replaceChild(container.firstChild, block.parentNode);
 }//highlightLanguage
-    
+
 function highlightAuto(block) {
   var result = null;
   var language = '';
@@ -918,7 +1027,7 @@ function highlightAuto(block) {
       result = highlight;
     }//if
   }//for
-  
+
   if(result) {
     // See these 4 lines? This is IE's notion of "block.innerHTML = result". Love this browser :-/
     var container = document.createElement('div');

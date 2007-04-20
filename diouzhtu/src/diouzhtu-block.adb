@@ -84,7 +84,8 @@ package body Diouzhtu.Block is
 
    function Code (Index : Positive; Block : String) return String is
       Extract  : constant Pattern_Matcher :=
-        Compile ("^code" & Attribute.Get_Pattern & "\.\s(.*?)$",
+        Compile ("^code(_[a-zA-Z]+?)??" &
+                   Attribute.Get_Pattern & "\.\s(.*?)$",
                  Case_Insensitive + Single_Line);
       Count   : constant Match_Count := Paren_Count (Extract);
       Matches : Match_Array (0 .. Paren_Count (Extract));
@@ -95,11 +96,16 @@ package body Diouzhtu.Block is
          return Parse (Block_Level, Block, Index);
       end if;
 
-      Result := To_Unbounded_String ("<p><code");
+      Result := To_Unbounded_String ("<p><pre><code");
 
-      if Matches (1) /= No_Match then
+      if Matches (2) /= No_Match then
          Append (Result, Attribute.Extract
-                   (Block (Matches (1).First .. Matches (1).Last)));
+                   (Block (Matches (2).First .. Matches (2).Last),
+                    Block (Matches (1).First + 1 .. Matches (1).Last)));
+      elsif Matches (1) /= No_Match then
+         Append (Result, " class='" &
+                   Block (Matches (1).First + 1 .. Matches (1).Last) &
+                   "'");
       end if;
 
       if Matches (Count) /= No_Match then
@@ -108,7 +114,7 @@ package body Diouzhtu.Block is
          Append (Result, ">" &
                    Block
                    (Matches (Count).First .. Matches (Count).Last) &
-                   "</code></p>" & ASCII.Lf);
+                   "</code></pre></p>" & ASCII.Lf);
       end if;
       return To_String (Result);
    end Code;
