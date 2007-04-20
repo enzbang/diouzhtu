@@ -28,7 +28,7 @@ procedure Diouzhtu2Html is
    use Ada.Command_Line;
    use Ada.Text_IO;
 
-   Wiki : Diouzhtu.Wiki_Information := Diouzhtu.Initialize ("/", ".");
+   Wiki : Diouzhtu.Wiki_Information := Diouzhtu.Initialize ("", "", ".");
 begin
 
    if Argument_Count = 1 then
@@ -66,6 +66,6 @@ begin
       Set_Exit_Status (Failure);
    end if;
 
---  exception
---     when others => Put_Line ("Usage : " & Command_Name & " [FILENAME]");
+exception
+   when others => Put_Line ("Usage : " & Command_Name & " [FILENAME]");
 end Diouzhtu2Html;
