@@ -28,19 +28,29 @@ package body Wiki_Website.Config is
    ------------------
 
    function Get_Filename (URI : in String) return String is
-      Local_URI : constant String :=
-                    URI (URI'First - 1 + Wiki_Web_Root'Length + 1 .. URI'Last);
-      Counter   : Natural         := 0;
+      Name : constant String :=
+               URI (URI'First - 1 + Wiki_Web_Root'Length + 2 .. URI'Last);
    begin
-      for K in Local_URI'Range loop
-         if Local_URI (K) = '/' then
-            Counter := Counter + 1;
-         end if;
-         if Counter = 2 and then K < Local_URI'Last then
-            return Local_URI (K + 1 .. Local_URI'Last);
-         end if;
-      end loop;
-      return "";
+
+      if Name = Wiki_Web_Edit or else Name = Wiki_Web_Preview then
+         return "";
+      end if;
+
+      if Name'Length > Wiki_Web_Edit'Length and then
+        Name (Name'First ..
+                Name'First + Wiki_Web_Edit'Length - 1) = Wiki_Web_Edit
+      then
+         return Name (Name'First + Wiki_Web_Edit'Length + 1 .. Name'Last);
+      end if;
+
+      if Name'Length > Wiki_Web_Preview'Length and then
+        Name (Name'First ..
+                Name'First + Wiki_Web_Preview'Length - 1) = Wiki_Web_Preview
+      then
+         return Name (Name'First + Wiki_Web_Preview'Length + 1 .. Name'Last);
+      end if;
+
+      return Name;
    end Get_Filename;
 
    -------------------

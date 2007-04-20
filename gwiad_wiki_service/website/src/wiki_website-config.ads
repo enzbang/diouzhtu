@@ -25,7 +25,6 @@ private package Wiki_Website.Config is
    --  Gwiad wiki Service name
 
    Wiki_Web_Edit    : constant String := "edit";
-   Wiki_Web_View    : constant String := "view";
    Wiki_Web_Preview : constant String := "preview";
    Text_Dir         : constant String := "text";
    HTML_Dir         : constant String := "html";

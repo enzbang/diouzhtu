@@ -60,7 +60,11 @@ package body Wiki_Website.ECWF_Callbacks is
       HTML_File : File_Type;
    begin
 
-      Ada.Text_IO.Put_Line (Filename);
+      if Filename'Length = 0 then
+         return;
+      end if;
+
+      Ada.Text_IO.Put_Line ("view :" & Filename);
 
       if Ada.Directories.Exists (Wiki_HTML_Dir & "/" & Filename) then
 

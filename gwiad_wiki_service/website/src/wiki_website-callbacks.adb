@@ -91,6 +91,10 @@ package body Wiki_Website.Callbacks is
 
    begin
 
+      if Name'Length = 0 then
+         return;
+      end if;
+
       if not Gwiad.Services.Register.Exists (Wiki_Service_Name) then
          Templates.Insert
            (Translations,
@@ -150,7 +154,10 @@ package body Wiki_Website.Callbacks is
       Name       : constant String := Get_Filename (Get_URI);
 
    begin
-      Ada.Text_IO.Put_Line (Text_Plain);
+
+      if Name'Length = 0 then
+         return;
+      end if;
 
       if not Gwiad.Services.Register.Exists (Wiki_Service_Name) then
          Templates.Insert
@@ -165,16 +172,19 @@ package body Wiki_Website.Callbacks is
       begin
          if Save /= "" then
             declare
-               Text_File : File_Type;
-               Filename  : constant String := Wiki_Text_Dir & "/" & Name;
+               Filename    : constant String := Wiki_Text_Dir & "/" & Name;
+               Text_File   : File_Type;
+               Update_HTML : Boolean := False;
             begin
 
                Ada.Text_IO.Put_Line (Filename);
 
                if Ada.Directories.Exists (Filename) then
-                  --  Here we should add RCS
+                  --  ??? Here we should add RCS
 
                   Ada.Directories.Delete_File (Filename);
+
+                  Update_HTML := True;
                end if;
 
                Ada.Text_IO.Put_Line (Filename);
@@ -187,6 +197,12 @@ package body Wiki_Website.Callbacks is
                     Item => Text_Plain);
 
                Close (File => Text_File);
+
+               if Update_HTML and then Ada.Directories.Exists
+                 (Wiki_HTML_Dir & "/" & Name) then
+                  Ada.Directories.Delete_File (Wiki_HTML_Dir & "/" & Name);
+               end if;
+
             end;
             Templates.Insert
               (Translations,

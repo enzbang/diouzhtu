@@ -131,7 +131,7 @@ begin
       MIME.Text_HTML);
 
    AWS.Services.ECWF.Registry.Register
-     (Wiki_Web_Root & "/" & Wiki_Web_View,
+     ("/",
       View_Template'Access,
       View'Access,
       MIME.Text_HTML);
