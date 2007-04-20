@@ -26,13 +26,21 @@
   </head>
 
 <body>
-<h1>@_FILENAME_@</h1>
 
 @@IF@@ @_HAS_BEEN_SAVED_@ /= ""
-Your file has been saved to @_HAS_BEEN_SAVED_@
+<h1>Thanks !</h1>
+<p>Thanks for editing this page.</p>
+<p>Now you can :</p>
+<ul>
+  <li><p>Jump to the <a href="/wiki/@_HAS_BEEN_SAVED_@">@_HAS_BEEN_SAVED_@</a> page</p></li>
+  <li><p><a href="/wiki/edit/@_HAS_BEEN_SAVED_@">Edit it again</a></p></li>
+</ul>
 
+<div id="preview_zone">
 @_LAZY_VIEW_@
+</div>
 @@ELSE@@
+<h1>@_FILENAME_@</h1>
 @_ERROR_@
 
 
