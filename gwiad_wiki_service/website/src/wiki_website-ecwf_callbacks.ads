@@ -19,12 +19,18 @@
 --  Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.       --
 ------------------------------------------------------------------------------
 
-package Diouzhtu.To_HTML is
+with AWS.Status;
+with AWS.Templates;
+with AWS.Services.ECWF.Context;
 
-   function Text_To_HTML (S : String) return String;
-   --  Converts a diouzhtu string to HTML
+private package Wiki_Website.ECWF_Callbacks is
 
-   function To_HTML (Filename : String) return String;
-   --  Converts a diouzhtu formatted file to HTML
+   use AWS;
 
-end Diouzhtu.To_HTML;
+   procedure View
+     (Request      : in     Status.Data;
+      Context      : access AWS.Services.ECWF.Context.Object;
+      Translations : in out Templates.Translate_Set);
+   --  View a wiki page
+
+end Wiki_Website.ECWF_Callbacks;

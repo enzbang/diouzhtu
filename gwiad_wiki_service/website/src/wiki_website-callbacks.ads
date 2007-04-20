@@ -19,12 +19,37 @@
 --  Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.       --
 ------------------------------------------------------------------------------
 
-package Diouzhtu.To_HTML is
+with AWS.Status;
+with AWS.Response;
+with AWS.Templates;
+with AWS.Services.ECWF.Context;
 
-   function Text_To_HTML (S : String) return String;
-   --  Converts a diouzhtu string to HTML
+private package Wiki_Website.Callbacks is
 
-   function To_HTML (Filename : String) return String;
-   --  Converts a diouzhtu formatted file to HTML
+   use AWS;
 
-end Diouzhtu.To_HTML;
+   function Default_Callback
+     (Request : in Status.Data) return Response.Data;
+   --  Default callback
+
+   function Edit_Template (Request : in Status.Data) return String;
+   --  Edit template
+
+   procedure Edit_Page
+     (Request      : in     Status.Data;
+      Context      : access AWS.Services.ECWF.Context.Object;
+      Translations : in out Templates.Translate_Set);
+
+   function View_Template (Request : in Status.Data) return String;
+   --  View template
+
+   function Preview_Template (Request : in Status.Data) return String;
+   --  Preview template
+
+   procedure Preview_Page
+     (Request      : in     Status.Data;
+      Context      : access AWS.Services.ECWF.Context.Object;
+      Translations : in out Templates.Translate_Set);
+   --  Preview a diouzhtu page
+
+end Wiki_Website.Callbacks;

@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <title>@_FILENAME_@</title>
+    <link rel="author" href="http://www.ramonat.fr" />
+    <meta name="author" content="Olivier Ramonat" />
+    <meta name="description"
+	  content="Wiki based on diouzhtu for Gwiad - AWS" />
+    <meta name="generator" content="diouzhtu" />
+    <meta http-equiv="Content-Type"
+          content="text/html; charset=utf-8" />
+    <style type="text/css">
+      textarea {
+      width : 100%;
+      border:thin solid gray;
+      padding: 1px;
+      }
+      #preview_zone {
+      border:medium dashed beige;
+      padding: 1em;
+      margin-bottom: 2em;
+      }
+    </style>
+  </head>
+
+<body>
+<h1>@_FILENAME_@</h1>
+
+@_LAZY_VIEW_@
+
+</body>
+</html>

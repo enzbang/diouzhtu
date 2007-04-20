@@ -25,6 +25,8 @@ MODULES = service interface website
 
 MODULES_BUILD = ${MODULES:%=%_build}
 
+MODULES_SETUP = ${MODULES:%=%_setup}
+
 MODULES_CLEAN = ${MODULES:%=%_clean}
 
 MODULES_CHECK = ${MODULES:%=%_check}
@@ -35,10 +37,15 @@ all: $(MODULES_BUILD)
 
 clean: $(MODULES_CLEAN)
 
+setup: $(MODULES_SETUP)
+
 check :$(MODULES_CHECK)
 
 ${MODULES_BUILD}:
 	${MAKE} -C ${@:%_build=%} $(OPTIONS)
+
+${MODULES_SETUP}:
+	${MAKE} -C ${@:%_setup=%} setup $(OPTIONS)
 
 ${MODULES_CLEAN}:
 	${MAKE} -C ${@:%_clean=%} clean $(OPTIONS)

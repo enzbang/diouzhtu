@@ -19,12 +19,49 @@
 --  Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.       --
 ------------------------------------------------------------------------------
 
-package Diouzhtu.To_HTML is
+with Ada.Directories;
 
-   function Text_To_HTML (S : String) return String;
-   --  Converts a diouzhtu string to HTML
+package body Wiki_Website.Config is
 
-   function To_HTML (Filename : String) return String;
-   --  Converts a diouzhtu formatted file to HTML
+   ------------------
+   -- Get_Filename --
+   ------------------
 
-end Diouzhtu.To_HTML;
+   function Get_Filename (URI : in String) return String is
+      Local_URI : constant String :=
+                    URI (URI'First - 1 + Wiki_Web_Root'Length + 1 .. URI'Last);
+      Counter   : Natural         := 0;
+   begin
+      for K in Local_URI'Range loop
+         if Local_URI (K) = '/' then
+            Counter := Counter + 1;
+         end if;
+         if Counter = 2 and then K < Local_URI'Last then
+            return Local_URI (K + 1 .. Local_URI'Last);
+         end if;
+      end loop;
+      return "";
+   end Get_Filename;
+
+   -------------------
+   -- Wiki_HTML_Dir --
+   -------------------
+
+   function Wiki_HTML_Dir return String is
+   begin
+      return Ada.Directories.Compose
+        (Containing_Directory => Wiki_Root,
+         Name                 => HTML_Dir);
+   end Wiki_HTML_Dir;
+
+   -------------------
+   -- Wiki_Text_Dir --
+   -------------------
+
+   function Wiki_Text_Dir return String is
+   begin
+      return Ada.Directories.Compose
+        (Containing_Directory => Wiki_Root,
+         Name                 => Text_Dir);
+   end Wiki_Text_Dir;
+end Wiki_Website.Config;

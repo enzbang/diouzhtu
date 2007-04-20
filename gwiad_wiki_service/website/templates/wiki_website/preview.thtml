@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <title>Edit : @_FILENAME_@</title>
+    <link rel="author" href="http://www.ramonat.fr" />
+    <meta name="author" content="Olivier Ramonat" />
+    <meta name="description"
+	  content="Wiki based on diouzhtu for Gwiad - AWS" />
+    <meta name="generator" content="diouzhtu" />
+    <meta http-equiv="Content-Type"
+          content="text/html; charset=utf-8" />
+    <style type="text/css">
+      textarea {
+      width : 100%;
+      border:thin solid gray;
+      padding: 1px;
+      }
+      #preview_zone {
+      border:medium dashed beige;
+      padding: 1em;
+      margin-bottom: 2em;
+      }
+    </style>
+  </head>
+
+<body>
+<h1>@_FILENAME_@</h1>
+
+@@IF@@ @_HAS_BEEN_SAVED_@ /= ""
+Your file has been saved to @_HAS_BEEN_SAVED_@
+
+@_LAZY_VIEW_@
+@@ELSE@@
+@_ERROR_@
+
+
+<div id="preview_zone">@_PREVIEW_@</div>
+
+<div id="edit_zone">
+  <form method="post" action="/wiki/preview/@_FILENAME_@">
+    <textarea rows="40" cols="80"
+              name="text_plain" id="text_plain">@_TEXT_PLAIN_@</textarea>
+    <p>
+      <input type="submit" name="save" id="save" value="save"/>
+      <input type="submit" value="preview" />
+    </p>
+  </form>
+</div>
+@@END_IF@@
+
+</body>
+</html>

@@ -30,3 +30,4 @@ clean:
 	-gnat clean -r -Pwiki_service
 
 check:
+setup:

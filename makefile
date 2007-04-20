@@ -26,9 +26,11 @@ OPTIONS = MODE="$(MODE)" CP="$(CP)" MKDIR="$(MKDIR)" RM="$(RM)" LIB_KIND="$(LIB_
 
 # Modules support
 
-MODULES = diouzhtu diouzhtu2html
+MODULES = diouzhtu diouzhtu2html gwiad_wiki_service
 
 MODULES_BUILD = ${MODULES:%=%_build}
+
+MODULES_SETUP = ${MODULES:%=%_setup}
 
 MODULES_CLEAN = ${MODULES:%=%_clean}
 
@@ -37,6 +39,8 @@ MODULES_CHECK = ${MODULES:%=%_check}
 # Targets
 
 all: $(MODULES_BUILD)
+
+setup: $(MODULES_SETUP)
 
 clean: $(MODULES_CLEAN)
 
@@ -51,6 +55,9 @@ I_GPR	= $(INSTALL)/lib/gnat
 
 ${MODULES_BUILD}:
 	${MAKE} -C ${@:%_build=%} $(OPTIONS)
+
+${MODULES_SETUP}:
+	${MAKE} -C ${@:%_setup=%} setup $(OPTIONS)
 
 ${MODULES_CLEAN}:
 	${MAKE} -C ${@:%_clean=%} clean $(OPTIONS)
@@ -74,3 +81,13 @@ install: install_dirs
 	$(CP) diouzhtu/lib/* $(I_LIB)
 	$(CP) config/projects/diouzhtu.gpr $(I_GPR)
 
+install_gwiad_service:
+	$(RM) -f /opt/gwiad/lib/libwiki_service.so
+	$(CP) gwiad_wiki_service/lib/libwiki_service.so /opt/gwiad/lib/
+
+install_gwiad_website:
+	$(RM) -f /opt/gwiad/lib/libwiki_website.so
+	$(CP) gwiad_wiki_service/lib/libwiki_website.so /opt/gwiad/lib/
+	$(MKDIR) /opt/gwiad/templates/wiki_website
+	$(CP) gwiad_wiki_service/website/templates/wiki_website/*.thtml \
+		/opt/gwiad/templates/wiki_website/

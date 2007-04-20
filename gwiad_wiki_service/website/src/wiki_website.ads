@@ -19,12 +19,12 @@
 --  Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.       --
 ------------------------------------------------------------------------------
 
-package Diouzhtu.To_HTML is
+with Wiki_Interface;
 
-   function Text_To_HTML (S : String) return String;
-   --  Converts a diouzhtu string to HTML
+package Wiki_Website is
 
-   function To_HTML (Filename : String) return String;
-   --  Converts a diouzhtu formatted file to HTML
+private
 
-end Diouzhtu.To_HTML;
+   function Get_Wiki_Service return Wiki_Interface.GW_Service'Class;
+   --  Returns the service
+end Wiki_Website;

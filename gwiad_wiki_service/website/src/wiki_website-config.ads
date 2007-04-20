@@ -19,12 +19,27 @@
 --  Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.       --
 ------------------------------------------------------------------------------
 
-package Diouzhtu.To_HTML is
+private package Wiki_Website.Config is
 
-   function Text_To_HTML (S : String) return String;
-   --  Converts a diouzhtu string to HTML
+   Wiki_Service_Name   : constant String := "wiki_service";
+   --  Gwiad wiki Service name
 
-   function To_HTML (Filename : String) return String;
-   --  Converts a diouzhtu formatted file to HTML
+   Wiki_Web_Edit    : constant String := "edit";
+   Wiki_Web_View    : constant String := "view";
+   Wiki_Web_Preview : constant String := "preview";
+   Text_Dir         : constant String := "text";
+   HTML_Dir         : constant String := "html";
 
-end Diouzhtu.To_HTML;
+   Wiki_Root        : constant String := "data/wiki_website";
+   Wiki_Web_Root    : constant String := "/wiki";
+
+   function Get_Filename (URI : in String) return String;
+   --  Get filename from URI
+
+   function Wiki_Text_Dir return String;
+   --  Returns wiki text dir
+
+   function Wiki_HTML_Dir return String;
+   --  Returns wiki HTML Dir
+
+end Wiki_Website.Config;

@@ -20,6 +20,8 @@
 ------------------------------------------------------------------------------
 
 with Ada.Strings.Unbounded;
+with Ada.Strings.Fixed;
+with Ada.Strings.Maps;
 with Ada.Characters.Handling;
 with Ada.Text_IO;
 
@@ -32,8 +34,68 @@ package body Diouzhtu.To_HTML is
    use Ada.Text_IO;
    use Ada.Strings.Unbounded;
 
+   function CR_Delete (S : String) return String;
+   --  Delete all CR characters
+
    function Web_Escape (S : in String) return String;
    --  Escape web characters
+
+   ---------------
+   -- CR_Delete --
+   ---------------
+
+   function CR_Delete (S : String) return String is
+      CR : constant String (1 .. 1) := (1 => ASCII.CR);
+   begin
+      return Strings.Fixed.Trim
+        (Strings.Fixed.Translate
+           (S, Strings.Maps.To_Mapping
+              (From => CR, To   => " ")),
+         Strings.Right);
+   end CR_Delete;
+
+   ------------------
+   -- Text_To_HTML --
+   ------------------
+
+   function Text_To_HTML (S : String) return String is
+      Text : constant String := CR_Delete (S);
+
+      Content       : Unbounded_String := Null_Unbounded_String;
+      Result        : Unbounded_String := Null_Unbounded_String;
+      Last          : Positive := S'First;
+   begin
+
+
+      for K in S'Range loop
+         if Text (K) = ASCII.Lf then
+            if Last < K - 1 then
+               if Content /= Null_Unbounded_String then
+                  Append (Content, ASCII.Lf);
+               end if;
+               Append (Content, Web_Escape (Text (Last .. K - 1)));
+            else
+               if Content /= Null_Unbounded_String then
+
+                  Append (Result,
+                          Parse (Block_Level, To_String (Content)));
+                  Content := Null_Unbounded_String;
+               end if;
+            end if;
+            Last := K + 1;
+         end if;
+      end loop;
+
+      if Last < Text'Last then
+         Append (Content, Web_Escape (Text (Last .. S'Last)));
+      end if;
+
+      if Content /= Null_Unbounded_String then
+         Append (Result, Parse (Block_Level, To_String (Content)));
+      end if;
+
+      return To_String (Result);
+   end Text_To_HTML;
 
    -------------
    -- To_HTML --
@@ -51,7 +113,7 @@ package body Diouzhtu.To_HTML is
 
       while not End_Of_File (Diouzhtu_File) loop
          declare
-            Line : constant String := Get_Line (Diouzhtu_File);
+            Line : constant String := CR_Delete (Get_Line (Diouzhtu_File));
          begin
 
             if Line /= "" then

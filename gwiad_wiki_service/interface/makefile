@@ -27,3 +27,4 @@ clean:
 	-gnat clean -r -Pwiki_interface
 
 check:
+setup:
