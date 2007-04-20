@@ -20,7 +20,6 @@
 ------------------------------------------------------------------------------
 
 with Ada.Text_IO;
-with Ada.Strings.Unbounded;
 with Diouzhtu.To_HTML;
 with Gwiad.Services.Register;
 
@@ -48,9 +47,8 @@ package body Wiki_Service is
 
    overriding function HTML
      (S : Wiki_Service; Filename : String) return String is
-      use Ada.Strings.Unbounded;
    begin
-      return To_HTML (To_String (S.Base_Directory & "/" & Filename));
+      return To_HTML (S.Information, Filename);
    end HTML;
 
    ------------------
@@ -59,11 +57,26 @@ package body Wiki_Service is
 
    overriding function HTML_Preview
      (S : Wiki_Service; Text : String) return String is
-      pragma Unreferenced (S);
-      use Ada.Strings.Unbounded;
    begin
-      return Text_To_HTML (Text);
+      return Text_To_HTML (S.Information, Text);
    end HTML_Preview;
+
+   ----------------
+   -- Initialize --
+   ----------------
+
+   overriding procedure Initialize
+     (S              : in out Wiki_Service;
+      Text_Directory : in     String;
+      Base_URL       : in     String)
+   is
+      Wiki : Diouzhtu.Wiki_Information :=
+               Diouzhtu.Initialize (Base_URL => Base_URL,
+                           Text_Directory  => Text_Directory);
+   begin
+      S.Information := Wiki;
+   end Initialize;
+
 
 begin
    Gwiad.Services.Register.Register

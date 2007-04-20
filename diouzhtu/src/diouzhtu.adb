@@ -28,7 +28,9 @@ package body Diouzhtu is
 
    type Callback is record
       To_HTML : access
-        function (Index : Positive; Block : String) return String;
+        function (Wiki  : Wiki_Information;
+                  Index   : Positive;
+                  Block   : String) return String;
    end record;
 
    package Callbacks is new Containers.Vectors
@@ -38,6 +40,13 @@ package body Diouzhtu is
    Blocks  : Vector;
    Inlines : Vector;
 
+   function Initialize
+     (Base_URL : String; Text_Directory : String) return Wiki_Information is
+   begin
+      return (Base_URL       => To_Unbounded_String (Base_URL),
+              Text_Directory => To_Unbounded_String (Text_Directory));
+   end Initialize;
+
    -----------------------
    -- Internal_Register --
    -----------------------
@@ -45,7 +54,10 @@ package body Diouzhtu is
    procedure Internal_Register
      (Level   : Register_Level;
       To_HTML : access
-        function (Index : Positive; Content : String) return String)
+        function
+        (Wiki  : Wiki_Information;
+        Index : Positive;
+        Content : String) return String)
    is
       Register_Callback : Callback;
    begin
@@ -62,7 +74,8 @@ package body Diouzhtu is
    -----------
 
    function Parse
-     (Level   : Register_Level;
+     (Wiki    : Wiki_Information;
+      Level   : Register_Level;
       Content : String;
       Index   : Natural := 0)
      return String
@@ -85,7 +98,7 @@ package body Diouzhtu is
 
       if Last_Index (Container) >= Current then
          return Element (Container, Current).To_HTML
-           (Current, To_String (Text));
+           (Wiki, Current, To_String (Text));
       end if;
 
       return To_String (Text);
@@ -98,7 +111,10 @@ package body Diouzhtu is
    procedure Register
      (Level   : Register_Level;
       To_HTML : access
-        function (Index : Positive; Content : String) return String)
+        function
+        (Wiki  : Wiki_Information;
+        Index : Positive;
+        Content : String) return String)
    is
       Register_Callback : Callback;
    begin
@@ -116,10 +132,4 @@ package body Diouzhtu is
                          New_Item => Register_Callback);
       end if;
    end Register;
-
-   procedure Set_Base_URL (Base_URL : in String) is
-   begin
-      Diouzhtu_Base_URL := To_Unbounded_String (Base_URL);
-   end Set_Base_URL;
-
 end Diouzhtu;

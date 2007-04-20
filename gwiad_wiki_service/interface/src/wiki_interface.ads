@@ -19,7 +19,6 @@
 --  Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.       --
 ------------------------------------------------------------------------------
 
-with Ada.Strings.Unbounded;
 with Gwiad.Services;
 
 package Wiki_Interface is
@@ -28,15 +27,19 @@ package Wiki_Interface is
 
    type Wiki2HTML_Interface is interface;
 
+   procedure Initialize
+     (S              : in out Wiki2HTML_Interface;
+      Text_Directory : in     String;
+      Base_URL       : in     String) is abstract;
+
    function HTML_Preview
      (S : Wiki2HTML_Interface; Text : String) return String is abstract;
 
    function HTML
      (S : Wiki2HTML_Interface; Filename : String) return String is abstract;
 
-   type GW_Service is abstract new Service and Wiki2HTML_Interface with record
-      Base_Directory : Ada.Strings.Unbounded.Unbounded_String;
-   end record;
+   type GW_Service is abstract new Service and Wiki2HTML_Interface
+   with null record;
 
    type GW_Service_Access is access all GW_Service;
 

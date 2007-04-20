@@ -21,18 +21,30 @@
 
 with Wiki_Interface;
 
+private with Diouzhtu;
+
 package Wiki_Service is
 
    use Wiki_Interface;
 
-   type Wiki_Service is new GW_Service with null record;
+   type Wiki_Service is new GW_Service with private;
 
    type Wiki_Service_Access is access all Wiki_Service;
+
+   overriding procedure Initialize
+     (S              : in out Wiki_Service;
+      Text_Directory : in     String;
+      Base_URL       : in     String);
 
    overriding function HTML_Preview
      (S : Wiki_Service; Text : String) return String;
 
    overriding function HTML
      (S : Wiki_Service; Filename : String) return String;
+
+private
+   type Wiki_Service is new GW_Service with record
+      Information : Diouzhtu.Wiki_Information;
+   end record;
 
 end Wiki_Service;

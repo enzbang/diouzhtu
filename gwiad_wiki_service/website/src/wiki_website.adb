@@ -19,7 +19,6 @@
 --  Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.       --
 ------------------------------------------------------------------------------
 
-with Ada.Strings.Unbounded;
 with Ada.Text_IO;
 
 with AWS.Services.Dispatchers.URI;
@@ -38,7 +37,6 @@ with Wiki_Website.ECWF_Callbacks;
 package body Wiki_Website is
 
    use AWS;
-   use Ada.Strings.Unbounded;
 
    use Gwiad;
    use Gwiad.Services;
@@ -72,14 +70,13 @@ package body Wiki_Website is
          Get_Service               : GW_Service'Class :=
                                        Wiki_World_Service_Access.all;
       begin
-         Get_Service.Base_Directory := To_Unbounded_String (Wiki_Text_Dir);
+         Get_Service.Initialize (Base_URL       => Wiki_Web_Root,
+                                 Text_Directory => Wiki_Text_Dir);
 
          Wiki_Service_Id := Gwiad.Services.Register.Set
            (Wiki_Service_Name, Service_Access (Wiki_World_Service_Access));
 
          Ada.Text_IO.Put_Line (String (Wiki_Service_Id));
-         Ada.Text_IO.Put_Line ("base dir "
-                               & To_String (Get_Service.Base_Directory));
          return Get_Service;
       end;
       --   end if;

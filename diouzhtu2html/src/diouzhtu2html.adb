@@ -27,10 +27,12 @@ procedure Diouzhtu2Html is
    use Diouzhtu.To_HTML;
    use Ada.Command_Line;
    use Ada.Text_IO;
+
+   Wiki : Diouzhtu.Wiki_Information := Diouzhtu.Initialize ("/", ".");
 begin
 
    if Argument_Count = 1 then
-      Put_Line (To_HTML (Argument (1)));
+      Put_Line (To_HTML (Wiki, Argument (1)));
    elsif Argument_Count >= 2 then
       declare
          File : File_Type;
@@ -46,7 +48,7 @@ begin
                end loop;
             end;
          end if;
-         Put (File, To_HTML (Argument (1)));
+         Put (File, To_HTML (Wiki, Argument (1)));
          if Argument_Count = 5 then
             declare
                Footer_File : File_Type;

@@ -23,29 +23,42 @@ private with Ada.Strings.Unbounded;
 
 package Diouzhtu is
 
+   type Wiki_Information is private;
+
+   function Initialize
+     (Base_URL : String; Text_Directory : String) return Wiki_Information;
+   --  Creates a new wiki
+
    type Register_Level is (Block_Level, Inline_Level);
 
    procedure Register
-     (Level    : Register_Level;
-      To_HTML  : access
-        function (Index : Positive; Content : String) return String);
+     (Level   : Register_Level;
+      To_HTML : access
+        function
+          (Wiki  : Wiki_Information;
+           Index : Positive;
+           Content : String) return String);
    --  Register a new recursive callback
 
-   procedure Set_Base_URL (Base_URL : in String);
-   --  Set diouzhtu base URL ( "/" by default)
-
 private
-   Diouzhtu_Base_URL : Ada.Strings.Unbounded.Unbounded_String :=
-                         Ada.Strings.Unbounded.To_Unbounded_String ("/");
+
+   type Wiki_Information is record
+      Base_URL       : Ada.Strings.Unbounded.Unbounded_String;
+      Text_Directory : Ada.Strings.Unbounded.Unbounded_String;
+   end record;
 
    procedure Internal_Register
      (Level   : Register_Level;
       To_HTML : access
-        function (Index : Positive; Content : String) return String);
+        function
+          (Wiki  : Wiki_Information;
+           Index : Positive;
+           Content : String) return String);
    --  Register a new recursive callback
 
    function Parse
-     (Level   : Register_Level;
+     (Wiki    : Wiki_Information;
+      Level   : Register_Level;
       Content : String;
       Index   : Natural := 0)
      return String;

@@ -29,29 +29,37 @@ package body Diouzhtu.Block is
    use Ada.Strings.Unbounded;
    use Diouzhtu;
 
-   function Blockquote (Index : Positive; Block : String) return String;
+   function Blockquote
+     (Wiki : Wiki_Information; Index : Positive; Block : String) return String;
    --  bq. Blockquote element
 
-   function Code (Index : Positive; Block : String) return String;
+   function Code
+     (Wiki : Wiki_Information; Index : Positive; Block : String) return String;
    --  code. code element
 
-   function Header (Index : Positive; Block : String) return String;
+   function Header
+     (Wiki : Wiki_Information; Index : Positive; Block : String) return String;
    --  <h1>, <h2>, ... element
 
-   function List (Index : Positive; Block : String) return String;
+   function List
+     (Wiki : Wiki_Information; Index : Positive; Block : String) return String;
    --  list element <ul>, <ol>
 
-   function Paragraph (Index : Positive; Block : String) return String;
+   function Paragraph
+     (Wiki : Wiki_Information; Index : Positive; Block : String) return String;
    --  <p> element
 
-   function Table (Index : Positive; Block : String) return String;
+   function Table
+     (Wiki : Wiki_Information; Index : Positive; Block : String) return String;
    --  table element
 
    ----------------
    -- Blockquote --
    ----------------
 
-   function Blockquote (Index : Positive; Block : String) return String is
+   function Blockquote
+     (Wiki : Wiki_Information; Index : Positive; Block : String)
+      return String is
       Extract : constant Pattern_Matcher :=
         Compile ("^bq" & Attribute.Get_Pattern & "\.\s(.*)$",
                  Case_Insensitive + Single_Line);
@@ -61,7 +69,7 @@ package body Diouzhtu.Block is
    begin
       Match (Extract, Block, Matches);
       if Matches (0) = No_Match then
-         return Parse (Block_Level, Block, Index);
+         return Parse (Wiki, Block_Level, Block, Index);
       end if;
 
       Result := To_Unbounded_String ("<blockquote");
@@ -72,17 +80,19 @@ package body Diouzhtu.Block is
       end if;
 
       if Matches (Count) /= No_Match then
-         Append (Result, "><p>" &
-                   Parse (Inline_Level,
-                          Block
-                            (Matches (Count).First .. Matches (Count).Last)) &
-                   "</p></blockquote>" & ASCII.Lf);
+         Append
+           (Result, "><p>" &
+            Parse (Wiki, Inline_Level,
+              Block (Matches (Count).First .. Matches (Count).Last)) &
+            "</p></blockquote>" & ASCII.Lf);
       end if;
       return To_String (Result);
 
    end Blockquote;
 
-   function Code (Index : Positive; Block : String) return String is
+   function Code
+     (Wiki : Wiki_Information; Index : Positive; Block : String) return String
+   is
       Extract  : constant Pattern_Matcher :=
         Compile ("^code(_[a-zA-Z]+?)??" &
                    Attribute.Get_Pattern & "\.\s(.*?)$",
@@ -93,7 +103,7 @@ package body Diouzhtu.Block is
    begin
       Match (Extract, Block, Matches);
       if Matches (0) = No_Match then
-         return Parse (Block_Level, Block, Index);
+         return Parse (Wiki, Block_Level, Block, Index);
       end if;
 
       Result := To_Unbounded_String ("<p><pre><code");
@@ -123,7 +133,9 @@ package body Diouzhtu.Block is
    -- Header --
    ------------
 
-   function Header (Index : Positive; Block : String) return String is
+   function Header
+     (Wiki : Wiki_Information; Index : Positive; Block : String) return String
+   is
       Extract : constant Pattern_Matcher :=
         Compile ("^h(\d)" & Attribute.Get_Pattern & "\.\s(.*)$",
                  Case_Insensitive + Single_Line);
@@ -137,7 +149,7 @@ package body Diouzhtu.Block is
       --   Search for block level
       Match (Extract, Block, Matches);
       if Matches (0) = No_Match then
-         return Parse (Block_Level, Block, Index);
+         return Parse (Wiki, Block_Level, Block, Index);
       end if;
 
       Header := Block (Matches (1).First);
@@ -152,7 +164,7 @@ package body Diouzhtu.Block is
 
       if Matches (Count) /= No_Match then
          Append (Result, ">" &
-                   Parse (Inline_Level,
+                   Parse (Wiki, Inline_Level,
                           Block (Matches
                                    (Count).First .. Matches (Count).Last)) &
                    "</h" & Header & ">" & ASCII.Lf);
@@ -161,7 +173,9 @@ package body Diouzhtu.Block is
       return To_String (Result);
    end Header;
 
-   function List (Index : Positive; Block : String) return String is
+   function List
+     (Wiki : Wiki_Information; Index : Positive; Block : String) return String
+   is
       Element     : constant array (1 .. 2) of String (1 .. 2) := ("ol", "ul");
       Tag         : constant array (1 .. 2) of Character := ('#', '*');
       Indentation : constant String := "  ";
@@ -173,7 +187,8 @@ package body Diouzhtu.Block is
       type List_Level is new Natural;
 
       procedure Parse_Line
-        (Line       : in String;
+        (Wiki       : in Wiki_Information;
+         Line       : in String;
          Level      : in out List_Level;
          Line_Level : in List_Level);
 
@@ -215,7 +230,8 @@ package body Diouzhtu.Block is
       ----------------
 
       procedure Parse_Line
-        (Line       : in String;
+        (Wiki       : in Wiki_Information;
+         Line       : in String;
          Level      : in out List_Level;
          Line_Level : in List_Level) is
          pragma Warnings (Off);
@@ -228,7 +244,7 @@ package body Diouzhtu.Block is
             Level := Level + 1;
             Append (Result, Indent (Level)
                       & '<' & Get_Element & '>' & ASCII.Lf);
-            Parse_Line (Line, Level, Line_Level);
+            Parse_Line (Wiki, Line, Level, Line_Level);
          elsif Line_Level < Level then
             Append (Result, Indent (Level)
                       & "</" & Get_Element & '>' & ASCII.Lf);
@@ -236,7 +252,7 @@ package body Diouzhtu.Block is
                Level := Level - 1;
                Append (Result, Indent (Level) & Indentation
                          & "</li>" & ASCII.Lf);
-               Parse_Line (Line, Level, Line_Level);
+               Parse_Line (Wiki, Line, Level, Line_Level);
             end if;
          else
             if Line = "" then
@@ -252,7 +268,7 @@ package body Diouzhtu.Block is
                   Content_Last := Content_Last - 1;
                end if;
                Append (Result, "<li>" &
-                         Parse (Inline_Level,
+                         Parse (Wiki, Inline_Level,
                                 Line (Content_First .. Content_Last))
                          &  "</li>" & ASCII.Lf);
             end;
@@ -261,7 +277,7 @@ package body Diouzhtu.Block is
 
    begin
       if Block'Length < 3 then
-         return Parse (Block_Level, Block, Index);
+         return Parse (Wiki, Block_Level, Block, Index);
       end if;
 
       Get_Tag := Block (Block'First);
@@ -271,7 +287,7 @@ package body Diouzhtu.Block is
       elsif Block (Block'First .. Block'First + 1) = Tag (2) & ' ' then
          Get_Element := Element (2);
       else
-         return Parse (Block_Level, Block, Index);
+         return Parse (Wiki, Block_Level, Block, Index);
       end if;
 
       declare
@@ -284,12 +300,12 @@ package body Diouzhtu.Block is
                   Line       : constant String := Block (Last .. K);
                   Line_Level : constant List_Level := Get_Current_Level (Line);
                begin
-                  Parse_Line (Line, Last_Level, Line_Level);
+                  Parse_Line (Wiki, Line, Last_Level, Line_Level);
                   Last := K + 1;
                end;
             end if;
          end loop;
-         Parse_Line ("", Last_Level, 0);
+         Parse_Line (Wiki, "", Last_Level, 0);
       end;
       return To_String (Result);
    end List;
@@ -298,7 +314,9 @@ package body Diouzhtu.Block is
    -- Paragraph --
    ---------------
 
-   function Paragraph (Index : Positive; Block : String) return String is
+   function Paragraph
+     (Wiki : Wiki_Information; Index : Positive; Block : String) return String
+   is
       pragma Unreferenced (Index);
       Extract : constant Pattern_Matcher :=
         Compile ("^p" & Attribute.Get_Pattern & "\.\s(.*)$",
@@ -309,7 +327,7 @@ package body Diouzhtu.Block is
    begin
       Match (Extract, Block, Matches);
       if Matches (0) = No_Match then
-         return "<p>" & Parse (Inline_Level, Block) & "</p>" & ASCII.Lf;
+         return "<p>" & Parse (Wiki, Inline_Level, Block) & "</p>" & ASCII.Lf;
       end if;
 
       Result := To_Unbounded_String ("<p");
@@ -323,7 +341,7 @@ package body Diouzhtu.Block is
 
          Append
            (Result, ">" &
-              Parse (Inline_Level,
+              Parse (Wiki, Inline_Level,
                      Block (Matches (Count).First .. Matches (Count).Last))
               & "</p>" & ASCII.Lf);
       end if;
@@ -344,7 +362,13 @@ package body Diouzhtu.Block is
       Internal_Register (Block_Level, Paragraph'Access);
    end Register;
 
-   function Table (Index : Positive; Block : String) return String is
+   -----------
+   -- Table --
+   -----------
+
+   function Table
+     (Wiki : Wiki_Information; Index : Positive; Block : String) return String
+   is
 
       Nb_Cols     : Natural          := 0;
       Nb_Rows     : Natural          := 0;
@@ -396,7 +420,7 @@ package body Diouzhtu.Block is
       Get_Dimension;
 
       if Nb_Cols = 0 or else Nb_Rows = 0 then
-         return Parse (Block_Level, Table_Block, Index);
+         return Parse (Wiki, Block_Level, Table_Block, Index);
       end if;
 
       declare
@@ -407,7 +431,7 @@ package body Diouzhtu.Block is
             if Table_Block (K) = '|' then
                if Line_Cols > 0 and then Last_Position + 2 < K - 2 then
                   Append
-                    (Result, Parse (Inline_Level,
+                    (Result, Parse (Wiki, Inline_Level,
                      Table_Block (Last_Position + 2 .. K - 2)));
                   Append (Result, "</td>" & ASCII.Lf);
                end if;

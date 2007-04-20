@@ -58,7 +58,7 @@ package body Diouzhtu.To_HTML is
    -- Text_To_HTML --
    ------------------
 
-   function Text_To_HTML (S : String) return String is
+   function Text_To_HTML (Wiki : Wiki_Information; S : String) return String is
       Text : constant String := CR_Delete (S);
 
       Content       : Unbounded_String := Null_Unbounded_String;
@@ -78,7 +78,7 @@ package body Diouzhtu.To_HTML is
                if Content /= Null_Unbounded_String then
 
                   Append (Result,
-                          Parse (Block_Level, To_String (Content)));
+                          Parse (Wiki, Block_Level, To_String (Content)));
                   Content := Null_Unbounded_String;
                end if;
             end if;
@@ -91,7 +91,7 @@ package body Diouzhtu.To_HTML is
       end if;
 
       if Content /= Null_Unbounded_String then
-         Append (Result, Parse (Block_Level, To_String (Content)));
+         Append (Result, Parse (Wiki, Block_Level, To_String (Content)));
       end if;
 
       return To_String (Result);
@@ -101,7 +101,9 @@ package body Diouzhtu.To_HTML is
    -- To_HTML --
    -------------
 
-   function To_HTML (Filename : String) return String is
+   function To_HTML
+     (Wiki : Wiki_Information; Filename : String) return String
+   is
       Diouzhtu_File : File_Type;
       Content       : Unbounded_String := Null_Unbounded_String;
       Result        : Unbounded_String := Null_Unbounded_String;
@@ -109,7 +111,7 @@ package body Diouzhtu.To_HTML is
 
       Open (File => Diouzhtu_File,
             Mode => In_File,
-            Name => Filename);
+            Name => To_String (Wiki.Text_Directory) & "/" & Filename);
 
       while not End_Of_File (Diouzhtu_File) loop
          declare
@@ -124,7 +126,7 @@ package body Diouzhtu.To_HTML is
             else
                if Content /= Null_Unbounded_String then
                   Append (Result,
-                          Parse (Block_Level, To_String (Content)));
+                          Parse (Wiki, Block_Level, To_String (Content)));
                   Content := Null_Unbounded_String;
                end if;
             end if;
@@ -132,7 +134,7 @@ package body Diouzhtu.To_HTML is
       end loop;
 
       if Content /= Null_Unbounded_String then
-         Append (Result, Parse (Block_Level, To_String (Content)));
+         Append (Result, Parse (Wiki, Block_Level, To_String (Content)));
       end if;
 
       Close (Diouzhtu_File);
