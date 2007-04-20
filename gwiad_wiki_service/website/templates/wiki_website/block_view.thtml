@@ -1,3 +1,21 @@
 <?xml version="1.0" encoding="utf-8"?>
 
+@@IF@@ @_VIEW_@ /= ""
 @_VIEW_@
+@@ELSE@@
+<h2>Index of @_URI_@</h2>
+<p>Select the file to edit</p>
+
+<ul>
+@@TABLE@@
+@@IF@@ @_IS_DIR_V_@
+@@IF@@ @_NAME_V_@ /= "./" and not (@_NAME_V_@ = "../" and @_URI_@ = "/wiki/")
+<li><a href="@_NAME_V_@">@_NAME_V_@</a></li>
+@@END_IF@@
+@@ELSE@@
+<li><p><a href="@_URI_@@_NAME_V_@">@_NAME_V_@</a> --  last modified @_TIME_V_@</p></li>
+@@END_IF@@
+@@END_TABLE@@
+</ul>
+@@END_IF@@
+

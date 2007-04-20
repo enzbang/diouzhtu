@@ -22,8 +22,11 @@
 with Ada.Strings.Unbounded;
 with Ada.Exceptions;
 
+with AWS.Services.Directory;
+
 with Wiki_Website.Config;
 with Wiki_Website.Template_Defs.Block_View;
+
 with Ada.Directories;
 with Ada.Text_IO;
 
@@ -52,25 +55,31 @@ package body Wiki_Website.ECWF_Callbacks is
    is
       pragma Unreferenced (Context);
       use AWS.Status;
+      use Ada.Directories;
 
-      Get_URI   : constant String := URI (Request);
-      Filename  : constant String := Get_Filename (Get_URI);
+      Get_URI       : constant String := URI (Request);
+      Filename      : constant String := Get_Filename (Get_URI);
+      HTML_Filename : constant String :=  Wiki_HTML_Dir & "/" & Filename;
 
       HTML_Text : Unbounded_String := Null_Unbounded_String;
       HTML_File : File_Type;
    begin
-
-      if Filename'Length = 0 then
-         return;
-      end if;
-
-      Ada.Text_IO.Put_Line ("view :" & Filename);
-
-      if Ada.Directories.Exists (Wiki_HTML_Dir & "/" & Filename) then
+      Ada.Text_IO.Put_Line (HTML_Filename);
+      if Exists (HTML_Filename) then
+         if Kind (HTML_Filename) /= Ordinary_File then
+            if Kind (HTML_Filename) = Directory then
+               Templates.Insert
+                 (Translations,
+                  Templates.To_Set (AWS.Services.Directory.Browse
+                    (Directory_Name => HTML_Filename,
+                     Request        => Request)));
+            end if;
+            return;
+         end if;
 
          Open (File => HTML_File,
                Mode => In_File,
-               Name => Wiki_HTML_Dir & "/" & Filename);
+               Name => HTML_Filename);
 
          while not End_Of_File (HTML_File) loop
             Append (HTML_Text, Get_Line (HTML_File));
@@ -83,7 +92,9 @@ package body Wiki_Website.ECWF_Callbacks is
            (Translations, Templates.Assoc
               (Template_Defs.Block_View.VIEW, HTML_Text));
 
-      else
+      elsif Exists (Wiki_Text_Dir & "/" & Filename)
+        and then Kind (Wiki_Text_Dir & "/" & Filename) = Ordinary_File
+      then
          if not Gwiad.Services.Register.Exists (Wiki_Service_Name) then
             Templates.Insert
               (Translations,
@@ -98,9 +109,11 @@ package body Wiki_Website.ECWF_Callbacks is
               (Translations,
                Templates.Assoc (Template_Defs.Block_View.VIEW, New_HTML));
 
+            Create_Path (Containing_Directory (HTML_Filename));
+
             Create (File => HTML_File,
                     Mode => Out_File,
-                    Name => Wiki_HTML_Dir & "/" & Filename);
+                    Name => HTML_Filename);
 
             Put (HTML_File, New_HTML);
 
@@ -111,8 +124,8 @@ package body Wiki_Website.ECWF_Callbacks is
    exception
       when E : others =>
          Ada.Text_IO.Put_Line (Ada.Exceptions.Exception_Information (E));
-         Templates.Insert
-           (Translations, Templates.Assoc ("ERROR", "<p>Service down</p>"));
+            Templates.Insert
+              (Translations, Templates.Assoc ("ERROR", "<p>Service down</p>"));
    end View;
 
 end Wiki_Website.ECWF_Callbacks;
