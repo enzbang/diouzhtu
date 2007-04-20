@@ -26,6 +26,7 @@ with Ada.Directories;
 with AWS.MIME;
 with AWS.Messages;
 with AWS.Parameters;
+with AWS.Services.Directory;
 with AWS.Services.ECWF.Registry;
 
 with Gwiad.Services.Register;
@@ -41,6 +42,7 @@ package body Wiki_Website.Callbacks is
 
    use Ada.Strings.Unbounded;
    use Ada.Text_IO;
+   use Ada;
 
    use Wiki_Website;
    use Wiki_Website.Config;
@@ -80,6 +82,7 @@ package body Wiki_Website.Callbacks is
       Translations : in out Templates.Translate_Set)
    is
       use AWS.Status;
+      use Ada.Directories;
       pragma Unreferenced (Context);
 
       Get_URI  : constant String := URI (Request);
@@ -91,10 +94,6 @@ package body Wiki_Website.Callbacks is
 
    begin
 
-      if Name'Length = 0 then
-         return;
-      end if;
-
       if not Gwiad.Services.Register.Exists (Wiki_Service_Name) then
          Templates.Insert
            (Translations,
@@ -103,7 +102,19 @@ package body Wiki_Website.Callbacks is
          return;
       end if;
 
-      if Ada.Directories.Exists (Filename) then
+      if Exists (Filename) then
+         if Kind (Filename) /= Ordinary_File then
+            if Kind (Filename) = Directory then
+               Templates.Insert
+                 (Translations,
+                  Templates.To_Set (AWS.Services.Directory.Browse
+                    (Directory_Name => Filename,
+                     Request        => Request)));
+               Ada.Text_IO.Put_Line ("here for " & Filename);
+            end if;
+            return;
+         end if;
+
          Open (File => Text_File,
                Mode => In_File,
                Name => Filename);
@@ -143,6 +154,7 @@ package body Wiki_Website.Callbacks is
       Context      : access AWS.Services.ECWF.Context.Object;
       Translations : in out Templates.Translate_Set)
    is
+      use Ada.Directories;
       pragma Unreferenced (Context);
       P          : constant Parameters.List := Status.Parameters (Request);
       Save       : constant String          :=
@@ -177,14 +189,17 @@ package body Wiki_Website.Callbacks is
                Update_HTML : Boolean := False;
             begin
 
-               Ada.Text_IO.Put_Line (Filename);
+               Text_IO.Put_Line (Filename);
 
-               if Ada.Directories.Exists (Filename) then
+               if Exists (Filename) and then
+                 Kind (Filename) = Ordinary_File then
                   --  ??? Here we should add RCS
 
-                  Ada.Directories.Delete_File (Filename);
+                  Delete_File (Filename);
 
                   Update_HTML := True;
+               else
+                  Create_Path (Containing_Directory (Filename));
                end if;
 
                Ada.Text_IO.Put_Line (Filename);

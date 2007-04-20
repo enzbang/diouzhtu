@@ -21,6 +21,7 @@
 
 @_ERROR_@
 
+@@IF@@ @_FILENAME_@ /= ""
 <form method="post" action="/wiki/preview/@_FILENAME_@">
   <textarea rows="40" cols="80"
             name="text_plain" id="text_plain">@_TEXT_PLAIN_@</textarea>
@@ -28,6 +29,25 @@
 
   <p><input type="submit" name="submit"/></p>
 </form>
+@@ELSE@@
+<h2>Index of @_URI_@</h2>
+<p>Select the file to edit</p>
+
+<ul>
+@@TABLE@@
+@@IF@@ @_IS_DIR_V_@
+@@IF@@ @_NAME_V_@ /= "./" and not (@_NAME_V_@ = "../" and @_URI_@ = "/wiki/edit/")
+<li><a href="@_NAME_V_@">@_NAME_V_@</a></li>
+@@END_IF@@
+@@ELSE@@
+<li><p><a href="@_URI_@@_NAME_V_@">@_NAME_V_@</a> --  last modified @_TIME_V_@</p></li>
+@@END_IF@@
+@@END_TABLE@@
+</ul>
+
+To create new page called my_first_page type go to url /wiki/edit/my_first_page
+@@END_IF@@
+
 
 </body>
 </html>
