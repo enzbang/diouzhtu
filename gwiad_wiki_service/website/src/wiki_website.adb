@@ -67,44 +67,37 @@ package body Wiki_Website is
       use Wiki_Interface;
    begin
 
-      --  ???
-      --  if Wiki_Service_Id = Null_Service_Id then
+      if Wiki_Service_Id = Null_Service_Id then
+         declare
+            Wiki_World_Service_Access : constant GW_Service_Access
+              := GW_Service_Access (Gwiad.Services.Register.Get
+                                    (Wiki_Service_Name));
+         begin
+            Initialize
+              (S              =>
+                 GW_Service'Class (Wiki_World_Service_Access.all),
+               Base_URL       => Wiki_Web_Root,
+               Img_Base_URL   => Wiki_Web_Root & "/" & Wiki_Web_Image,
+               Text_Directory => Wiki_Text_Dir);
+
+            Wiki_Service_Id := Gwiad.Services.Register.Set
+              (Wiki_Service_Name, Service_Access (Wiki_World_Service_Access));
+
+            Ada.Text_IO.Put_Line (String (Wiki_Service_Id));
+         end;
+      end if;
+
       declare
-         Wiki_World_Service_Access : constant GW_Service_Access
-           := GW_Service_Access (Gwiad.Services.Register.Get
-                                 (Wiki_Service_Name));
+         Wiki_World_Service_Access : constant GW_Service_Access :=
+                                       GW_Service_Access
+                                         (Gwiad.Services.Register.Get
+                                            (Wiki_Service_Name,
+                                             Wiki_Service_Id));
          Get_Service               : GW_Service'Class :=
                                        Wiki_World_Service_Access.all;
       begin
-         Get_Service.Initialize
-           (Base_URL       => Wiki_Web_Root,
-            Img_Base_URL   => Wiki_Web_Root & "/" & Wiki_Web_Image,
-            Text_Directory => Wiki_Text_Dir);
-
-         Wiki_Service_Id := Gwiad.Services.Register.Set
-           (Wiki_Service_Name, Service_Access (Wiki_World_Service_Access));
-
-         Ada.Text_IO.Put_Line (String (Wiki_Service_Id));
          return Get_Service;
       end;
-      --   end if;
-
---        declare
---           Wiki_World_Service_Access : constant GW_Service_Access :=
---                                         GW_Service_Access
---                                           (Gwiad.Services.Register.Get
---                                              (Wiki_Service_Name,
---                                               Wiki_Service_Id));
---           Get_Service               : GW_Service'Class :=
---                                         Wiki_World_Service_Access.all;
---        begin
---           Ada.Text_IO.Put_Line (String (Wiki_Service_Id));
---
---           Ada.Text_IO.Put_Line ("base dir "
---                                 & To_String (Get_Service.Base_Directory));
---
---           return Get_Service;
---        end;
    end Get_Wiki_Service;
 
    --------------------
