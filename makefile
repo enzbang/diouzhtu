@@ -82,10 +82,12 @@ install: install_dirs
 	$(CP) config/projects/diouzhtu.gpr $(I_GPR)
 
 install_gwiad_service:
+	-$(GWIAD_UNREGISTER_SCRIPT) 127.0.0.1:8080 service wiki_service
 	$(RM) -f /opt/gwiad/lib/libwiki_service.so
 	$(CP) gwiad_wiki_service/lib/libwiki_service.so /opt/gwiad/lib/
 
 install_gwiad_website:
+	-$(GWIAD_UNREGISTER_SCRIPT) 127.0.0.1:8080 website /opt/gwiad/lib/libwiki_website.so
 	$(RM) -f /opt/gwiad/lib/libwiki_website.so
 	$(CP) gwiad_wiki_service/lib/libwiki_website.so /opt/gwiad/lib/
 	$(MKDIR) /opt/gwiad/templates/wiki_website
