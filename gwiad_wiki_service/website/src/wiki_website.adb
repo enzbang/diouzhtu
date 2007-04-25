@@ -31,7 +31,7 @@ with AWS.MIME;
 
 with Gwiad.Services.Register;
 with Gwiad.Websites.Register;
-with Gwiad.Web;
+with Gwiad.Web.Register;
 
 with Wiki_Website.Config;
 with Wiki_Website.Callbacks;
@@ -125,10 +125,11 @@ package body Wiki_Website is
    ----------------
 
    procedure Unregister is
+      use Gwiad.Web.Register;
    begin
-      Gwiad.Web.Unregister_Web_Directory
-        (Web_Dir => Wiki_Web_Root);
+      Unregister (Web_Dir => Wiki_Web_Root);
    end Unregister;
+
 
 begin
 
@@ -163,8 +164,8 @@ begin
       View'Access,
       MIME.Text_HTML);
 
-   Gwiad.Web.Register_Web_Directory (Web_Dir => Wiki_Web_Root,
-                                     Action  => Main_Dispatcher);
+   Gwiad.Web.Register.Register (Web_Dir => Wiki_Web_Root,
+                                Action  => Main_Dispatcher);
 
    Gwiad.Websites.Register.Register
      (Name        => "wiki",
