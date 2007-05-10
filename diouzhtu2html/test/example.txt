@@ -54,12 +54,20 @@ Un lien vers "une url de test":http://diouzhtu.org externe
 
 Un lien vers "une url de test":http://diouzhtu.org
 
+Test "http://url_with_scripts":http://url_with_scripts
+
 "(class)Une url de test(title)":page2
 
 An image !diouzhtu.png! in png format
 
-code. @code@
+code.
+@code@
 
-code. "(class)Une url de test(title)":page2
+end code.
+
+code.
+"(class)Une url de test(title)":page2
+
+end code.
 
 Insert @@@@ for writting @@
