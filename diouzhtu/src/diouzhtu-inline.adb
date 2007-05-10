@@ -55,6 +55,10 @@ package body Diouzhtu.Inline is
    --  "(class)link name(tooltip)":http ://u.r.l
    --  "(class)link name(tooltip)":relative/url
 
+   function Single_Link
+     (Wiki : Wiki_Information; Index : Positive; S : String) return String;
+   --  http://u.r.l
+
    function Strong
      (Wiki : Wiki_Information; Index : Positive; S : String) return String;
    --  Strength can be give to text by surrounding with asterisks.
@@ -307,11 +311,6 @@ package body Diouzhtu.Inline is
         Compile ("""(\([\w-_]+?\))??([^\(\)]+?)(\(.*\))??"":" &
                  "((http://)??[^ \s\[\]]+)(\s|$)",
                  Case_Insensitive + Single_Line);
-      --          :=
-      --  Compile ('(' & '"' & "(\([\w-_]+?\))??([^()/]*)?(\([\w-_]+\))??"
-      --                        & """:([^ \s\[\]]+))",
-      --                      Case_Insensitive);
-      --  & '"' & ":""((http://)??[\w._-]+?)\G)",
       Matches  : Match_Array (0 .. 6);
       Current  : Natural := S'First;
       Result   : Unbounded_String := Null_Unbounded_String;
@@ -329,8 +328,7 @@ package body Diouzhtu.Inline is
 
          declare
             URL         : constant String :=
-              Parse (Wiki, Inline_Level,
-                     S (Matches (4).First .. Matches (4).Last));
+                             S (Matches (4).First .. Matches (4).Last);
             Http_Prefix : constant String := "http://";
          begin
             if URL'Length >= Http_Prefix'Length and then
@@ -385,12 +383,55 @@ package body Diouzhtu.Inline is
    procedure Register is
    begin
       Diouzhtu.Internal_Register (Inline_Level, Code'Access);
+      Diouzhtu.Internal_Register (Inline_Level, Link'Access);
+      Diouzhtu.Internal_Register (Inline_Level, Single_Link'Access);
+      Diouzhtu.Internal_Register (Inline_Level, Image'Access);
       Diouzhtu.Internal_Register (Inline_Level, Emphasis'Access);
       Diouzhtu.Internal_Register (Inline_Level, Strong'Access);
-      Diouzhtu.Internal_Register (Inline_Level, Link'Access);
-      Diouzhtu.Internal_Register (Inline_Level, Image'Access);
       Diouzhtu.Internal_Register (Inline_Level, Default'Access);
    end Register;
+
+   -----------------
+   -- Single_Link --
+   -----------------
+
+   function Single_Link
+     (Wiki : Wiki_Information; Index : Positive; S : String) return String
+   is
+      Extract : constant Pattern_Matcher :=
+        Compile ("(\shttp://[^ \s\[\]]+)(\s|$)",
+                 Case_Insensitive + Single_Line);
+      Matches : Match_Array (0 .. 2);
+      Current : Natural := S'First;
+      Result  : Unbounded_String := Null_Unbounded_String;
+   begin
+      loop
+         Match (Extract, S, Matches, Current);
+         exit when Matches (0) = No_Match;
+
+         if Matches (1).First > Current + 1 then
+            Append
+              (Result,
+               Parse (Wiki, Inline_Level,
+                      S (Current .. Matches (1).First), Index));
+         end if;
+
+         declare
+            In_Content : constant String :=
+              S (Matches (1).First .. Matches (1).Last);
+         begin
+            Append (Result, "<a href="""
+                      & In_Content & """>" & In_Content & "</a> ");
+         end;
+         Current := Matches (1).Last + 2;
+      end loop;
+
+      Append (Result,
+              Parse (Wiki, Inline_Level, S (Current .. S'Last), Index));
+      return To_String (Result);
+   exception
+      when others => return "";
+   end Single_Link;
 
    ------------
    -- Strong --

@@ -94,7 +94,7 @@ package body Diouzhtu.To_HTML is
                Append (Result, Code.End_Code);
                In_Code_Block := False;
             else
-               Append (Result, Block_Content & ASCII.Lf & ASCII.Lf);
+               Append (Result, ASCII.Lf & ASCII.Lf & Block_Content);
             end if;
 
          else
@@ -104,7 +104,7 @@ package body Diouzhtu.To_HTML is
             begin
                if Code_Content /= "" then
                   In_Code_Block := True;
-                  Append (Result, Code_Content & ASCII.Lf & ASCII.Lf);
+                  Append (Result, Code_Content);
                else
                   Append
                     (Result,
