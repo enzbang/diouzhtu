@@ -665,7 +665,7 @@ Ada definition (c) Olivier Ramonat <enzbang@ramonat.fr>
 LANGUAGES.ada = {
   defaultMode: {
     lexems: [UNDERSCORE_IDENT_RE],
-    contains: ['tag', 'comment', 'string'],
+    contains: ['tag', 'comment', 'string', 'attribute'],
     keywords: {
           'abort' : 1, 'else' : 1, 'new' : 1, 'return' : 1,
           'abs' : 1, 'elsif' : 1, 'not' : 1, 'reverse' : 1,
@@ -696,10 +696,11 @@ LANGUAGES.ada = {
       begin: '--', end: '$'
     },
     {
-      className: 'string',
-      begin: '\'', end: '[^\\\\]\'',
-      illegal: '[^\\\\][^\']'
+       className: 'attribute',
+       begin: '\'[a-zA-Z]+', end: '^',
+       illegal: ' '
     },
+    APOS_STRING_MODE,
     QUOTE_STRING_MODE,
     {
       className: 'title',
