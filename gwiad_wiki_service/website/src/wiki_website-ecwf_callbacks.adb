@@ -26,6 +26,7 @@ with AWS.Services.Directory;
 
 with Wiki_Website.Config;
 with Wiki_Website.Template_Defs.Block_View;
+with Wiki_Website.Template_Defs.View;
 
 with Ada.Directories;
 with Ada.Text_IO;
@@ -68,6 +69,11 @@ package body Wiki_Website.ECWF_Callbacks is
       Templates.Insert
         (Translations,
          Templates.Assoc (Template_Defs.Block_View.FILENAME, Filename));
+
+      Templates.Insert
+        (Translations,
+         Templates.Assoc
+           (Template_Defs.View.WEBSITE_NAME, Website_Name));
 
       if Exists (HTML_Filename) then
          if Kind (HTML_Filename) /= Ordinary_File then

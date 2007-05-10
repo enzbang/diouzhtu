@@ -27,12 +27,18 @@ private package Wiki_Website.Config is
    Wiki_Web_Image   : constant String := "img";
    Wiki_Web_Edit    : constant String := "edit";
    Wiki_Web_Preview : constant String := "preview";
+   Wiki_Web_CSS     : constant String := "css";
+   Wiki_Web_JS      : constant String := "js";
 
    Text_Dir         : constant String := "text";
    HTML_Dir         : constant String := "html";
    Image_Dir        : constant String := "img";
+   CSS_Dir          : constant String := "css";
+   JS_Dir           : constant String := "dir";
 
    Wiki_Root        : constant String := "data/wiki_website";
+   CSS_Root         : constant String := "css/wiki_website";
+   JS_Root          : constant String := "js/wiki_website";
    Wiki_Web_Root    : constant String := "/wiki";
 
    function Get_Filename (URI : in String) return String;

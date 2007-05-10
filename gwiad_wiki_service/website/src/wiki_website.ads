@@ -23,6 +23,8 @@ with Wiki_Interface;
 
 package Wiki_Website is
 
+      Website_Name : constant String := "Diouzhtu_Website";
+
 private
 
    function Get_Wiki_Service return Wiki_Interface.GW_Service'Class;

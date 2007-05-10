@@ -81,15 +81,26 @@ install: install_dirs
 	$(CP) diouzhtu/lib/* $(I_LIB)
 	$(CP) config/projects/diouzhtu.gpr $(I_GPR)
 
+install_gwiad_interface:
+	$(CP) gwiad_wiki_service/interface/lib/libwiki_interface.so /opt/gwiad/librairies/
+
+
 install_gwiad_service:
 	-$(GWIAD_UNREGISTER_SCRIPT) 127.0.0.1:8080 service wiki_service
 	$(RM) -f /opt/gwiad/lib/libwiki_service.so
-	$(CP) gwiad_wiki_service/lib/libwiki_service.so /opt/gwiad/lib/
+	$(CP) /opt/gnat/gpl-2006/lib/diouzhtu/*$(SOEXT) /opt/gwiad/librairies/
+	$(CP) gwiad_wiki_service/lib/libwiki_service.so /opt/gwiad/lib
 
 install_gwiad_website:
 	-$(GWIAD_UNREGISTER_SCRIPT) 127.0.0.1:8080 website /opt/gwiad/lib/libwiki_website.so
 	$(RM) -f /opt/gwiad/lib/libwiki_website.so
 	$(CP) gwiad_wiki_service/lib/libwiki_website.so /opt/gwiad/lib/
-	$(MKDIR) /opt/gwiad/templates/wiki_website
+	$(MKDIR) /opt/gwiad/templates/wiki_website/
+	$(MKDIR) /opt/gwiad/css/wiki_website/
+	$(MKDIR) /opt/gwiad/js/wiki_website/
 	$(CP) gwiad_wiki_service/website/templates/wiki_website/*.thtml \
 		/opt/gwiad/templates/wiki_website/
+	$(CP) gwiad_wiki_service/website/templates/wiki_website/css/*.css \
+		/opt/gwiad/css/wiki_website/
+	$(CP) external_libraries/highlight/*.js	\
+		/opt/gwiad/js/wiki_website/

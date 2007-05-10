@@ -1,9 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
-
 @@IF@@ @_VIEW_@ /= ""
+<h1>@_REPLACE_ALL((.*\/)/):FILENAME_@</h1>
 @_VIEW_@
 @@ELSIF@@ @_URI_@ /= ""
-<h2>Index of @_URI_@</h2>
+<h1>Index of @_REPLACE_ALL(\//):REPLACE_ALL((.*\/(.+))/\2):URI_@</h1>
+<h2>@_URI_@</h2>
 <p>Select the file to edit</p>
 
 <ul>

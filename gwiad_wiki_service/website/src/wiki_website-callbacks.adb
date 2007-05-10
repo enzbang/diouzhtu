@@ -66,7 +66,7 @@ package body Wiki_Website.Callbacks is
          --  Page not found
          return Response.Build
            (Content_Type  => MIME.Text_HTML,
-            Message_Body  => "<p>Error</p>");
+            Message_Body  => "<p>Page not found !</p>");
       else
          return Web_Page;
       end if;

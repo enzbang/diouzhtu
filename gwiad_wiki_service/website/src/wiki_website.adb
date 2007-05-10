@@ -53,11 +53,40 @@ package body Wiki_Website is
 
    Main_Dispatcher : AWS.Services.Dispatchers.URI.Handler;
 
+   function CSS_Callback (Request : in Status.Data) return Response.Data;
+   --  CSS callback
+
    function Image_Callback (Request : in Status.Data) return Response.Data;
    --  Image callback
 
+   function JS_Callback (Request : in Status.Data) return Response.Data;
+   --  Javascript callback
+
    procedure Unregister;
    --  Unregister website
+
+   ------------------
+   -- CSS_Callback --
+   ------------------
+
+   function CSS_Callback (Request : in Status.Data) return Response.Data is
+      URI : constant String := Status.URI (Request);
+      File : constant String :=
+               CSS_Root & "/"
+                 & URI (URI'First + Wiki_Web_Root'Length
+                        + Wiki_Web_CSS'Length + 2 .. URI'Last);
+   begin
+      Ada.Text_IO.Put_Line (URI);
+      Ada.Text_IO.Put_Line (File);
+
+      if Ada.Directories.Exists (File) then
+         return Response.File (MIME.Content_Type (File), File);
+      else
+         return Response.Build
+           (Content_Type  => MIME.Text_HTML,
+            Message_Body  => "<p>Error</p>");
+      end if;
+   end CSS_Callback;
 
    ----------------------
    -- Get_Wiki_Service --
@@ -120,6 +149,26 @@ package body Wiki_Website is
       end if;
    end Image_Callback;
 
+   -----------------
+   -- JS_Callback --
+   -----------------
+
+   function JS_Callback (Request : in Status.Data) return Response.Data is
+      URI : constant String := Status.URI (Request);
+      File : constant String :=
+               JS_Root & "/"
+                 & URI (URI'First + Wiki_Web_Root'Length
+                        + Wiki_Web_JS'Length + 2 .. URI'Last);
+   begin
+      if Ada.Directories.Exists (File) then
+         return Response.File (MIME.Content_Type (File), File);
+      else
+         return Response.Build
+           (Content_Type  => MIME.Text_HTML,
+            Message_Body  => "<p>Error</p>");
+      end if;
+   end JS_Callback;
+
    ----------------
    -- Unregister --
    ----------------
@@ -137,6 +186,18 @@ begin
      (Main_Dispatcher,
       Wiki_Web_Root & "/" & Wiki_Web_Image,
       Action => Dispatchers.Callback.Create (Image_Callback'Access),
+      Prefix => True);
+
+   AWS.Services.Dispatchers.URI.Register
+     (Main_Dispatcher,
+      Wiki_Web_Root & "/" & Wiki_Web_CSS,
+      Action => Dispatchers.Callback.Create (CSS_Callback'Access),
+      Prefix => True);
+
+   AWS.Services.Dispatchers.URI.Register
+     (Main_Dispatcher,
+      Wiki_Web_Root & "/" & Wiki_Web_JS,
+      Action => Dispatchers.Callback.Create (JS_Callback'Access),
       Prefix => True);
 
    AWS.Services.Dispatchers.URI.Register_Default_Callback
