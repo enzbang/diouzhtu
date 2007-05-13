@@ -20,14 +20,17 @@
 ------------------------------------------------------------------------------
 
 with GNAT.Regpat;
+with Ada.Characters.Handling;
 with Ada.Strings.Unbounded;
 with Ada.Exceptions;
 with Ada.Text_IO;
+
 with Diouzhtu;
 
 package body Diouzhtu.Inline is
 
    use GNAT.Regpat;
+   use Ada;
    use Ada.Exceptions;
    use Ada.Strings.Unbounded;
 
@@ -359,7 +362,8 @@ package body Diouzhtu.Inline is
             Append
               (Result, '>' & Parse
                  (Wiki, Inline_Level,
-                  S (Matches (2).First .. Matches (2).Last)) & "</a> ");
+                  S (Matches (2).First .. Matches (2).Last),
+                 Index + 1) & "</a> ");
          end if;
          Current := Matches (0).Last + 1;
       end loop;
@@ -384,6 +388,10 @@ package body Diouzhtu.Inline is
    begin
       Diouzhtu.Internal_Register (Inline_Level, Code'Access);
       Diouzhtu.Internal_Register (Inline_Level, Link'Access);
+
+      --  Single Link should always comes just after Link to be skipped when
+      --  parsing link description
+
       Diouzhtu.Internal_Register (Inline_Level, Single_Link'Access);
       Diouzhtu.Internal_Register (Inline_Level, Image'Access);
       Diouzhtu.Internal_Register (Inline_Level, Emphasis'Access);
@@ -399,7 +407,7 @@ package body Diouzhtu.Inline is
      (Wiki : Wiki_Information; Index : Positive; S : String) return String
    is
       Extract : constant Pattern_Matcher :=
-        Compile ("(\shttp://[^ \s\[\]]+)(\s|$)",
+        Compile ("(http://[^ \s\[\]]+)(\s|$)",
                  Case_Insensitive + Single_Line);
       Matches : Match_Array (0 .. 2);
       Current : Natural := S'First;
@@ -413,15 +421,25 @@ package body Diouzhtu.Inline is
             Append
               (Result,
                Parse (Wiki, Inline_Level,
-                      S (Current .. Matches (1).First), Index));
+                      S (Current .. Matches (1).First - 1), Index));
          end if;
 
          declare
+            End_Content : constant Character := S (Matches (1).Last);
             In_Content : constant String :=
               S (Matches (1).First .. Matches (1).Last);
          begin
-            Append (Result, "<a href="""
-                      & In_Content & """>" & In_Content & "</a> ");
+            if not Characters.Handling.Is_Alphanumeric (End_Content) then
+               --  Try to fix url
+               Append (Result, "<a href="""
+                       & In_Content (In_Content'First .. In_Content'Last - 1)
+                       & """>"
+                       & In_Content (In_Content'First .. In_Content'Last - 1)
+                       & "</a>" & End_Content);
+            else
+               Append (Result, "<a href="""
+                       & In_Content & """>" & In_Content & "</a> ");
+            end if;
          end;
          Current := Matches (1).Last + 2;
       end loop;
