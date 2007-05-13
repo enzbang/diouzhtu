@@ -53,6 +53,8 @@ I_INC	= $(INSTALL)/include/diouzhtu
 I_LIB	= $(INSTALL)/lib/diouzhtu
 I_GPR	= $(INSTALL)/lib/gnat
 
+PLUGIN_DISTRIB = gwiad_wiki_plugin
+
 ${MODULES_BUILD}:
 	${MAKE} -C ${@:%_build=%} $(OPTIONS)
 
@@ -82,25 +84,35 @@ install: install_dirs
 	$(CP) config/projects/diouzhtu.gpr $(I_GPR)
 
 install_gwiad_interface:
-	$(CP) gwiad_wiki_service/interface/lib/libwiki_interface.so /opt/gwiad/librairies/
+	$(CP) gwiad_wiki_service/interface/lib/libwiki_interface.so /opt/gwiad/bin/
 
 
 install_gwiad_service:
 	-$(GWIAD_UNREGISTER_SCRIPT) 127.0.0.1:8080 service wiki_service
 	$(RM) -f /opt/gwiad/lib/libwiki_service.so
-	$(CP) /opt/gnat/gpl-2006/lib/diouzhtu/*$(SOEXT) /opt/gwiad/librairies/
+	$(CP) /opt/gnat/gpl-2006/lib/diouzhtu/*$(SOEXT) /opt/gwiad/bin/
 	$(CP) gwiad_wiki_service/lib/libwiki_service.so /opt/gwiad/lib
 
 install_gwiad_website:
 	-$(GWIAD_UNREGISTER_SCRIPT) 127.0.0.1:8080 website /opt/gwiad/lib/libwiki_website.so
 	$(RM) -f /opt/gwiad/lib/libwiki_website.so
 	$(CP) gwiad_wiki_service/lib/libwiki_website.so /opt/gwiad/lib/
-	$(MKDIR) /opt/gwiad/templates/wiki_website/
-	$(MKDIR) /opt/gwiad/css/wiki_website/
-	$(MKDIR) /opt/gwiad/js/wiki_website/
-	$(CP) gwiad_wiki_service/website/templates/wiki_website/*.thtml \
-		/opt/gwiad/templates/wiki_website/
+	$(MKDIR) /opt/gwiad/plugin/wiki_website/example/templates/
+	$(MKDIR) /opt/gwiad/plugin/wiki_website/example/css
+	$(MKDIR) /opt/gwiad/plugin/wiki_website/example/js
+	$(CP) gwiad_wiki_service/website/templates/*.thtml \
+		/opt/gwiad/plugin/wiki_website/example/templates/
 	$(CP) gwiad_wiki_service/website/templates/wiki_website/css/*.css \
-		/opt/gwiad/css/wiki_website/
+		/opt/gwiad/plugin/wiki_website/example/css/
 	$(CP) external_libraries/highlight/*.js	\
-		/opt/gwiad/js/wiki_website/
+		/opt/gwiad/plugin/wiki_website/example/js/
+
+gwiad_plugin_distrib:
+	$(MKDIR) -p $(PLUGIN_DISTRIB)
+	$(CP) gwiad_wiki_service/interface/lib/libwiki_interface.so $(PLUGIN_DISTRIB)/
+	$(CP) gwiad_wiki_service/lib/libwiki_website.so $(PLUGIN_DISTRIB)/
+	$(CP) gwiad_wiki_service/lib/libwiki_service.so $(PLUGIN_DISTRIB)/
+	$(CP) gwiad_wiki_service/plugin/install.sh $(PLUGIN_DISTRIB)/
+	$(CP) /opt/gnat/gpl-2006/lib/diouzhtu/*$(SOEXT) $(PLUGIN_DISTRIB)/
+	$(TAR_DIR) $(PLUGIN_DISTRIB).tgz $(PLUGIN_DISTRIB)
+	$(RM) -r $(PLUGIN_DISTRIB)

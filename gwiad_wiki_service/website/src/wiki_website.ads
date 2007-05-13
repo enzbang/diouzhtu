@@ -19,14 +19,8 @@
 --  Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.       --
 ------------------------------------------------------------------------------
 
-with Wiki_Interface;
-
 package Wiki_Website is
 
-      Website_Name : constant String := "Diouzhtu_Website";
+   pragma Pure;
 
-private
-
-   function Get_Wiki_Service return Wiki_Interface.GW_Service'Class;
-   --  Returns the service
 end Wiki_Website;

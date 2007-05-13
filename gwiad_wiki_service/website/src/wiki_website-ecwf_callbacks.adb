@@ -20,23 +20,24 @@
 ------------------------------------------------------------------------------
 
 with Ada.Strings.Unbounded;
-with Ada.Exceptions;
 
 with AWS.Services.Directory;
 
 with Wiki_Website.Config;
+with Wiki_Website.Service;
 with Wiki_Website.Template_Defs.Block_View;
-with Wiki_Website.Template_Defs.View;
 
 with Ada.Directories;
 with Ada.Text_IO;
 
+with Gwiad.OS;
 with Gwiad.Services.Register;
 
 with Wiki_Interface;
 
 package body Wiki_Website.ECWF_Callbacks is
 
+   use Ada;
    use Ada.Strings.Unbounded;
    use Ada.Text_IO;
 
@@ -59,21 +60,19 @@ package body Wiki_Website.ECWF_Callbacks is
       use Ada.Directories;
 
       Get_URI       : constant String := URI (Request);
-      Filename      : constant String := Get_Filename (Get_URI);
-      HTML_Filename : constant String :=  Wiki_HTML_Dir & "/" & Filename;
+      Web_Root      : constant String := Get_Wiki_Web_Root (Get_URI);
+      Name          : constant Wiki_Name := Get_Wiki_Name (Web_Root);
+      Filename      : constant String := Get_Filename (Web_Root, Get_URI);
+      HTML_Filename : constant String :=
+                        Wiki_HTML_Dir (Name) & "/" & Filename;
 
-      HTML_Text : Unbounded_String := Null_Unbounded_String;
-      HTML_File : File_Type;
+      HTML_Text     : Unbounded_String := Null_Unbounded_String;
+      HTML_File     : File_Type;
+
    begin
-
       Templates.Insert
         (Translations,
          Templates.Assoc (Template_Defs.Block_View.FILENAME, Filename));
-
-      Templates.Insert
-        (Translations,
-         Templates.Assoc
-           (Template_Defs.View.WEBSITE_NAME, Website_Name));
 
       if Exists (HTML_Filename) then
          if Kind (HTML_Filename) /= Ordinary_File then
@@ -102,8 +101,9 @@ package body Wiki_Website.ECWF_Callbacks is
            (Translations, Templates.Assoc
               (Template_Defs.Block_View.VIEW, HTML_Text));
 
-      elsif Exists (Wiki_Text_Dir & "/" & Filename)
-        and then Kind (Wiki_Text_Dir & "/" & Filename) = Ordinary_File
+      elsif Exists (Wiki_Text_Dir (Name) & "/" & Filename)
+        and then Kind (Wiki_Text_Dir (Name)
+                       & "/" & Filename) = Ordinary_File
       then
          if not Gwiad.Services.Register.Exists (Wiki_Service_Name) then
             Templates.Insert
@@ -112,7 +112,7 @@ package body Wiki_Website.ECWF_Callbacks is
          end if;
 
          declare
-            Get_Service : GW_Service'Class := Get_Wiki_Service;
+            Get_Service : GW_Service'Class := Service.Get (Name, Web_Root);
             New_HTML    : constant String  := HTML (Get_Service, Filename);
          begin
             Templates.Insert
@@ -130,12 +130,20 @@ package body Wiki_Website.ECWF_Callbacks is
             Close (HTML_File);
          end;
       end if;
-
-   exception
-      when E : others =>
-         Ada.Text_IO.Put_Line (Ada.Exceptions.Exception_Information (E));
-            Templates.Insert
-              (Translations, Templates.Assoc ("ERROR", "<p>Service down</p>"));
    end View;
+
+   -------------------
+   -- View_Template --
+   -------------------
+
+   function View_Template (Request : in Status.Data) return String is
+      Get_URI       : constant String := AWS.Status.URI (Request);
+      Web_Root      : constant String := Get_Wiki_Web_Root (Get_URI);
+      Name          : constant Wiki_Name := Get_Wiki_Name (Web_Root);
+   begin
+      Ada.Text_IO.Put_Line ("view template");
+      return Wiki_Root (Name) & Gwiad.OS.Directory_Separator
+        & Template_Defs.Block_View.Template;
+   end View_Template;
 
 end Wiki_Website.ECWF_Callbacks;

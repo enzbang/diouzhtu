@@ -33,4 +33,7 @@ private package Wiki_Website.ECWF_Callbacks is
       Translations : in out Templates.Translate_Set);
    --  View a wiki page
 
+   function View_Template (Request : in Status.Data) return String;
+   --  Returns the view template corresponding to the wiki website
+
 end Wiki_Website.ECWF_Callbacks;

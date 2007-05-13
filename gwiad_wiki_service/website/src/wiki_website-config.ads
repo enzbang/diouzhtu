@@ -21,6 +21,10 @@
 
 private package Wiki_Website.Config is
 
+   type Wiki_Name is new String;
+
+   Wiki_Config_Exception : exception;
+
    Wiki_Service_Name   : constant String := "wiki_service";
    --  Gwiad wiki Service name
 
@@ -30,24 +34,39 @@ private package Wiki_Website.Config is
    Wiki_Web_CSS     : constant String := "css";
    Wiki_Web_JS      : constant String := "js";
 
-   Text_Dir         : constant String := "text";
-   HTML_Dir         : constant String := "html";
-   Image_Dir        : constant String := "img";
-   CSS_Dir          : constant String := "css";
-   JS_Dir           : constant String := "dir";
+   procedure Add_Config (Name : Wiki_Name; Web_Root : String);
+   --  Adds a new config (a new wiki website)
 
-   Wiki_Root        : constant String := "data/wiki_website";
-   CSS_Root         : constant String := "css/wiki_website";
-   JS_Root          : constant String := "js/wiki_website";
-   Wiki_Web_Root    : constant String := "/wiki";
+   function Get_Wiki_Name (Wiki_Web_Root : String) return Wiki_Name;
+   --  Returns wiki name from URI
 
-   function Get_Filename (URI : in String) return String;
+   function Get_Wiki_Web_Root (URI : String) return String;
+   --  Returns wiki web root
+
+   function Get_Wiki_Web_Root (Name : Wiki_Name) return String;
+   --  Returns the wiki web root corresponding to a wiki name
+
+   function Get_Filename (Wiki_Web_Root : String; URI : String) return String;
    --  Get filename from URI
 
-   function Wiki_Text_Dir return String;
+   function Wiki_Root (Name : Wiki_Name) return String;
+   --  Returns wiki root
+
+   function Wiki_Text_Dir (Name : Wiki_Name) return String;
    --  Returns wiki text dir
 
-   function Wiki_HTML_Dir return String;
+   function Wiki_Image_Dir (Name : Wiki_Name) return String;
+   --  Returns wiki image dir
+
+   function Wiki_HTML_Dir (Name : Wiki_Name) return String;
    --  Returns wiki HTML Dir
 
+   function Wiki_Data_Root (Name : Wiki_Name) return String;
+   --  Returns wiki data root
+
+   function Wiki_CSS_Root (Name : Wiki_Name) return String;
+   --  Returns wiki css root
+
+   function Wiki_JS_Root (Name : Wiki_Name) return String;
+   --  Returns wiki JS root
 end Wiki_Website.Config;

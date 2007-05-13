@@ -19,37 +19,23 @@
 --  Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.       --
 ------------------------------------------------------------------------------
 
-with AWS.Status;
-with AWS.Response;
-with AWS.Templates;
-with AWS.Services.ECWF.Context;
+with Wiki_Interface;
+with Wiki_Website.Config;
 
-private package Wiki_Website.Callbacks is
+private package Wiki_Website.Service is
 
-   use AWS;
+   use Wiki_Website.Config;
 
-   function Default_Callback (Request : in Status.Data) return Response.Data;
-   --  Default callback
+   function Get
+     (Name : Wiki_Name; Web_Root : String)
+      return Wiki_Interface.GW_Service'Class;
+   --  Returns the service
 
-   function CSS_Callback (Request : in Status.Data) return Response.Data;
-   --  CSS callback
+   procedure Register (Wiki_Web_Root : String; Name : Wiki_Name);
+   --  Register a website
 
-   function Image_Callback (Request : in Status.Data) return Response.Data;
-   --  Image callback
+   procedure Unregister (Website_Name : String);
+   --  Unregister a website
 
-   function JS_Callback (Request : in Status.Data) return Response.Data;
-   --  Javascript callback
 
-   procedure Edit_Page
-     (Request      : in     Status.Data;
-      Context      : access AWS.Services.ECWF.Context.Object;
-      Translations : in out Templates.Translate_Set);
-   --  Edit a page
-
-   procedure Preview_Page
-     (Request      : in     Status.Data;
-      Context      : access AWS.Services.ECWF.Context.Object;
-      Translations : in out Templates.Translate_Set);
-   --  Preview a page (uses wiki service)
-
-end Wiki_Website.Callbacks;
+end Wiki_Website.Service;

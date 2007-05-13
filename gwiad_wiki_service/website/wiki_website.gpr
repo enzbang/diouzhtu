@@ -38,7 +38,9 @@ Project Wiki_Website is
    for Library_Ali_Dir use "lib";
    for Library_Dir use "../lib";
    for Library_Name use "wiki_website";
-   for Library_Interface use ("wiki_website");
+   for Library_Interface use ("wiki_website",
+                              "wiki_website.service",
+                              "wiki_website.config");
    for Library_Kind use "dynamic";
    for Library_Auto_Init use "false";
 

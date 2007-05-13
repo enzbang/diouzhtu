@@ -21,6 +21,7 @@
 
 with Ada.Strings.Unbounded;
 with Ada.Text_IO;
+with Ada.Exceptions;
 with Ada.Directories;
 
 with AWS.MIME;
@@ -34,19 +35,44 @@ with Gwiad.Services.Register;
 with Wiki_Interface;
 
 with Wiki_Website.Config;
+with Wiki_Website.Service;
 with Wiki_Website.Template_Defs.Edit;
-with Wiki_Website.Template_Defs.View;
 with Wiki_Website.Template_Defs.Preview;
 
 package body Wiki_Website.Callbacks is
 
    use Ada.Strings.Unbounded;
+   use Ada.Exceptions;
    use Ada.Text_IO;
    use Ada;
 
    use Wiki_Website;
    use Wiki_Website.Config;
    use Wiki_Interface;
+
+   ------------------
+   -- CSS_Callback --
+   ------------------
+
+   function CSS_Callback (Request : in Status.Data) return Response.Data is
+      URI       : constant String := Status.URI (Request);
+      Web_Root  : constant String := Get_Wiki_Web_Root (URI);
+   begin
+      if Web_Root /= "" then
+         declare
+            File : constant String :=
+                     Wiki_CSS_Root
+                       (Get_Wiki_Name (Web_Root)) & "/"
+                        & URI (URI'First + Web_Root'Length +
+                                 Wiki_Web_CSS'Length + 2 .. URI'Last);
+         begin
+            if Ada.Directories.Exists (File) then
+               return Response.File (MIME.Content_Type (File), File);
+            end if;
+         end;
+      end if;
+      return Response.Acknowledge (Status_Code  => Messages.S404);
+   end CSS_Callback;
 
    ----------------------
    -- Default_Callback --
@@ -70,6 +96,14 @@ package body Wiki_Website.Callbacks is
       else
          return Web_Page;
       end if;
+   exception
+      when E : others => Ada.Text_IO.Put_Line
+           ("(Default_Callback) : Failed ! "
+           & Exception_Information (E));
+         return Response.Acknowledge
+           (Status_Code  => Messages.S500,
+            Message_Body => "<p>Internal error</p>",
+            Content_Type => MIME.Text_HTML);
    end Default_Callback;
 
    ---------------
@@ -86,8 +120,10 @@ package body Wiki_Website.Callbacks is
       pragma Unreferenced (Context);
 
       Get_URI  : constant String := URI (Request);
-      Name     : constant String := Get_Filename (Get_URI);
-      Filename : constant String := Wiki_Text_Dir & "/" & Name;
+      Root     : constant String := Get_Wiki_Web_Root (Get_URI);
+      Name     : constant String := Get_Filename (Root, Get_URI);
+      Filename : constant String :=
+                    Wiki_Text_Dir (Get_Wiki_Name (Root)) & "/" & Name;
 
       Text_Plain : Unbounded_String;
       Text_File  : File_Type;
@@ -110,7 +146,6 @@ package body Wiki_Website.Callbacks is
                   Templates.To_Set (AWS.Services.Directory.Browse
                     (Directory_Name => Filename,
                      Request        => Request)));
-               Ada.Text_IO.Put_Line ("here for " & Filename);
             end if;
             return;
          end if;
@@ -135,15 +170,43 @@ package body Wiki_Website.Callbacks is
          Templates.Assoc (Template_Defs.Edit.FILENAME, Name));
    end Edit_Page;
 
-   -------------------
-   -- Edit_Template --
-   -------------------
+   --------------------
+   -- Image_Callback --
+   --------------------
 
-   function Edit_Template (Request : in Status.Data) return String is
-      pragma Unreferenced (Request);
+   function Image_Callback (Request : in Status.Data) return Response.Data is
+      URI  : constant String := Status.URI (Request);
+      Root : constant String := Get_Wiki_Web_Root (URI);
+      Name : constant Wiki_Name := Get_Wiki_Name (Wiki_Web_Root => Root);
+      File : constant String := Wiki_Data_Root (Name)
+        & "/" & Wiki_Image_Dir (Name) & "/"
+        & URI (URI'First + Root'Length +
+                 Wiki_Web_Image'Length + 2 .. URI'Last);
    begin
-      return Template_Defs.Edit.Template;
-   end Edit_Template;
+      if Ada.Directories.Exists (File) then
+         return Response.File (MIME.Content_Type (File), File);
+      else
+         return Response.Acknowledge (Status_Code => Messages.S500);
+      end if;
+   end Image_Callback;
+
+   -----------------
+   -- JS_Callback --
+   -----------------
+
+   function JS_Callback (Request : in Status.Data) return Response.Data is
+      URI : constant String := Status.URI (Request);
+      Wiki_Root : constant String := Get_Wiki_Web_Root (URI);
+      File : constant String := Wiki_JS_Root (Get_Wiki_Name (Wiki_Root)) & "/"
+        & URI (URI'First + Wiki_Root'Length +
+                 Wiki_Web_JS'Length + 2 .. URI'Last);
+   begin
+      if Ada.Directories.Exists (File) then
+         return Response.File (MIME.Content_Type (File), File);
+      else
+         return Response.Acknowledge (Status_Code => Messages.S500);
+      end if;
+   end JS_Callback;
 
    ------------------
    -- Preview_Page --
@@ -156,14 +219,16 @@ package body Wiki_Website.Callbacks is
    is
       use Ada.Directories;
       pragma Unreferenced (Context);
-      P          : constant Parameters.List := Status.Parameters (Request);
-      Save       : constant String          :=
+      P           : constant Parameters.List := Status.Parameters (Request);
+      Save        : constant String          :=
                      Parameters.Get (P, Template_Defs.Preview.HTTP.save);
-      Text_Plain : constant String          :=
+      Text_Plain  : constant String          :=
                      Parameters.Get (P, Template_Defs.Preview.HTTP.text_plain);
 
-      Get_URI    : constant String := Status.URI (Request);
-      Name       : constant String := Get_Filename (Get_URI);
+      Get_URI     : constant String := Status.URI (Request);
+      Root        : constant String := Get_Wiki_Web_Root (Get_URI);
+      Name        : constant Wiki_Name := Get_Wiki_Name (Root);
+      Wiki_Filename : constant String := Get_Filename (Root, Get_URI);
 
    begin
 
@@ -180,11 +245,15 @@ package body Wiki_Website.Callbacks is
       end if;
 
       declare
-         Get_Service : GW_Service'Class := Get_Wiki_Service;
+         Get_Service : GW_Service'Class :=
+                         Service.Get (Web_Root => Root,
+                                      Name     => Name);
       begin
          if Save /= "" then
             declare
-               Filename    : constant String := Wiki_Text_Dir & "/" & Name;
+
+               Filename    : constant String :=
+                               Wiki_Text_Dir (Name) & "/" & Wiki_Filename;
                Text_File   : File_Type;
                Update_HTML : Boolean := False;
             begin
@@ -214,14 +283,16 @@ package body Wiki_Website.Callbacks is
                Close (File => Text_File);
 
                if Update_HTML and then Ada.Directories.Exists
-                 (Wiki_HTML_Dir & "/" & Name) then
-                  Ada.Directories.Delete_File (Wiki_HTML_Dir & "/" & Name);
+                 (Wiki_HTML_Dir (Name) & "/" & Wiki_Filename) then
+                  Ada.Directories.Delete_File
+                    (Wiki_HTML_Dir (Name) & "/" & Wiki_Filename);
                end if;
 
             end;
             Templates.Insert
               (Translations,
-               Templates.Assoc (Template_Defs.Preview.HAS_BEEN_SAVED, Name));
+               Templates.Assoc (Template_Defs.Preview.HAS_BEEN_SAVED,
+                 Wiki_Filename));
          else
             Templates.Insert
               (Translations,
@@ -233,29 +304,10 @@ package body Wiki_Website.Callbacks is
                Templates.Assoc (Template_Defs.Preview.TEXT_PLAIN, Text_Plain));
             Templates.Insert
               (Translations,
-               Templates.Assoc (Template_Defs.Preview.FILENAME, Name));
+               Templates.Assoc
+                 (Template_Defs.Preview.FILENAME, Wiki_Filename));
          end if;
       end;
    end Preview_Page;
-
-   ----------------------
-   -- Preview_Template --
-   ----------------------
-
-   function Preview_Template (Request : in Status.Data) return String is
-      pragma Unreferenced (Request);
-   begin
-      return Template_Defs.Preview.Template;
-   end Preview_Template;
-
-   -------------------
-   -- View_Template --
-   -------------------
-
-   function View_Template (Request : in Status.Data) return String is
-      pragma Unreferenced (Request);
-   begin
-      return Template_Defs.View.Template;
-   end View_Template;
 
 end Wiki_Website.Callbacks;
