@@ -1,0 +1,8 @@
+@@IF@@ @_MODIFICATION_DATE_@ /= ""
+<p class="footdate">
+  Updated @_FORMAT_DATE(%A %B %d %Y @ %T ):MODIFICATION_DATE_@
+</p>
+@@END_IF@@
+</div>
+</body>
+</html>

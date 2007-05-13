@@ -1,32 +1,13 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
-    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml">
-  <head>
-    <title>Edit : @_FILENAME_@</title>
-    <link rel="author" href="http://www.ramonat.fr" />
-    <meta name="author" content="Olivier Ramonat" />
-    <meta name="description"
-	  content="Wiki based on diouzhtu for Gwiad - AWS" />
-    <meta name="generator" content="diouzhtu" />
-    <meta http-equiv="Content-Type"
-          content="text/html; charset=utf-8" />
-    <style type="text/css">
-      textarea { width : 100%;}
-    </style>
-  </head>
+@@INCLUDE@@ top.thtml "Edit : @_FILENAME_@"
 
-<body>
 <h1>@_FILENAME_@</h1>
 
 @_ERROR_@
 
 @@IF@@ @_FILENAME_@ /= ""
-<form method="post" action="/wiki/preview/@_FILENAME_@">
+<form method="post" action="@_WIKI_WEB_ROOT_@/preview/@_FILENAME_@">
   <textarea rows="40" cols="80"
             name="text_plain" id="text_plain">@_TEXT_PLAIN_@</textarea>
-  <p class="syntax_info">Based on diouzhtu syntax</p>
-
   <p><input type="submit" name="submit"/></p>
 </form>
 @@ELSE@@
@@ -36,7 +17,7 @@
 <ul>
 @@TABLE@@
 @@IF@@ @_IS_DIR_V_@
-@@IF@@ @_NAME_V_@ /= "./" and not (@_NAME_V_@ = "../" and @_URI_@ = "/wiki/edit/")
+@@IF@@ @_NAME_V_@ /= "./" and not (@_NAME_V_@ = "../" and @_URI_@ = "@_WIKI_WEB_ROOT_@/edit/")
 <li><a href="@_NAME_V_@">@_NAME_V_@</a></li>
 @@END_IF@@
 @@ELSE@@
@@ -45,9 +26,7 @@
 @@END_TABLE@@
 </ul>
 
-To create new page called my_first_page type go to url /wiki/edit/my_first_page
+To create new page called my_first_page type go to url @_WIKI_WEB_ROOT_@/edit/my_first_page
 @@END_IF@@
 
-
-</body>
-</html>
+@@INCLUDE@@ bottom.thtml

@@ -19,12 +19,15 @@
 --  Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.       --
 ------------------------------------------------------------------------------
 
+with GNAT.Calendar.Time_IO;
+
 with Ada.Strings.Unbounded;
 
 with AWS.Services.Directory;
 
 with Wiki_Website.Config;
 with Wiki_Website.Service;
+with Wiki_Website.Template_Defs.Bottom;
 with Wiki_Website.Template_Defs.Block_View;
 
 with Ada.Directories;
@@ -130,6 +133,13 @@ package body Wiki_Website.ECWF_Callbacks is
             Close (HTML_File);
          end;
       end if;
+
+      Templates.Insert
+        (Translations,
+         Templates.Assoc (Template_Defs.Bottom.MODIFICATION_DATE,
+           GNAT.Calendar.Time_IO.Image
+             (Directories.Modification_Time
+                (Name => HTML_Filename), "%Y-%m-%d %T")));
    end View;
 
    -------------------

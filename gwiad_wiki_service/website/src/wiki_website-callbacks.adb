@@ -36,6 +36,7 @@ with Wiki_Interface;
 
 with Wiki_Website.Config;
 with Wiki_Website.Service;
+with Wiki_Website.Template_Defs.Top;
 with Wiki_Website.Template_Defs.Edit;
 with Wiki_Website.Template_Defs.Preview;
 
@@ -84,6 +85,13 @@ package body Wiki_Website.Callbacks is
       Translations : Templates.Translate_Set;
       Web_Page     : Response.Data;
    begin
+
+      --  Insert global data
+
+      Templates.Insert
+        (Translations,
+         Templates.Assoc (Template_Defs.Top.WIKI_WEB_ROOT,
+          Get_Wiki_Web_Root (URI)));
 
       Web_Page := AWS.Services.ECWF.Registry.Build
         (URI, Request, Translations, Cache_Control => Messages.Prevent_Cache);
@@ -293,6 +301,7 @@ package body Wiki_Website.Callbacks is
               (Translations,
                Templates.Assoc (Template_Defs.Preview.HAS_BEEN_SAVED,
                  Wiki_Filename));
+
          else
             Templates.Insert
               (Translations,

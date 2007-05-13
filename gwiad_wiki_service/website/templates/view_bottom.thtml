@@ -1,8 +1,0 @@
-@@IF@@ @_$1_@ = Diouzhtu_Website
-<p class="footdate">
-  Updated @_MODIFICATION_DATE_@
-</p>
-</div>
-</body>
-</html>
-@@END_IF@@

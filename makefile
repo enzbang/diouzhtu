@@ -90,7 +90,7 @@ install_gwiad_interface:
 install_gwiad_service:
 	-$(GWIAD_UNREGISTER_SCRIPT) 127.0.0.1:8080 service wiki_service
 	$(RM) -f /opt/gwiad/lib/libwiki_service.so
-	$(CP) /opt/gnat/gpl-2006/lib/diouzhtu/*$(SOEXT) /opt/gwiad/bin/
+	$(CP) $(INSTALL)/lib/diouzhtu/*$(SOEXT) /opt/gwiad/bin/
 	$(CP) gwiad_wiki_service/lib/libwiki_service.so /opt/gwiad/lib
 
 install_gwiad_website:
@@ -113,6 +113,6 @@ gwiad_plugin_distrib:
 	$(CP) gwiad_wiki_service/lib/libwiki_website.so $(PLUGIN_DISTRIB)/
 	$(CP) gwiad_wiki_service/lib/libwiki_service.so $(PLUGIN_DISTRIB)/
 	$(CP) gwiad_wiki_service/plugin/install.sh $(PLUGIN_DISTRIB)/
-	$(CP) /opt/gnat/gpl-2006/lib/diouzhtu/*$(SOEXT) $(PLUGIN_DISTRIB)/
+	$(CP) $(INSTALL)/lib/diouzhtu/*$(SOEXT) $(PLUGIN_DISTRIB)/
 	$(TAR_DIR) $(PLUGIN_DISTRIB).tgz $(PLUGIN_DISTRIB)
 	$(RM) -r $(PLUGIN_DISTRIB)

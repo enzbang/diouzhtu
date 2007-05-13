@@ -1,5 +1,9 @@
-@@INCLUDE@@ view_top.thtml @_WEBSITE_NAME_@
+@@INCLUDE@@ top.thtml @_FILENAME_@
+
+  <ul id="control_menu">
+    <li><a href="@_WIKI_WEB_ROOT_@/edit/@_FILENAME_@">Edit</a></li>
+  </ul>
 
 @_LAZY_VIEW_@
 
-@@INCLUDE@@ view_bottom.thtml @_WEBSITE_NAME_@
+@@INCLUDE@@ bottom.thtml
