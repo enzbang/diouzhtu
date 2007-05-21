@@ -63,57 +63,11 @@ package body Diouzhtu.To_HTML is
       Text : constant String := CR_Delete (S);
 
       Content       : Unbounded_String := Null_Unbounded_String;
+      Parse_Result  : Unbounded_String := Null_Unbounded_String;
       Result        : Unbounded_String := Null_Unbounded_String;
       Last          : Positive := S'First;
 
       In_Code_Block  : Boolean := False;
-      End_Code_Block : constant String := "end code.";
-
-      procedure Block_To_HTML;
-      --  Parse a block content
-
-      -------------------
-      -- Block_To_HTML --
-      -------------------
-
-      procedure Block_To_HTML is
-         Block_Content : constant String := To_String (Content);
-      begin
-
-         if In_Code_Block then
-
-            --  Search for end tag
-
-            if Block_Content'Length >= End_Code_Block'Length
-              and then
-                Block_Content
-                  (Block_Content'First ..
-                         Block_Content'First +
-                           End_Code_Block'Length - 1)
-                      = End_Code_Block then
-               Append (Result, Code.End_Code);
-               In_Code_Block := False;
-            else
-               Append (Result, ASCII.Lf & ASCII.Lf & Block_Content);
-            end if;
-
-         else
-            declare
-               Code_Content : constant String :=
-                                Code.Begin_Code (Block_Content);
-            begin
-               if Code_Content /= "" then
-                  In_Code_Block := True;
-                  Append (Result, Code_Content);
-               else
-                  Append
-                    (Result,
-                     Parse
-                       (Wiki, Block_Level, To_String (Content)));
-               end if;
-            end;
-         end if;
-      end Block_To_HTML;
 
    begin
 
@@ -126,7 +80,10 @@ package body Diouzhtu.To_HTML is
                Append (Content, Web_Escape (Text (Last .. K - 1)));
             else
                if Content /= Null_Unbounded_String then
-                  Block_To_HTML;
+                  Code.Parse (Wiki, To_String (Content),
+                              In_Code_Block, Parse_Result);
+                  Append (Result, Parse_Result);
+                  Parse_Result := Null_Unbounded_String;
                   Content := Null_Unbounded_String;
                end if;
             end if;
@@ -139,7 +96,9 @@ package body Diouzhtu.To_HTML is
       end if;
 
       if Content /= Null_Unbounded_String then
-         Block_To_HTML;
+         Code.Parse (Wiki, To_String (Content),
+                     In_Code_Block, Parse_Result);
+         Append (Result, Parse_Result);
       end if;
 
       return To_String (Result);
@@ -173,7 +132,7 @@ package body Diouzhtu.To_HTML is
          if Is_Open (Diouzhtu_File) then
             Close (Diouzhtu_File);
          end if;
-         return "";
+         raise;
    end To_HTML;
 
    ----------------

@@ -121,14 +121,13 @@ package body Diouzhtu is
       Register_Callback : Callback;
    begin
       --  ???
-      --  First Blocks and Inlines callback is code and user callbacks should
+      --  First Inlines callback is code and user callbacks should
       --  not erase this.
       --  Insert them after code callback
 
       Register_Callback.To_HTML := To_HTML;
       if Level = Block_Level then
-         Blocks.Insert (Before   => Next (Blocks.First),
-                        New_Item => Register_Callback);
+         Blocks.Prepend (New_Item  => Register_Callback);
       else
          Inlines.Insert (Before   => Next (Inlines.First),
                          New_Item => Register_Callback);

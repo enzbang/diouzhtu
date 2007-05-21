@@ -252,7 +252,9 @@ package body Diouzhtu.Block is
          Last_Level : List_Level := 0; -- List_Level'First
       begin
          for K in Block'Range loop
-            if Block (K) = ASCII.Lf or else K = Block'Last then
+            if K = Block'Last
+              or else (Block (K) = ASCII.Lf and then Block (K + 1) = Get_Tag)
+            then
                declare
                   Line       : constant String := Block (Last .. K);
                   Line_Level : constant List_Level := Get_Current_Level (Line);

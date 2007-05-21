@@ -33,13 +33,17 @@ p(example1#big-red2). Red _here_ and _there_
 
 *It is a -- dash*
 
-# First
-## sub 1
-# Second
+# First a *little*
+## sub 1 @help@
+# Second from
+my
 ## sub 2
+friend
 ## sub 3
 ### other
 # Third
+point and end of
+the block
 
 @code block@
 
@@ -62,12 +66,10 @@ An image !diouzhtu.png! in png format
 
 code.
 @code@
-
 end code.
 
 code.
 "(class)Une url de test(title)":page2
-
 end code.
 
 Insert @@@@ for writting @@
@@ -77,3 +79,19 @@ Another test with an url http://url_in_text in text
 A test with (http://an.url)
 
 And another http://url.to.test.
+
+code(diouzhtu).
+| Cell 1 | Cell 2 | Cell 3 |
+| Cell 1 | Cell 2 | Cell 3 |
+| Cell 1 |
+| Cell 1 | Cell 2 |
+end code.
+
+code(with-end-blank-line).
+Just
+With
+
+end code.
+
+End of *test*
+

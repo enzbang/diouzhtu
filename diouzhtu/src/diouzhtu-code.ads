@@ -19,12 +19,17 @@
 --  Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.       --
 ------------------------------------------------------------------------------
 
+with Ada.Strings.Unbounded;
+
 package Diouzhtu.Code is
 
-   function Begin_Code (Block : in String) return String;
-   --  Returns a code mark if the block start with code.
+   use Ada.Strings.Unbounded;
 
-   function End_Code return String;
-   --  End the code tag
+   procedure Parse
+     (Wiki          : in Wiki_Information;
+      Block         : in String;
+      Is_Code_Block : in out Boolean;
+      Result        : out Unbounded_String);
+   --  Search for code block. Call Diouzhtu.Parse if not a code block
 
 end Diouzhtu.Code;
