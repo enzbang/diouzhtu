@@ -67,8 +67,8 @@ package body Wiki_Website.ECWF_Callbacks is
       Name          : constant Wiki_Name := Get_Wiki_Name (Web_Root);
       Filename      : constant String := Get_Filename (Web_Root, Get_URI);
       HTML_Filename : constant String :=
-                        Wiki_HTML_Dir (Name) & "/" & Filename;
-
+                        Wiki_HTML_Dir (Name)
+                        & Gwiad.OS.Directory_Separator & Filename;
       HTML_Text     : Unbounded_String := Null_Unbounded_String;
       HTML_File     : File_Type;
 
