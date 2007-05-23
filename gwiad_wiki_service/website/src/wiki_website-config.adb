@@ -32,7 +32,7 @@ package body Wiki_Website.Config is
    use Ada;
 
    Plugin_Root : constant String :=
-                   Directories.Compose ("plugin", "wiki_website");
+                   Directories.Compose ("plugins", "wiki_website");
 
    package Config_Maps is new Ada.Containers.Indefinite_Hashed_Maps
      (String, Wiki_Name, Ada.Strings.Hash, "=", "=");

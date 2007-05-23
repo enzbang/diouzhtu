@@ -290,7 +290,6 @@ package body @_PACKAGE_@ is
      @@IF@@ @_UPPER:SLICE(1..5):VARIABLE_LIST_@ = "LAZY_"
          ECWF.Registry.Register
             ("@_VARIABLE_LIST_@",
-             @@--             "templates/wiki_website/block_@_LOWER:REPLACE_ALL(LAZY_/):VARIABLE_LIST_@.thtml",
              ECWF_Callbacks.@_CAPITALIZE:REPLACE_ALL(LAZY_/):VARIABLE_LIST_@_Template'Access,
              ECWF_Callbacks.@_CAPITALIZE:REPLACE_ALL(LAZY_/):VARIABLE_LIST_@'Access);
      @@END_IF@@

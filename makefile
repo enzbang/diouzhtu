@@ -97,15 +97,15 @@ install_gwiad_website:
 	-$(GWIAD_UNREGISTER_SCRIPT) 127.0.0.1:8080 website /opt/gwiad/lib/libwiki_website.so
 	$(RM) -f /opt/gwiad/lib/libwiki_website.so
 	$(CP) gwiad_wiki_service/lib/libwiki_website.so /opt/gwiad/lib/
-	$(MKDIR) /opt/gwiad/plugin/wiki_website/example/templates/
-	$(MKDIR) /opt/gwiad/plugin/wiki_website/example/css
-	$(MKDIR) /opt/gwiad/plugin/wiki_website/example/js
+	$(MKDIR) /opt/gwiad/plugins/wiki_website/example/templates/
+	$(MKDIR) /opt/gwiad/plugins/wiki_website/example/css
+	$(MKDIR) /opt/gwiad/plugins/wiki_website/example/js
 	$(CP) gwiad_wiki_service/website/templates/*.thtml \
-		/opt/gwiad/plugin/wiki_website/example/templates/
+		/opt/gwiad/plugins/wiki_website/example/templates/
 	$(CP) gwiad_wiki_service/website/templates/wiki_website/css/*.css \
-		/opt/gwiad/plugin/wiki_website/example/css/
+		/opt/gwiad/plugins/wiki_website/example/css/
 	$(CP) external_libraries/highlight/*.js	\
-		/opt/gwiad/plugin/wiki_website/example/js/
+		/opt/gwiad/plugins/wiki_website/example/js/
 
 gwiad_plugin_distrib:
 	$(MKDIR) -p $(PLUGIN_DISTRIB)
