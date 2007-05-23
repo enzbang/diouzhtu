@@ -21,21 +21,24 @@
 
 with Ada.Text_IO;
 with Ada.Exceptions;
+with Ada.Strings.Unbounded;
 
-with Ada.Directories;
 with Ada.Containers.Indefinite_Hashed_Maps;
 with Ada.Strings.Hash;
 
 package body Wiki_Website.Config is
 
-   use Ada.Exceptions;
    use Ada;
+   use Ada.Exceptions;
+   use Ada.Strings.Unbounded;
 
-   Plugin_Root : constant String :=
-                   Directories.Compose ("plugins", "wiki_website");
+   type Wiki_Data is record
+      Host_Name : Unbounded_String;
+      Web_Root  : Unbounded_String;
+   end record;
 
    package Config_Maps is new Ada.Containers.Indefinite_Hashed_Maps
-     (String, Wiki_Name, Ada.Strings.Hash, "=", "=");
+     (String, Wiki_Data, Strings.Hash, "=", "=");
    use Config_Maps;
 
    Configs : Map;
@@ -44,10 +47,14 @@ package body Wiki_Website.Config is
    -- Add_Config --
    ----------------
 
-   procedure Add_Config (Name : Wiki_Name; Web_Root : String) is
+   procedure Add_Config
+     (Name : Wiki_Name; Hostname : String; Web_Root : String)
+   is
    begin
-      Configs.Insert (Key       => Web_Root,
-                      New_Item  => Name);
+      Configs.Insert (Key       => String (Name),
+                      New_Item  =>
+                        (Host_Name => To_Unbounded_String (Hostname),
+                         Web_Root  => To_Unbounded_String (Web_Root)));
    end Add_Config;
 
    ------------------
@@ -93,20 +100,8 @@ package body Wiki_Website.Config is
    -- Get_Wiki_Name --
    -------------------
 
-   function Get_Wiki_Name (Wiki_Web_Root : String) return Wiki_Name is
-   begin
-      if Configs.Contains (Wiki_Web_Root) then
-         return Configs.Element (Wiki_Web_Root);
-      end if;
-      raise Wiki_Config_Exception;
-   end Get_Wiki_Name;
-
-   -----------------------
-   -- Get_Wiki_Web_Root --
-   -----------------------
-
-   function Get_Wiki_Web_Root (URI : String) return String is
-      Position : Cursor := Configs.First;
+   function Get_Wiki_Name (Hostname : String; URI : String) return Wiki_Name is
+      Position : Cursor := No_Element;
 
       function Match_URI return Boolean;
       --  Test if the web root element match the given URI
@@ -116,7 +111,7 @@ package body Wiki_Website.Config is
       ---------------
 
       function Match_URI return Boolean is
-         Web_Root : constant String := Key (Position);
+         Web_Root : constant String := To_String (Element (Position).Web_Root);
       begin
          if URI'Length >= Web_Root'Length and then
            URI (URI'First .. URI'First + Web_Root'Length - 1) = Web_Root
@@ -126,33 +121,36 @@ package body Wiki_Website.Config is
             return False;
          end if;
       end Match_URI;
-
    begin
-      while Position /= No_Element and then not Match_URI loop
-         Next (Position);
-      end loop;
 
-      if Position = No_Element then
-         raise Wiki_Config_Exception;
+      if Hostname /= "" then
+         Position := Configs.First;
+         while Position /= No_Element
+           and then Element (Position).Host_Name /= Hostname loop
+            Next (Position);
+         end loop;
       end if;
 
-      return Key (Position);
-   end Get_Wiki_Web_Root;
+      if Position = No_Element then
+         Position := Configs.First;
+         while Position /= No_Element and then not Match_URI loop
+            Next (Position);
+         end loop;
+
+         if Position = No_Element then
+            raise Wiki_Config_Exception;
+         end if;
+      end if;
+      return Wiki_Name (Key (Position));
+   end Get_Wiki_Name;
 
    -----------------------
    -- Get_Wiki_Web_Root --
    -----------------------
 
    function Get_Wiki_Web_Root (Name : Wiki_Name) return String is
-      Position : Cursor := Configs.First;
    begin
-      while Position /= No_Element loop
-         if Element (Position) = Name then
-            return Key (Position);
-         end if;
-         Next (Position);
-      end loop;
-      raise Wiki_Config_Exception;
+      return To_String (Configs.Element (String (Name)).Web_Root);
    end Get_Wiki_Web_Root;
 
    -------------------
@@ -176,6 +174,15 @@ package body Wiki_Website.Config is
         (Containing_Directory => Wiki_Root (Name),
          Name                 => "data");
    end Wiki_Data_Root;
+
+   ---------------
+   -- Wiki_Host --
+   ---------------
+
+   function Wiki_Host (Name : Wiki_Name) return String is
+   begin
+      return To_String (Configs.Element (String (Name)).Host_Name);
+   end Wiki_Host;
 
    -------------------
    -- Wiki_HTML_Dir --

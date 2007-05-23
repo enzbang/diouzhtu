@@ -20,6 +20,7 @@
 ------------------------------------------------------------------------------
 
 with "../../shared";
+with "gwiad";
 with "gwiad-services";
 
 Project Wiki_Interface is

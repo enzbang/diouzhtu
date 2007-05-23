@@ -31,7 +31,11 @@ private package Wiki_Website.Service is
       return Wiki_Interface.GW_Service'Class;
    --  Returns the service
 
-   procedure Register (Wiki_Web_Root : String; Name : Wiki_Name);
+   procedure Register
+     (Wiki_Web_Root : String;
+      Virtual_Host  : String;
+      Name          : Wiki_Name;
+      Description   : String);
    --  Register a website
 
    procedure Unregister (Website_Name : String);

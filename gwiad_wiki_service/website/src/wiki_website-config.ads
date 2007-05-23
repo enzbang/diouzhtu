@@ -19,6 +19,8 @@
 --  Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.       --
 ------------------------------------------------------------------------------
 
+with Ada.Directories;
+
 private package Wiki_Website.Config is
 
    type Wiki_Name is new String;
@@ -28,26 +30,30 @@ private package Wiki_Website.Config is
    Wiki_Service_Name   : constant String := "wiki_service";
    --  Gwiad wiki Service name
 
+   Plugin_Root : constant String :=
+                   Ada.Directories.Compose ("plugins", "wiki_website");
+
    Wiki_Web_Image   : constant String := "img";
    Wiki_Web_Edit    : constant String := "edit";
    Wiki_Web_Preview : constant String := "preview";
    Wiki_Web_CSS     : constant String := "css";
    Wiki_Web_JS      : constant String := "js";
 
-   procedure Add_Config (Name : Wiki_Name; Web_Root : String);
+   procedure Add_Config
+     (Name : Wiki_Name; Hostname : String; Web_Root : String);
    --  Adds a new config (a new wiki website)
 
-   function Get_Wiki_Name (Wiki_Web_Root : String) return Wiki_Name;
+   function Get_Wiki_Name (Hostname : String; URI : String) return Wiki_Name;
    --  Returns wiki name from URI
-
-   function Get_Wiki_Web_Root (URI : String) return String;
-   --  Returns wiki web root
 
    function Get_Wiki_Web_Root (Name : Wiki_Name) return String;
    --  Returns the wiki web root corresponding to a wiki name
 
    function Get_Filename (Wiki_Web_Root : String; URI : String) return String;
    --  Get filename from URI
+
+   function Wiki_Host (Name : Wiki_Name) return String;
+   --  Returns wiki host
 
    function Wiki_Root (Name : Wiki_Name) return String;
    --  Returns wiki root

@@ -50,7 +50,9 @@ check :$(MODULES_CHECK)
 
 I_BIN	= $(INSTALL)/bin
 I_INC	= $(INSTALL)/include/diouzhtu
+I_INC_W = $(INSTALL)/include/wiki_interface
 I_LIB	= $(INSTALL)/lib/diouzhtu
+I_LIB_W	= $(INSTALL)/lib/wiki_interface
 I_GPR	= $(INSTALL)/lib/gnat
 
 PLUGIN_DISTRIB = gwiad_wiki_plugin
@@ -75,13 +77,18 @@ install_clean:
 install_dirs: install_clean
 	$(MKDIR) $(I_BIN)
 	$(MKDIR) $(I_INC)
+	$(MKDIR) $(I_INC_W)
 	$(MKDIR) $(I_LIB)
+	$(MKDIR) $(I_LIB_W)
 	$(MKDIR) $(I_GPR)
 
 install: install_dirs
 	$(CP) diouzhtu/src/*.ad[sb] $(I_INC)
+	$(CP) gwiad_wiki_service/interface/src/*.ads $(I_INC_W)
 	$(CP) diouzhtu/lib/* $(I_LIB)
+	$(CP) gwiad_wiki_service/interface/lib/* $(I_LIB_W)
 	$(CP) config/projects/diouzhtu.gpr $(I_GPR)
+	$(CP) config/projects/wiki_interface.gpr $(I_GPR)
 
 install_gwiad_interface:
 	$(CP) gwiad_wiki_service/interface/lib/libwiki_interface.so /opt/gwiad/bin/

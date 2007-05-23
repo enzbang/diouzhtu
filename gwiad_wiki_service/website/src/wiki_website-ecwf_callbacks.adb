@@ -63,8 +63,10 @@ package body Wiki_Website.ECWF_Callbacks is
       use Ada.Directories;
 
       Get_URI       : constant String := URI (Request);
-      Web_Root      : constant String := Get_Wiki_Web_Root (Get_URI);
-      Name          : constant Wiki_Name := Get_Wiki_Name (Web_Root);
+      Name          : constant Wiki_Name :=
+                        Get_Wiki_Name (Hostname => Host (Request),
+                                       URI      => Get_URI);
+      Web_Root      : constant String := Get_Wiki_Web_Root (Name);
       Filename      : constant String := Get_Filename (Web_Root, Get_URI);
       HTML_Filename : constant String :=
                         Wiki_HTML_Dir (Name)
@@ -73,6 +75,8 @@ package body Wiki_Website.ECWF_Callbacks is
       HTML_File     : File_Type;
 
    begin
+
+      Ada.Text_IO.Put_Line ("View");
       Templates.Insert
         (Translations,
          Templates.Assoc (Template_Defs.Block_View.FILENAME, Filename));
@@ -88,6 +92,8 @@ package body Wiki_Website.ECWF_Callbacks is
             end if;
             return;
          end if;
+
+         Ada.Text_IO.Put_Line ("ViewHMTL " & HTML_Filename);
 
          Open (File => HTML_File,
                Mode => In_File,
@@ -108,6 +114,8 @@ package body Wiki_Website.ECWF_Callbacks is
         and then Kind (Wiki_Text_Dir (Name)
                        & "/" & Filename) = Ordinary_File
       then
+         Ada.Text_IO.Put_Line ("VIEW FILE "& Filename);
+
          if not Gwiad.Services.Register.Exists (Wiki_Service_Name) then
             Templates.Insert
               (Translations,
@@ -134,12 +142,14 @@ package body Wiki_Website.ECWF_Callbacks is
          end;
       end if;
 
-      Templates.Insert
-        (Translations,
-         Templates.Assoc (Template_Defs.Bottom.MODIFICATION_DATE,
-           GNAT.Calendar.Time_IO.Image
-             (Directories.Modification_Time
-                (Name => HTML_Filename), "%Y-%m-%d %T")));
+      if Exists (HTML_Filename) then
+         Templates.Insert
+           (Translations,
+            Templates.Assoc (Template_Defs.Bottom.MODIFICATION_DATE,
+              GNAT.Calendar.Time_IO.Image
+                (Directories.Modification_Time
+                   (Name => HTML_Filename), "%Y-%m-%d %T")));
+      end if;
    end View;
 
    -------------------
@@ -147,11 +157,11 @@ package body Wiki_Website.ECWF_Callbacks is
    -------------------
 
    function View_Template (Request : in Status.Data) return String is
-      Get_URI       : constant String := AWS.Status.URI (Request);
-      Web_Root      : constant String := Get_Wiki_Web_Root (Get_URI);
-      Name          : constant Wiki_Name := Get_Wiki_Name (Web_Root);
+      Get_URI  : constant String    := Status.URI (Request);
+      Name     : constant Wiki_Name :=
+                   Get_Wiki_Name (Hostname => Status.Host (Request),
+                                  URI      => Get_URI);
    begin
-      Ada.Text_IO.Put_Line ("view template");
       return Wiki_Root (Name) & Gwiad.OS.Directory_Separator
         & Template_Defs.Block_View.Template;
    end View_Template;
