@@ -91,28 +91,29 @@ install: install_dirs
 	$(CP) config/projects/wiki_interface.gpr $(I_GPR)
 
 install_gwiad_interface:
-	$(CP) gwiad_wiki_service/interface/lib/libwiki_interface.so /opt/gwiad/bin/
+	$(CP) gwiad_wiki_service/interface/lib/libwiki_interface.so $(GWIAD_DIR)/bin/
 
 
 install_gwiad_service:
 	-$(GWIAD_UNREGISTER_SCRIPT) 127.0.0.1:8080 service wiki_service
-	$(RM) -f /opt/gwiad/lib/libwiki_service.so
-	$(CP) $(INSTALL)/lib/diouzhtu/*$(SOEXT) /opt/gwiad/bin/
-	$(CP) gwiad_wiki_service/lib/libwiki_service.so /opt/gwiad/lib
+	$(RM) -f $(GWIAD_DIR)/lib/libwiki_service.so
+	$(CP) $(INSTALL)/lib/diouzhtu/*$(SOEXT) $(GWIAD_DIR)/bin/
+	$(CP) gwiad_wiki_service/lib/libwiki_service.so $(GWIAD_DIR)/lib
 
 install_gwiad_website:
-	-$(GWIAD_UNREGISTER_SCRIPT) 127.0.0.1:8080 website /opt/gwiad/lib/libwiki_website.so
-	$(RM) -f /opt/gwiad/lib/libwiki_website.so
-	$(CP) gwiad_wiki_service/lib/libwiki_website.so /opt/gwiad/lib/
-	$(MKDIR) /opt/gwiad/plugins/wiki_website/example/templates/
-	$(MKDIR) /opt/gwiad/plugins/wiki_website/example/css
-	$(MKDIR) /opt/gwiad/plugins/wiki_website/example/js
+	-$(GWIAD_UNREGISTER_SCRIPT) 127.0.0.1:8080 website $(GWIAD_DIR)/lib/libwiki_website.so
+	$(RM) -f $(GWIAD_DIR)/lib/libwiki_website.so
+	$(MKDIR) $(GWIAD_DIR)/plugins/wiki_website/example/templates/
+	$(MKDIR) $(GWIAD_DIR)/plugins/wiki_website/example/css
+	$(MKDIR) $(GWIAD_DIR)/plugins/wiki_website/example/js
+	$(CP) gwiad_wiki_service/website/config/config.ini $(GWIAD_DIR)/plugins/wiki_website/example/
 	$(CP) gwiad_wiki_service/website/templates/*.thtml \
-		/opt/gwiad/plugins/wiki_website/example/templates/
+		$(GWIAD_DIR)/plugins/wiki_website/example/templates/
 	$(CP) gwiad_wiki_service/website/templates/wiki_website/css/*.css \
-		/opt/gwiad/plugins/wiki_website/example/css/
+		$(GWIAD_DIR)/plugins/wiki_website/example/css/
 	$(CP) external_libraries/highlight/*.js	\
-		/opt/gwiad/plugins/wiki_website/example/js/
+		$(GWIAD_DIR)/plugins/wiki_website/example/js/
+	$(CP) gwiad_wiki_service/lib/libwiki_website.so $(GWIAD_DIR)/lib/
 
 gwiad_plugin_distrib:
 	$(MKDIR) -p $(PLUGIN_DISTRIB)
