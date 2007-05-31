@@ -144,6 +144,10 @@ package body Wiki_Website.Callbacks is
 
    begin
 
+      Templates.Insert
+        (Translations,
+         Templates.Assoc (Template_Defs.Top.WIKI_NAME, String (Name)));
+
       if not Gwiad.Services.Register.Exists (Wiki_Service_Name) then
          Templates.Insert
            (Translations,
@@ -182,10 +186,6 @@ package body Wiki_Website.Callbacks is
       Templates.Insert
         (Translations,
          Templates.Assoc (Template_Defs.Edit.FILENAME, Simple_Name));
-
-      Templates.Insert
-        (Translations,
-         Templates.Assoc (Template_Defs.Top.WIKI_NAME, String (Name)));
    end Edit_Page;
 
    --------------------
@@ -259,9 +259,9 @@ package body Wiki_Website.Callbacks is
 
    begin
 
-      if Name'Length = 0 then
-         return;
-      end if;
+      Templates.Insert
+        (Translations,
+         Templates.Assoc (Template_Defs.Top.WIKI_NAME, String (Name)));
 
       if not Gwiad.Services.Register.Exists (Wiki_Service_Name) then
          Templates.Insert
@@ -336,9 +336,6 @@ package body Wiki_Website.Callbacks is
                  (Template_Defs.Preview.FILENAME, Wiki_Filename));
          end if;
       end;
-      Templates.Insert
-        (Translations,
-         Templates.Assoc (Template_Defs.Top.WIKI_NAME, String (Name)));
    end Preview_Page;
 
 end Wiki_Website.Callbacks;

@@ -75,7 +75,10 @@ package body Wiki_Website.ECWF_Callbacks is
 
    begin
 
-      Ada.Text_IO.Put_Line ("View " & HTML_Filename);
+      Templates.Insert
+        (Translations,
+         Templates.Assoc (Template_Defs.Top.WIKI_NAME, String (Name)));
+
       Templates.Insert
         (Translations,
          Templates.Assoc (Template_Defs.Block_View.FILENAME, Filename));
@@ -91,8 +94,6 @@ package body Wiki_Website.ECWF_Callbacks is
             end if;
             return;
          end if;
-
-         Ada.Text_IO.Put_Line ("ViewHMTL " & HTML_Filename);
 
          Open (File => HTML_File,
                Mode => In_File,
@@ -113,7 +114,6 @@ package body Wiki_Website.ECWF_Callbacks is
         and then Kind (Wiki_Text_Dir (Name)
                        & "/" & Filename) = Ordinary_File
       then
-         Ada.Text_IO.Put_Line ("VIEW FILE "& Filename);
 
          if not Gwiad.Services.Register.Exists (Wiki_Service_Name) then
             Templates.Insert
@@ -149,9 +149,6 @@ package body Wiki_Website.ECWF_Callbacks is
                 (Directories.Modification_Time
                    (Name => HTML_Filename), "%Y-%m-%d %T")));
       end if;
-      Templates.Insert
-        (Translations,
-         Templates.Assoc (Template_Defs.Top.WIKI_NAME, String (Name)));
    end View;
 
    -------------------
