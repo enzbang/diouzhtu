@@ -1,32 +1,33 @@
 @@IF@@ @_VIEW_@ /= ""
-<h1>@_REPLACE_ALL((.*\/)/):FILENAME_@</h1>
-@_VIEW_@
+   <h1>@_REPLACE_ALL((.*\/)/):FILENAME_@</h1>
+   @_VIEW_@
 @@ELSIF@@ @_URI_@ /= ""
-<h1>Index of @_REPLACE_ALL(\//):REPLACE_ALL((.*\/(.+))/\2):URI_@</h1>
-<h2>@_URI_@</h2>
-<p>Select the file to edit</p>
-
-<ul>
-@@TABLE@@
-@@IF@@ @_IS_DIR_V_@
-@@IF@@ @_NAME_V_@ /= "./" and not (@_NAME_V_@ = "../" and @_URI_@ = "@_WIKI_WEB_ROOT_@/")
-<li><a href="@_NAME_V_@">@_NAME_V_@</a></li>
-@@END_IF@@
+   <h1>Index of @_REPLACE_ALL(\//):REPLACE_ALL((.*\/(.+))/\2):URI_@</h1>
+   <h2>[@_URI_@]</h2>
+   <p>Select the file to edit</p>
+   
+   <ul>
+   @@TABLE@@
+      @@IF@@ @_IS_DIR_V_@
+         @@IF@@ @_NAME_V_@ /= "./" and not (@_NAME_V_@ = "../" and @_URI_@ = "@_WIKI_WEB_ROOT_@/")
+         <li><a href="@_NAME_V_@">@_NAME_V_@</a></li>
+         @@END_IF@@
+      @@ELSE@@
+         @@IF@@ not @_MATCH(.*~$):NAME_V_@ @@-- Do not display the name ending with ~
+         @@-- ??? With next Template Parser version the test could be
+         @@--     @@IF@@ @_SLICE(0..0):NAME_V@ /= "~"
+         @@--     it should be faster
+            <li><p><a href="@_URI_@@_NAME_V_@">@_NAME_V_@</a> --  last modified @_TIME_V_@</p></li>
+         @@END_IF@@
+      @@END_IF@@
+   @@END_TABLE@@
+   </ul>
+@@ELSIF@@ @_FILENAME_@ /= ""
+   <h1>@_REPLACE_ALL((.*\/)/):FILENAME_@</h1>
+   <p id="doesnotexist">This page does not exist ! 
+      <a href="@_WIKI_WEB_ROOT_@/edit/@_FILENAME_@">Create it ?</a>
+   </p>
 @@ELSE@@
-@@IF@@ not @_MATCH(.*~$):NAME_V_@ @@-- Do not display the name ending with ~
-@@-- ??? With next Template Parser version the test could be
-@@--     @@IF@@ @_SLICE(0..0):NAME_V@ /= "~"
-@@--     it should be faster
-<li><p><a href="@_URI_@@_NAME_V_@">@_NAME_V_@</a> --  last modified @_TIME_V_@</p></l\
-i>
-@@END_IF@@
-@@END_IF@@
-@@END_TABLE@@
-</ul>
-@@ELSE@@
-<h1>@_REPLACE_ALL((.*\/)/):FILENAME_@</h1>
-<p id="doesnotexist">
-This page does not exist ! <a href="@_WIKI_WEB_ROOT_@/edit/@_FILENAME_@">Create it ?</a>
-</p>
+   @@INCLUDE@@ welcome.thtml
 @@END_IF@@
 

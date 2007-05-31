@@ -25,6 +25,7 @@ with Ada.Strings.Unbounded;
 
 with Ada.Containers.Indefinite_Hashed_Maps;
 with Ada.Strings.Hash;
+with Ada.Strings.Fixed;
 
 package body Wiki_Website.Config is
 
@@ -100,18 +101,32 @@ package body Wiki_Website.Config is
    -- Get_Wiki_Name --
    -------------------
 
-   function Get_Wiki_Name (Hostname : String; URI : String) return Wiki_Name is
-      Position : Cursor := No_Element;
+   function Get_Wiki_Name (Request : AWS.Status.Data) return Wiki_Name is
+      function Get_Hostname (Hostname : String) return String;
+      --  Get hostname
 
-      function Match_URI return Boolean;
+      function Match_URI (URI, Web_Root : String) return Boolean;
       --  Test if the web root element match the given URI
+
+      function Get_Hostname (Hostname : String) return String is
+         K : Natural;
+      begin
+         K := Strings.Fixed.Index (Hostname, ":");
+
+         if K = 0 then
+            K := Hostname'Last;
+         else
+            K := K - 1;
+         end if;
+         return Hostname (Hostname'First .. K);
+      end Get_Hostname;
+
 
       ---------------
       -- Match_URI --
       ---------------
 
-      function Match_URI return Boolean is
-         Web_Root : constant String := To_String (Element (Position).Web_Root);
+      function Match_URI (URI, Web_Root : String) return Boolean is
       begin
          if URI'Length >= Web_Root'Length and then
            URI (URI'First .. URI'First + Web_Root'Length - 1) = Web_Root
@@ -121,27 +136,37 @@ package body Wiki_Website.Config is
             return False;
          end if;
       end Match_URI;
+
+      URI      : constant String := AWS.Status.URI (Request);
+      Hostname : constant String := Get_Hostname (AWS.Status.Host (Request));
+      Position : Cursor := No_Element;
    begin
 
-      if Hostname /= "" then
-         Position := Configs.First;
-         while Position /= No_Element
-           and then Element (Position).Host_Name /= Hostname loop
-            Next (Position);
-         end loop;
-      end if;
+      Position := Configs.First;
+      while Position /= No_Element loop
+         declare
+            Wiki : constant Wiki_Data := Element (Position);
+         begin
+            if Wiki.Host_Name = Hostname
+              and then Match_URI (URI, To_String (Wiki.Web_Root)) then
+               Ada.Text_IO.Put_Line ("found wiki name " & Key (Position)
+                                     & " for "
+                                     & Hostname & ", " & URI);
 
-      if Position = No_Element then
-         Position := Configs.First;
-         while Position /= No_Element and then not Match_URI loop
-            Next (Position);
-         end loop;
+               return Wiki_Name (Key (Position));
+            end if;
+            if Element (Position).Host_Name /= Hostname then
+               Ada.Text_IO.Put_Line ("Hostname : "
+                                     & To_String (Element (Position).Host_Name)
+                                     & "!=" & Hostname);
+            end if;
+         end;
+         Next (Position);
+      end loop;
 
-         if Position = No_Element then
-            raise Wiki_Config_Exception;
-         end if;
-      end if;
-      return Wiki_Name (Key (Position));
+      Ada.Text_IO.Put_Line ("err "   & Hostname & ", " & URI);
+
+      raise Wiki_Config_Exception with Hostname & URI;
    end Get_Wiki_Name;
 
    -----------------------

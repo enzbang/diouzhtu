@@ -20,6 +20,7 @@
 ------------------------------------------------------------------------------
 
 with Ada.Directories;
+with AWS.Status;
 
 private package Wiki_Website.Config is
 
@@ -43,7 +44,7 @@ private package Wiki_Website.Config is
      (Name : Wiki_Name; Hostname : String; Web_Root : String);
    --  Adds a new config (a new wiki website)
 
-   function Get_Wiki_Name (Hostname : String; URI : String) return Wiki_Name;
+   function Get_Wiki_Name (Request : AWS.Status.Data) return Wiki_Name;
    --  Returns wiki name from URI
 
    function Get_Wiki_Web_Root (Name : Wiki_Name) return String;

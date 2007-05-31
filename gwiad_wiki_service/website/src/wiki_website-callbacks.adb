@@ -56,12 +56,10 @@ package body Wiki_Website.Callbacks is
    ------------------
 
    function CSS_Callback (Request : in Status.Data) return Response.Data is
-      URI       : constant String := Status.URI (Request);
-      Host      : constant String := Status.Host (Request);
-      Name      : constant Wiki_Name := Get_Wiki_Name (Hostname => Host,
-                                                       URI      => URI);
-      Web_Root  : constant String := Get_Wiki_Web_Root (Name);
-      File      : constant String :=
+      Name     : constant Wiki_Name := Get_Wiki_Name (Request);
+      URI      : constant String    := Status.URI (Request);
+      Web_Root : constant String    := Get_Wiki_Web_Root (Name);
+      File     : constant String    :=
                     Wiki_CSS_Root (Name) & "/"
                     & URI (URI'First + Web_Root'Length +
                              Wiki_Web_CSS'Length + 2 .. URI'Last);
@@ -83,35 +81,38 @@ package body Wiki_Website.Callbacks is
 
    function Default_Callback (Request : in Status.Data) return Response.Data is
       use type Messages.Status_Code;
-      URI          : constant String := Status.URI (Request);
-      Name         : constant Wiki_Name
-        := Get_Wiki_Name (Hostname => Status.Host (Request), URI => URI);
-      Translations : Templates.Translate_Set;
-      Web_Page     : Response.Data;
    begin
+      declare
+         Name         : constant Wiki_Name := Get_Wiki_Name (Request);
+         URI          : constant String := Status.URI (Request);
+         Translations : Templates.Translate_Set;
+         Web_Page     : Response.Data;
+      begin
 
-      --  Insert global data
+         --  Insert global data
 
-      Templates.Insert
-        (Translations,
-         Templates.Assoc (Template_Defs.Top.WIKI_WEB_ROOT,
-          Get_Wiki_Web_Root (Name)));
+         Templates.Insert
+           (Translations,
+            Templates.Assoc (Template_Defs.Top.WIKI_WEB_ROOT,
+              Get_Wiki_Web_Root (Name)));
 
-      Web_Page := AWS.Services.ECWF.Registry.Build
-        (URI, Request, Translations, Cache_Control => Messages.Prevent_Cache);
+         Web_Page := AWS.Services.ECWF.Registry.Build
+           (URI, Request, Translations,
+            Cache_Control => Messages.Prevent_Cache);
 
-      if Response.Status_Code (Web_Page) = Messages.S404 then
-         --  Page not found
-         return Response.Build
-           (Content_Type  => MIME.Text_HTML,
-            Message_Body  => "<p>Page not found !</p>");
-      else
-         return Web_Page;
-      end if;
+         if Response.Status_Code (Web_Page) = Messages.S404 then
+            --  Page not found
+            return Response.Build
+              (Content_Type  => MIME.Text_HTML,
+               Message_Body  => "<p>Page not found !</p>");
+         else
+            return Web_Page;
+         end if;
+      end;
    exception
       when E : others => Ada.Text_IO.Put_Line
            ("(Default_Callback) : Failed ! "
-           & Exception_Information (E));
+            & Exception_Information (E));
          return Response.Acknowledge
            (Status_Code  => Messages.S500,
             Message_Body => "<p>Internal error</p>",
@@ -131,9 +132,8 @@ package body Wiki_Website.Callbacks is
       use Ada.Directories;
       pragma Unreferenced (Context);
 
+      Name        : constant Wiki_Name := Get_Wiki_Name (Request);
       Get_URI     : constant String := URI (Request);
-      Name        : constant Wiki_Name
-        := Get_Wiki_Name (Hostname => Host (Request), URI => Get_URI);
       Root        : constant String := Get_Wiki_Web_Root (Name);
       Simple_Name : constant String := Get_Filename (Root, Get_URI);
       Filename    : constant String :=
@@ -182,6 +182,10 @@ package body Wiki_Website.Callbacks is
       Templates.Insert
         (Translations,
          Templates.Assoc (Template_Defs.Edit.FILENAME, Simple_Name));
+
+      Templates.Insert
+        (Translations,
+         Templates.Assoc (Template_Defs.Top.WIKI_NAME, String (Name)));
    end Edit_Page;
 
    --------------------
@@ -190,8 +194,7 @@ package body Wiki_Website.Callbacks is
 
    function Image_Callback (Request : in Status.Data) return Response.Data is
       URI  : constant String := Status.URI (Request);
-      Name : constant Wiki_Name :=
-               Get_Wiki_Name (Hostname => Status.Host (Request), URI => URI);
+      Name : constant Wiki_Name := Get_Wiki_Name (Request);
       Root : constant String := Get_Wiki_Web_Root (Name);
       File : constant String := Wiki_Data_Root (Name)
         & "/" & Wiki_Image_Dir (Name) & "/"
@@ -201,8 +204,12 @@ package body Wiki_Website.Callbacks is
       if Ada.Directories.Exists (File) then
          return Response.File (MIME.Content_Type (File), File);
       else
-         return Response.Acknowledge (Status_Code => Messages.S500);
+         return Response.Acknowledge (Status_Code => Messages.S404);
       end if;
+   exception
+      when E : others => Ada.Text_IO.Put_Line
+           (Ada.Exceptions.Exception_Information (E));
+         return Response.Acknowledge (Status_Code  => Messages.S404);
    end Image_Callback;
 
    -----------------
@@ -211,8 +218,7 @@ package body Wiki_Website.Callbacks is
 
    function JS_Callback (Request : in Status.Data) return Response.Data is
       URI : constant String := Status.URI (Request);
-      Name : constant Wiki_Name :=
-               Get_Wiki_Name (Hostname => Status.Host (Request), URI => URI);
+      Name : constant Wiki_Name := Get_Wiki_Name (Request);
       Wiki_Root : constant String := Get_Wiki_Web_Root (Name);
       File : constant String := Wiki_JS_Root (Name) & "/"
         & URI (URI'First + Wiki_Root'Length +
@@ -221,8 +227,12 @@ package body Wiki_Website.Callbacks is
       if Ada.Directories.Exists (File) then
          return Response.File (MIME.Content_Type (File), File);
       else
-         return Response.Acknowledge (Status_Code => Messages.S500);
+         return Response.Acknowledge (Status_Code => Messages.S404);
       end if;
+   exception
+      when E : others => Ada.Text_IO.Put_Line
+        (Ada.Exceptions.Exception_Information (E));
+      return Response.Acknowledge (Status_Code  => Messages.S404);
    end JS_Callback;
 
    ------------------
@@ -243,9 +253,7 @@ package body Wiki_Website.Callbacks is
                         Parameters.Get (P,
                                         Template_Defs.Preview.HTTP.text_plain);
       Get_URI       : constant String := Status.URI (Request);
-      Name          : constant Wiki_Name :=
-                        Get_Wiki_Name (Hostname => Status.Host (Request),
-                                       URI      => Get_URI);
+      Name          : constant Wiki_Name := Get_Wiki_Name (Request);
       Root          : constant String := Get_Wiki_Web_Root (Name);
       Wiki_Filename : constant String := Get_Filename (Root, Get_URI);
 
@@ -328,6 +336,9 @@ package body Wiki_Website.Callbacks is
                  (Template_Defs.Preview.FILENAME, Wiki_Filename));
          end if;
       end;
+      Templates.Insert
+        (Translations,
+         Templates.Assoc (Template_Defs.Top.WIKI_NAME, String (Name)));
    end Preview_Page;
 
 end Wiki_Website.Callbacks;

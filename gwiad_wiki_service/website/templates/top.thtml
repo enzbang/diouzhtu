@@ -26,4 +26,4 @@
     </style>
   </head>
 <body class="wiki_website_example">
-<div id="title"><a href="@_WIKI_WEB_ROOT_@/">Diouzhtu</a></div>
+<div id="title"><a href="@_WIKI_WEB_ROOT_@/">@_WIKI_NAME_@</a></div>

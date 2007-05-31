@@ -1,5 +1,8 @@
-@@INCLUDE@@ top.thtml "Edit : @_FILENAME_@"
-
+@@IF@@ @_FILENAME_@ /= ""
+   @@INCLUDE@@ top.thtml "Edit : @_FILENAME_@"
+@@ELSE@@
+   @@INCLUDE@@ top.thtml "Edit"
+@@END_IF@@
 <h1>@_FILENAME_@</h1>
 
 @_ERROR_@
@@ -11,20 +14,28 @@
   <p><input type="submit" name="submit"/></p>
 </form>
 @@ELSE@@
-<h2>Index of @_URI_@</h2>
-<p>Select the file to edit</p>
-
-<ul>
-@@TABLE@@
-@@IF@@ @_IS_DIR_V_@
-@@IF@@ @_NAME_V_@ /= "./" and not (@_NAME_V_@ = "../" and @_URI_@ = "@_WIKI_WEB_ROOT_@/edit/")
-<li><a href="@_NAME_V_@">@_NAME_V_@</a></li>
-@@END_IF@@
+@@IF@@ @_URI_@ /= ""
+   <h2>Index of @_URI_@</h2>
 @@ELSE@@
-<li><p><a href="@_URI_@@_NAME_V_@">@_NAME_V_@</a> --  last modified @_TIME_V_@</p></li>
+   <h2>Index</h2>
 @@END_IF@@
-@@END_TABLE@@
-</ul>
+
+@@IF@@ @_NAME_V_@ = ""
+   <p>Empty directory</p>
+@@ELSE@@
+   <p>Select the file to edit</p>
+   <ul>
+   @@TABLE@@
+      @@IF@@ @_IS_DIR_V_@
+         @@IF@@ @_NAME_V_@ /= "./" and not (@_NAME_V_@ = "../" and @_URI_@ = "@_WIKI_WEB_ROOT_@/edit/")
+         <li><a href="@_NAME_V_@">@_NAME_V_@</a></li>
+         @@END_IF@@
+      @@ELSE@@
+      <li><p><a href="@_URI_@@_NAME_V_@">@_NAME_V_@</a> --  last modified @_TIME_V_@</p></li>
+      @@END_IF@@
+   @@END_TABLE@@
+   </ul>
+@@END_IF@@
 
 To create new page called my_first_page type go to url @_WIKI_WEB_ROOT_@/edit/my_first_page
 @@END_IF@@

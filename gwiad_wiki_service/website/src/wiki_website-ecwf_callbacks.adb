@@ -27,6 +27,7 @@ with AWS.Services.Directory;
 
 with Wiki_Website.Config;
 with Wiki_Website.Service;
+with Wiki_Website.Template_Defs.Top;
 with Wiki_Website.Template_Defs.Bottom;
 with Wiki_Website.Template_Defs.Block_View;
 
@@ -63,9 +64,7 @@ package body Wiki_Website.ECWF_Callbacks is
       use Ada.Directories;
 
       Get_URI       : constant String := URI (Request);
-      Name          : constant Wiki_Name :=
-                        Get_Wiki_Name (Hostname => Host (Request),
-                                       URI      => Get_URI);
+      Name          : constant Wiki_Name := Get_Wiki_Name (Request);
       Web_Root      : constant String := Get_Wiki_Web_Root (Name);
       Filename      : constant String := Get_Filename (Web_Root, Get_URI);
       HTML_Filename : constant String :=
@@ -76,7 +75,7 @@ package body Wiki_Website.ECWF_Callbacks is
 
    begin
 
-      Ada.Text_IO.Put_Line ("View");
+      Ada.Text_IO.Put_Line ("View " & HTML_Filename);
       Templates.Insert
         (Translations,
          Templates.Assoc (Template_Defs.Block_View.FILENAME, Filename));
@@ -150,6 +149,9 @@ package body Wiki_Website.ECWF_Callbacks is
                 (Directories.Modification_Time
                    (Name => HTML_Filename), "%Y-%m-%d %T")));
       end if;
+      Templates.Insert
+        (Translations,
+         Templates.Assoc (Template_Defs.Top.WIKI_NAME, String (Name)));
    end View;
 
    -------------------
@@ -157,10 +159,7 @@ package body Wiki_Website.ECWF_Callbacks is
    -------------------
 
    function View_Template (Request : in Status.Data) return String is
-      Get_URI  : constant String    := Status.URI (Request);
-      Name     : constant Wiki_Name :=
-                   Get_Wiki_Name (Hostname => Status.Host (Request),
-                                  URI      => Get_URI);
+      Name     : constant Wiki_Name := Get_Wiki_Name (Request);
    begin
       return Wiki_Root (Name) & Gwiad.OS.Directory_Separator
         & Template_Defs.Block_View.Template;

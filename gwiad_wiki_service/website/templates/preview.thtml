@@ -19,7 +19,7 @@
 <div id="preview_zone">@_PREVIEW_@</div>
 
 <div id="edit_zone">
-  <form method="post" action="/wiki/preview/@_FILENAME_@">
+  <form method="post" action="@_WIKI_WEB_ROOT_@/preview/@_FILENAME_@">
     <textarea rows="40" cols="80"
               name="text_plain" id="text_plain">@_TEXT_PLAIN_@</textarea>
     <p>
