@@ -65,7 +65,6 @@ package body Wiki_Website.ECWF_Callbacks is
 
       Get_URI        : constant String := URI (Request);
       Name           : constant Wiki_Name := Get_Wiki_Name (Request);
-      Web_Root       : constant String := Get_Wiki_Web_Root (Name);
       HTML_Root      : constant String
         := Current_Directory & Gwiad.OS.Directory_Separator
           & Wiki_HTML_Dir (Name);
@@ -73,7 +72,7 @@ package body Wiki_Website.ECWF_Callbacks is
         := Current_Directory & Gwiad.OS.Directory_Separator
           & Containing_Directory (Wiki_HTML_Dir (Name)
                                   & Gwiad.OS.Directory_Separator
-                                  & Get_Directory (Web_Root, Get_URI));
+                                  & Get_Directory (Get_URI));
 
       procedure Menu
         (From : in String; Filenames : in out Templates.Vector_Tag);
@@ -177,8 +176,7 @@ package body Wiki_Website.ECWF_Callbacks is
 
       Get_URI       : constant String := URI (Request);
       Name          : constant Wiki_Name := Get_Wiki_Name (Request);
-      Web_Root      : constant String := Get_Wiki_Web_Root (Name);
-      Filename      : constant String := Get_Filename (Web_Root, Get_URI);
+      Filename      : constant String := Get_Filename (Get_URI);
       HTML_Filename : constant String :=
                         Wiki_HTML_Dir (Name)
                         & Gwiad.OS.Directory_Separator & Filename;
@@ -227,7 +225,7 @@ package body Wiki_Website.ECWF_Callbacks is
          end if;
 
          declare
-            Get_Service : GW_Service'Class := Service.Get (Name, Web_Root);
+            Get_Service : constant GW_Service'Class := Service.Get (Name);
             New_HTML    : constant String  := HTML (Get_Service, Filename);
          begin
             Templates.Insert

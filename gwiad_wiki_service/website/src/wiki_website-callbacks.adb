@@ -58,11 +58,9 @@ package body Wiki_Website.Callbacks is
    function CSS_Callback (Request : in Status.Data) return Response.Data is
       Name     : constant Wiki_Name := Get_Wiki_Name (Request);
       URI      : constant String    := Status.URI (Request);
-      Web_Root : constant String    := Get_Wiki_Web_Root (Name);
       File     : constant String    :=
                     Wiki_CSS_Root (Name) & "/"
-                    & URI (URI'First + Web_Root'Length +
-                             Wiki_Web_CSS'Length + 2 .. URI'Last);
+                    & URI (URI'First + Wiki_Web_CSS'Length + 2 .. URI'Last);
    begin
       if Ada.Directories.Exists (File) then
          return Response.File (MIME.Content_Type (File), File);
@@ -83,18 +81,10 @@ package body Wiki_Website.Callbacks is
       use type Messages.Status_Code;
    begin
       declare
-         Name         : constant Wiki_Name := Get_Wiki_Name (Request);
          URI          : constant String := Status.URI (Request);
          Translations : Templates.Translate_Set;
          Web_Page     : Response.Data;
       begin
-
-         --  Insert global data
-
-         Templates.Insert
-           (Translations,
-            Templates.Assoc (Template_Defs.Top.WIKI_WEB_ROOT,
-              Get_Wiki_Web_Root (Name)));
 
          Web_Page := AWS.Services.ECWF.Registry.Build
            (URI, Request, Translations,
@@ -134,8 +124,7 @@ package body Wiki_Website.Callbacks is
 
       Name        : constant Wiki_Name := Get_Wiki_Name (Request);
       Get_URI     : constant String := URI (Request);
-      Root        : constant String := Get_Wiki_Web_Root (Name);
-      Simple_Name : constant String := Get_Filename (Root, Get_URI);
+      Simple_Name : constant String := Get_Filename (Get_URI);
       Filename    : constant String :=
                       Wiki_Text_Dir (Name) & "/" & Simple_Name;
 
@@ -195,11 +184,9 @@ package body Wiki_Website.Callbacks is
    function Image_Callback (Request : in Status.Data) return Response.Data is
       URI  : constant String := Status.URI (Request);
       Name : constant Wiki_Name := Get_Wiki_Name (Request);
-      Root : constant String := Get_Wiki_Web_Root (Name);
       File : constant String := Wiki_Data_Root (Name)
         & "/" & Wiki_Image_Dir (Name) & "/"
-        & URI (URI'First + Root'Length +
-                 Wiki_Web_Image'Length + 2 .. URI'Last);
+        & URI (URI'First + Wiki_Web_Image'Length + 2 .. URI'Last);
    begin
       if Ada.Directories.Exists (File) then
          return Response.File (MIME.Content_Type (File), File);
@@ -219,10 +206,8 @@ package body Wiki_Website.Callbacks is
    function JS_Callback (Request : in Status.Data) return Response.Data is
       URI : constant String := Status.URI (Request);
       Name : constant Wiki_Name := Get_Wiki_Name (Request);
-      Wiki_Root : constant String := Get_Wiki_Web_Root (Name);
       File : constant String := Wiki_JS_Root (Name) & "/"
-        & URI (URI'First + Wiki_Root'Length +
-                 Wiki_Web_JS'Length + 2 .. URI'Last);
+        & URI (URI'First + Wiki_Web_JS'Length + 2 .. URI'Last);
    begin
       if Ada.Directories.Exists (File) then
          return Response.File (MIME.Content_Type (File), File);
@@ -254,8 +239,7 @@ package body Wiki_Website.Callbacks is
                                         Template_Defs.Preview.HTTP.text_plain);
       Get_URI       : constant String := Status.URI (Request);
       Name          : constant Wiki_Name := Get_Wiki_Name (Request);
-      Root          : constant String := Get_Wiki_Web_Root (Name);
-      Wiki_Filename : constant String := Get_Filename (Root, Get_URI);
+      Wiki_Filename : constant String := Get_Filename (Get_URI);
 
    begin
 
@@ -272,9 +256,7 @@ package body Wiki_Website.Callbacks is
       end if;
 
       declare
-         Get_Service : GW_Service'Class :=
-                         Service.Get (Web_Root => Root,
-                                      Name     => Name);
+         Get_Service : GW_Service'Class := Service.Get (Name);
       begin
          if Save /= "" then
             declare

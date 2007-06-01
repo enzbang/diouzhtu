@@ -40,21 +40,16 @@ private package Wiki_Website.Config is
    Wiki_Web_CSS     : constant String := "css";
    Wiki_Web_JS      : constant String := "js";
 
-   procedure Add_Config
-     (Name : Wiki_Name; Hostname : String; Web_Root : String);
+   procedure Add_Config (Name : Wiki_Name; Hostname : String);
    --  Adds a new config (a new wiki website)
 
    function Get_Wiki_Name (Request : AWS.Status.Data) return Wiki_Name;
    --  Returns wiki name from URI
 
-   function Get_Wiki_Web_Root (Name : Wiki_Name) return String;
-   --  Returns the wiki web root corresponding to a wiki name
-
-   function Get_Directory
-     (Wiki_Web_Root : String; URI : String) return String;
+   function Get_Directory (URI : String) return String;
    --  Get directory from URI
 
-   function Get_Filename (Wiki_Web_Root : String; URI : String) return String;
+   function Get_Filename (URI : String) return String;
    --  Get filename from URI
 
    function Wiki_Host (Name : Wiki_Name) return String;

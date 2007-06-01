@@ -25,7 +25,6 @@ with Ada.Directories;
 
 with Ada.Containers.Indefinite_Hashed_Maps;
 with Ada.Strings.Hash;
-with Ada.Strings.Unbounded;
 with AWS.Dispatchers.Callback;
 with AWS.Services.ECWF.Registry;
 with AWS.Services.Dispatchers.URI;
@@ -61,7 +60,7 @@ package body Wiki_Website.Service is
 
    Services : Service_Maps.Map;
 
-   type Attribute is (Description, Web_Root, Virtual_Host);
+   type Attribute is (Description, Virtual_Host);
 
    package Conf is new Gwiad.Iniparser (Attribute);
 
@@ -95,25 +94,10 @@ package body Wiki_Website.Service is
                  (Path & Gwiad.OS.Directory_Separator & "config.ini");
                Conf.IO.Close;
 
-               declare
-                  use Ada.Strings.Unbounded;
-                  Get_Web_Root : constant String := Conf.Get_Value (Web_Root);
-                  Wiki_Web_Root : Unbounded_String :=
-                                    To_Unbounded_String (Get_Web_Root);
-               begin
-
-                  if Get_Web_Root (Get_Web_Root'Last) = '/' then
-                     Wiki_Web_Root := Delete (Source  => Wiki_Web_Root,
-                                              From    => Get_Web_Root'Last,
-                                              Through => Get_Web_Root'Last);
-                  end if;
-
-                  Wiki_Website.Service.Register
-                    (Name          => Name,
-                     Virtual_Host  => Conf.Get_Value (Virtual_Host),
-                     Description   => Conf.Get_Value (Description),
-                     Wiki_Web_Root => To_String (Wiki_Web_Root));
-               end;
+               Wiki_Website.Service.Register
+                 (Name          => Name,
+                  Virtual_Host  => Conf.Get_Value (Virtual_Host),
+                  Description   => Conf.Get_Value (Description));
             end if;
          exception
             when Conf.IO.Uncomplete_Config =>
@@ -138,14 +122,12 @@ package body Wiki_Website.Service is
    -- Get --
    ---------
 
-   function Get
-     (Name : Wiki_Name; Web_Root : String)
-      return Wiki_Interface.GW_Service'Class
+   function Get (Name : Wiki_Name) return Wiki_Interface.GW_Service'Class
    is
       use Wiki_Interface;
    begin
 
-      if not Services.Contains (Web_Root) then
+      if not Services.Contains (String (Name)) then
          declare
             Wiki_Service_Id : Service_Id;
             Wiki_World_Service_Access : constant GW_Service_Access
@@ -157,13 +139,13 @@ package body Wiki_Website.Service is
             Initialize
               (S              =>
                  GW_Service'Class (Wiki_World_Service_Access.all),
-               Base_URL       => Web_Root,
-               Img_Base_URL   => Web_Root & "/" & Wiki_Web_Image,
+               Base_URL       => "/",
+               Img_Base_URL   => "/" & Wiki_Web_Image,
                Text_Directory => Wiki_Text_Dir (Name));
 
             Wiki_Service_Id := Gwiad.Services.Register.Set
               (Wiki_Service_Name, Service_Access (Wiki_World_Service_Access));
-            Services.Insert (Key       => Web_Root,
+            Services.Insert (Key       => String (Name),
                              New_Item  => Wiki_Service_Id);
 
             return Get_Service;
@@ -171,7 +153,7 @@ package body Wiki_Website.Service is
       else
          declare
             Wiki_Service_Id : constant Service_Id :=
-                                Services.Element (Web_Root);
+                                Services.Element (String (Name));
             Wiki_World_Service_Access : constant GW_Service_Access :=
                                           GW_Service_Access
                                             (Gwiad.Services.Register.Get
@@ -189,10 +171,7 @@ package body Wiki_Website.Service is
    end Get;
 
    procedure Register
-     (Wiki_Web_Root : String;
-      Virtual_Host  : String;
-      Name          : Wiki_Name;
-      Description   : String)
+     (Virtual_Host  : String; Name : Wiki_Name; Description : String)
    is
       Template_Dir : constant String    := Wiki_Root (Name);
       Sep          : constant Character := Gwiad.OS.Directory_Separator;
@@ -204,19 +183,19 @@ package body Wiki_Website.Service is
 
       AWS.Services.Dispatchers.URI.Register
         (Main_Dispatcher,
-         Wiki_Web_Root & "/" & Wiki_Web_Image,
+         "/" & Wiki_Web_Image,
          Action => Dispatchers.Callback.Create (Image_Callback'Access),
          Prefix => True);
 
       AWS.Services.Dispatchers.URI.Register
         (Main_Dispatcher,
-         Wiki_Web_Root & "/" & Wiki_Web_CSS,
+         "/" & Wiki_Web_CSS,
          Action => Dispatchers.Callback.Create (CSS_Callback'Access),
          Prefix => True);
 
       AWS.Services.Dispatchers.URI.Register
         (Main_Dispatcher,
-         Wiki_Web_Root & "/" & Wiki_Web_JS,
+         "/" & Wiki_Web_JS,
          Action => Dispatchers.Callback.Create (JS_Callback'Access),
          Prefix => True);
 
@@ -228,39 +207,31 @@ package body Wiki_Website.Service is
       --  Register ECWF pages
 
       AWS.Services.ECWF.Registry.Register
-        (Key          => Wiki_Web_Root & "/" & Wiki_Web_Edit,
+        (Key          => "/" & Wiki_Web_Edit,
          Template     => Template_Dir & Sep & Template_Defs.Edit.Template,
          Data_CB      => Edit_Page'Access,
          Content_Type => MIME.Text_HTML,
          Prefix       => True);
 
       AWS.Services.ECWF.Registry.Register
-        (Key          => Wiki_Web_Root & "/" & Wiki_Web_Preview,
+        (Key          => "/" & Wiki_Web_Preview,
          Template     => Template_Dir & Sep & Template_Defs.Preview.Template,
          Data_CB      => Preview_Page'Access,
          Content_Type => MIME.Text_HTML,
          Prefix       => True);
 
       AWS.Services.ECWF.Registry.Register
-        (Key          => Wiki_Web_Root & "/",
+        (Key          => "/",
          Template     => Template_Dir & Sep & Template_Defs.View.Template,
          Data_CB      => View'Access,
          Content_Type => MIME.Text_HTML,
          Prefix       => True);
 
-      Config.Add_Config (Name     => Name,
-                         Hostname => Virtual_Host,
-                         Web_Root => Wiki_Web_Root);
+      Config.Add_Config (Name => Name, Hostname => Virtual_Host);
 
-      if Virtual_Host /= "" then
-         Gwiad.Web.Register.Virtual_Host.Register
-           (Hostname => Virtual_Host,
-            Action   => Main_Dispatcher);
-      else
-         Gwiad.Web.Register.Register
-           (Web_Dir => Wiki_Web_Root,
-            Action  => Main_Dispatcher);
-      end if;
+      Gwiad.Web.Register.Virtual_Host.Register
+        (Hostname => Virtual_Host,
+         Action   => Main_Dispatcher);
 
       Gwiad.Websites.Register.Register
         (Name        => String (Name),
@@ -277,15 +248,9 @@ package body Wiki_Website.Service is
    ----------------
 
    procedure Unregister (Website_Name : in String) is
-      Web_Root : constant String := Get_Wiki_Web_Root
-        (Name => Wiki_Name (Website_Name));
       Host     : constant String := Wiki_Host (Wiki_Name (Website_Name));
    begin
-      if Host /= "" then
-         Gwiad.Web.Register.Virtual_Host.Unregister (Hostname => Host);
-      else
-         Gwiad.Web.Register.Unregister (Web_Dir => Web_Root);
-      end if;
+      Gwiad.Web.Register.Virtual_Host.Unregister (Hostname => Host);
    end Unregister;
 
 begin
