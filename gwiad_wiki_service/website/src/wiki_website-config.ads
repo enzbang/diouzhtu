@@ -50,6 +50,10 @@ private package Wiki_Website.Config is
    function Get_Wiki_Web_Root (Name : Wiki_Name) return String;
    --  Returns the wiki web root corresponding to a wiki name
 
+   function Get_Directory
+     (Wiki_Web_Root : String; URI : String) return String;
+   --  Get directory from URI
+
    function Get_Filename (Wiki_Web_Root : String; URI : String) return String;
    --  Get filename from URI
 

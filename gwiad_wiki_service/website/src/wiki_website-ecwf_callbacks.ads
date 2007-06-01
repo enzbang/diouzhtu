@@ -27,6 +27,15 @@ private package Wiki_Website.ECWF_Callbacks is
 
    use AWS;
 
+   procedure Menu
+     (Request      : in     Status.Data;
+      Context      : access AWS.Services.ECWF.Context.Object;
+      Translations : in out Templates.Translate_Set);
+   --  Display the menu
+
+   function Menu_Template (Request : in Status.Data) return String;
+   --  Returns the menu template corresponding to the wiki website
+
    procedure View
      (Request      : in     Status.Data;
       Context      : access AWS.Services.ECWF.Context.Object;

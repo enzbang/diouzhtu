@@ -246,7 +246,7 @@ package @_PACKAGE_@.@_CAPITALIZE:REPLACE_ALL(\./_):BASENAME_@ is
 
    package Set is
    @@TABLE@@
-      @_REPLACE_ALL(SET_/)REPLACE_ALL(__/_):SET_VAR_@ : constant String := "@_SET_VAL_@";
+      @_REPLACE_ALL(__/_):SET_VAR_@ : constant String := "@_SET_VAL_@";
    @@END_TABLE@@
    end Set;
 @@END_IF@@

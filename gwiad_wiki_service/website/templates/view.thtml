@@ -4,6 +4,9 @@
     <li><a href="@_WIKI_WEB_ROOT_@/edit/@_FILENAME_@">Edit</a></li>
   </ul>
 
+<div id="menu">
+@_LAZY_MENU_@
+</div>
 @_LAZY_VIEW_@
 
 @@INCLUDE@@ bottom.thtml

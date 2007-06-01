@@ -28,6 +28,11 @@ body {
     list-style:none;
 }
 
+#menu {
+   float:left;
+   width:25%;
+}
+
 h1, h2, h3 {
     color: white;
 }

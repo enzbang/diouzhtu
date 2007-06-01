@@ -58,6 +58,23 @@ package body Wiki_Website.Config is
                          Web_Root  => To_Unbounded_String (Web_Root)));
    end Add_Config;
 
+   -------------------
+   -- Get_Directory --
+   -------------------
+
+   function Get_Directory
+     (Wiki_Web_Root : String; URI : String) return String
+   is
+      Filename : constant String := Get_Filename (Wiki_Web_Root, URI);
+   begin
+
+      if Filename (Filename'Last) = '/' then
+         return Filename;
+      else
+         return Directories.Containing_Directory (Filename);
+      end if;
+   end Get_Directory;
+
    ------------------
    -- Get_Filename --
    ------------------
