@@ -1,7 +1,10 @@
-@@INCLUDE@@ top.thtml @_FILENAME_@
+@@INCLUDE@@ top.thtml @_REPLACE_ALL((.*\/)/):FILENAME_@
 
   <ul id="control_menu">
-    <li><a href="@_WIKI_WEB_ROOT_@/edit/@_FILENAME_@">Edit</a></li>
+    <li>
+       <a href="@_WIKI_WEB_ROOT_@/edit/@_REPLACE_ALL((.*\/)/):FILENAME_@">
+          Edit</a>
+    </li>
   </ul>
 
 <div id="menu">

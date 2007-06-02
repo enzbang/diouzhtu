@@ -1,0 +1,18 @@
+@@SET@@ SET_BEGIN_BLOCK = <ul>
+@@SET@@ SET_END_BLOCK = </ul>
+
+@@TABLE@@
+@@IF@@ @_NAME_V_@ = @_SET_BEGIN_BLOCK_@
+@_SET_BEGIN_BLOCK_@
+@@ELSIF@@  @_NAME_V_@ = @_SET_END_BLOCK_@
+@_SET_END_BLOCK_@
+@@ELSE@@
+@@IF@@ not @_MATCH(.*~$):NAME_V_@
+@@-- Do not display the name ending with ~
+@@-- ??? With next Template Parser version the test could be
+@@--     @@IF@@ @_SLICE(0..0):NAME_V@ /= "~"
+@@--     it should be faster
+<li><p><a href="@_URI_@@_NAME_V_@">@_NAME_V_@</a></p></li>
+@@END_IF@@
+@@END_IF@@
+@@END_TABLE@@

@@ -174,33 +174,91 @@ package body Wiki_Website.ECWF_Callbacks is
       use AWS.Status;
       use Ada.Directories;
 
-      Get_URI       : constant String := URI (Request);
-      Name          : constant Wiki_Name := Get_Wiki_Name (Request);
-      Filename      : constant String := Get_Filename (Get_URI);
-      HTML_Filename : constant String :=
-                        Wiki_HTML_Dir (Name)
-                        & Gwiad.OS.Directory_Separator & Filename;
-      HTML_Text     : Unbounded_String := Null_Unbounded_String;
-      HTML_File     : File_Type;
+      Get_URI        : constant String := URI (Request);
+      Name           : constant Wiki_Name := Get_Wiki_Name (Request);
+      Filename       : constant String := Get_Filename (Get_URI);
+      Local_Filename : constant String :=
+                         Wiki_Text_Dir (Name)
+                         & Gwiad.OS.Directory_Separator & Filename;
+      HTML_Filename  : constant String :=
+                         Wiki_HTML_Dir (Name)
+                         & Gwiad.OS.Directory_Separator & Filename;
+      HTML_Text      : Unbounded_String := Null_Unbounded_String;
 
-   begin
+      function Get_First_Filename (Dir : in String) return String;
+      --  Get first file in directory (or subdirectories)
 
-      Templates.Insert
-        (Translations,
-         Templates.Assoc (Template_Defs.Top.WIKI_NAME, String (Name)));
+      procedure View_File (View_Filename : in String);
+      --  View the given file
 
-      Templates.Insert
-        (Translations,
-         Templates.Assoc (Template_Defs.Block_View.FILENAME, Filename));
+      ------------------------
+      -- Get_First_Filename --
+      ------------------------
 
-      if Exists (HTML_Filename) then
-         if Kind (HTML_Filename) /= Ordinary_File then
+      function Get_First_Filename (Dir : in String) return String is
+         S : Search_Type;
+         D : Directory_Entry_Type;
+      begin
+
+         Start_Search (Search    => S,
+                       Directory => Dir,
+                       Pattern   => "*",
+                       Filter    => (Ordinary_File => True,
+                                     Directory     => False,
+                                     Special_File  => False));
+
+         if More_Entries (S) then
+            Get_Next_Entry (S, D);
+            return Directories.Full_Name (D);
+         end if;
+
+         --  Not file in directory. Search in subdirectories
+
+         Start_Search (Search    => S,
+                       Directory => Dir,
+                       Pattern   => "*",
+                       Filter    => (Ordinary_File => False,
+                                     Directory     => True,
+                                     Special_File  => False));
+         while More_Entries (S) loop
+            Get_Next_Entry (S, D);
+            declare
+               SN : constant String := Simple_Name (D);
+            begin
+               if SN (SN'First) /= '.' then
+                  declare
+                     First_Filename : constant String
+                       := Get_First_Filename (Directories.Full_Name (D));
+                  begin
+                     if First_Filename /= "" then
+                        return First_Filename;
+                     end if;
+                  end;
+               end if;
+            end;
+         end loop;
+
+         --  No files found.
+
+         return "";
+      exception
+            when others => return "";
+      end Get_First_Filename;
+
+      ---------------
+      -- View_File --
+      ---------------
+
+      procedure View_File (View_Filename : in String) is
+         HTML_File     : File_Type;
+      begin
+         if View_Filename = "" then
             return;
          end if;
 
          Open (File => HTML_File,
                Mode => In_File,
-               Name => HTML_Filename);
+               Name => View_Filename);
 
          while not End_Of_File (HTML_File) loop
             Append (HTML_Text, Get_Line (HTML_File));
@@ -213,11 +271,26 @@ package body Wiki_Website.ECWF_Callbacks is
            (Translations, Templates.Assoc
               (Template_Defs.Block_View.VIEW, HTML_Text));
 
-      elsif Exists (Wiki_Text_Dir (Name) & "/" & Filename)
-        and then Kind (Wiki_Text_Dir (Name)
-                       & "/" & Filename) = Ordinary_File
-      then
+         Templates.Insert
+           (Translations,
+            Templates.Assoc
+              (Template_Defs.Block_View.FILENAME, View_Filename));
+      end View_File;
 
+   begin
+
+      Templates.Insert
+        (Translations,
+         Templates.Assoc (Template_Defs.Top.WIKI_NAME, String (Name)));
+
+      if Exists (HTML_Filename)
+        and then Kind (HTML_Filename) = Ordinary_File
+      then
+         View_File (HTML_Filename);
+
+      elsif Exists (Local_Filename)
+        and then Kind (Local_Filename) = Ordinary_File
+      then
          if not Gwiad.Services.Register.Exists (Wiki_Service_Name) then
             Templates.Insert
               (Translations,
@@ -227,6 +300,8 @@ package body Wiki_Website.ECWF_Callbacks is
          declare
             Get_Service : constant GW_Service'Class := Service.Get (Name);
             New_HTML    : constant String  := HTML (Get_Service, Filename);
+
+            HTML_File     : File_Type;
          begin
             Templates.Insert
               (Translations,
@@ -242,6 +317,17 @@ package body Wiki_Website.ECWF_Callbacks is
 
             Close (HTML_File);
          end;
+      else
+         --  Search the first filename in this directory or subdirectories
+
+         if Local_Filename = ""
+           or else Local_Filename (Local_Filename'Last) = '/'
+         then
+            View_File (Get_First_Filename (Local_Filename));
+         else
+            View_File (Get_First_Filename
+                       (Containing_Directory (Local_Filename)));
+         end if;
       end if;
 
       if Exists (HTML_Filename) then
