@@ -320,13 +320,13 @@ package body Wiki_Website.ECWF_Callbacks is
       else
          --  Search the first filename in this directory or subdirectories
 
-         if Local_Filename = ""
-           or else Local_Filename (Local_Filename'Last) = '/'
+         if HTML_Filename = ""
+              or else HTML_Filename (HTML_Filename'Last) = '/'
          then
-            View_File (Get_First_Filename (Local_Filename));
+            View_File (Get_First_Filename (HTML_Filename));
          else
             View_File (Get_First_Filename
-                       (Containing_Directory (Local_Filename)));
+                       (Containing_Directory (HTML_Filename)));
          end if;
       end if;
 
