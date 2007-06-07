@@ -64,7 +64,7 @@ package body Wiki_Website.Config is
       if Filename = "" or else Filename (Filename'Last) = '/' then
          return Filename;
       else
-         return Directories.Containing_Directory (Filename);
+         return Directories.Containing_Directory (Filename) & '/';
       end if;
    end Get_Directory;
 
