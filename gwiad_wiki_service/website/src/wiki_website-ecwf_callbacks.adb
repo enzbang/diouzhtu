@@ -21,6 +21,7 @@
 
 with GNAT.Calendar.Time_IO;
 
+with Ada.Strings.Fixed;
 with Ada.Strings.Unbounded;
 
 with Wiki_Website.Config;
@@ -174,15 +175,17 @@ package body Wiki_Website.ECWF_Callbacks is
       use AWS.Status;
       use Ada.Directories;
 
-      Get_URI        : constant String := URI (Request);
-      Name           : constant Wiki_Name := Get_Wiki_Name (Request);
-      Filename       : constant String := Get_Filename (Get_URI);
-      Local_Filename : constant String :=
-                         Wiki_Text_Dir (Name)
-                         & Gwiad.OS.Directory_Separator & Filename;
+      Get_URI         : constant String := URI (Request);
+      Name            : constant Wiki_Name := Get_Wiki_Name (Request);
+      Filename        : constant String := Get_Filename (Get_URI);
+      Local_Directory : constant String := Wiki_Text_Dir (Name);
+      Local_Filename  : constant String :=
+                          Local_Directory
+                            & Gwiad.OS.Directory_Separator & Filename;
+      HTML_Directory : constant String := Wiki_HTML_Dir (Name);
       HTML_Filename  : constant String :=
-                         Wiki_HTML_Dir (Name)
-                         & Gwiad.OS.Directory_Separator & Filename;
+                         HTML_Directory & Gwiad.OS.Directory_Separator
+                           & Filename;
       HTML_Text      : Unbounded_String := Null_Unbounded_String;
 
       function Get_First_Filename (Dir : in String) return String;
@@ -209,7 +212,14 @@ package body Wiki_Website.ECWF_Callbacks is
 
          if More_Entries (S) then
             Get_Next_Entry (S, D);
-            return Directories.Full_Name (D);
+            declare
+               Full_Name : constant String := Directories.Full_Name (D);
+            begin
+               return Strings.Fixed.Delete (Source  => Full_Name,
+                                            From    => Full_Name'First,
+                                            Through => Full_Name'First +
+                                              Current_Directory'Length);
+            end;
          end if;
 
          --  Not file in directory. Search in subdirectories
@@ -251,7 +261,13 @@ package body Wiki_Website.ECWF_Callbacks is
 
       procedure View_File (View_Filename : in String) is
          HTML_File     : File_Type;
+         Web_Filename  : constant String := View_Filename
+           (View_Filename'First + HTML_Directory'Length + 1
+            .. View_Filename'Last);
       begin
+
+         Ada.Text_IO.Put_Line (View_Filename);
+
          if View_Filename = "" then
             return;
          end if;
@@ -274,7 +290,7 @@ package body Wiki_Website.ECWF_Callbacks is
          Templates.Insert
            (Translations,
             Templates.Assoc
-              (Template_Defs.Block_View.FILENAME, View_Filename));
+              (Template_Defs.Block_View.FILENAME, Web_Filename));
       end View_File;
 
    begin
@@ -323,10 +339,23 @@ package body Wiki_Website.ECWF_Callbacks is
          if HTML_Filename = ""
               or else HTML_Filename (HTML_Filename'Last) = '/'
          then
-            View_File (Get_First_Filename (HTML_Filename));
+            declare
+               First_Filename : constant String :=
+                                  Get_First_Filename (HTML_Filename);
+            begin
+               Ada.Text_IO.Put_Line ("His " & First_Filename);
+               View_File (First_Filename);
+            end;
          else
-            View_File (Get_First_Filename
-                       (Containing_Directory (HTML_Filename)));
+            declare
+               First_Filename : constant String :=
+                                  Get_First_Filename
+                                    (Containing_Directory (HTML_Filename));
+            begin
+               Ada.Text_IO.Put_Line ("Her " & First_Filename);
+
+               View_File (First_Filename);
+            end;
          end if;
       end if;
 
