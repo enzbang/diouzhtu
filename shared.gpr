@@ -86,7 +86,7 @@ project Shared is
    package Linker is
       case Build is
          when "Debug" =>
-            for Default_Switches ("Ada") use ("-g");
+            for Default_Switches ("Ada") use ("-g", "-lgmem");
 
          when "Release" =>
             for Default_Switches ("Ada") use ();
