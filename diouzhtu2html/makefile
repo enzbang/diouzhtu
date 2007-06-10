@@ -28,11 +28,6 @@ clean:
 	-gnat clean -r -Pdiouzhtu2html
 
 check:
-	-$(RM) tmp/example_gen.html
-	./bin/diouzhtu2html test/example.txt test/example_gen.html
-	cat test/example_gen.html
-	diff test/example_gen.html test/example.html
-	./bin/diouzhtu2html test/example.txt test/example_gen_all.html -create-all-page test/example_header.html test/example_footer.html
-	cat test/example_gen_all.html
+	make -C all
 
 setup:
