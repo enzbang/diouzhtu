@@ -20,9 +20,19 @@
 ##############################################################################
 
 # Options
+
 include mk.config
 
-OPTIONS = MODE="$(MODE)" CP="$(CP)" MKDIR="$(MKDIR)" RM="$(RM)" LIB_KIND="$(LIB_KIND)"
+OPTIONS = MODE="$(MODE)" CP="$(CP)" MKDIR="$(MKDIR)" RM="$(RM)" \
+	LIB_KIND="$(LIB_KIND)"
+
+ifeq ($(OS),Windows_NT)
+SOEXT=.dll
+EXEEXT=.exe
+else
+SOEXT=.so
+EXEEXT=
+endif
 
 # Modules support
 
@@ -56,6 +66,8 @@ I_LIB_W	= $(INSTALL)/lib/wiki_interface
 I_GPR	= $(INSTALL)/lib/gnat
 
 PLUGIN_DISTRIB = gwiad_wiki_plugin
+GWIAD_SERVICES = $(GWIAD_DIR)/lib/services
+GWIAD_WEBSITES = $(GWIAD_DIR)/lib/websites
 
 ${MODULES_BUILD}:
 	${MAKE} -C ${@:%_build=%} $(OPTIONS)
@@ -91,35 +103,39 @@ install: install_dirs
 	$(CP) config/projects/wiki_interface.gpr $(I_GPR)
 
 install_gwiad_interface:
-	$(CP) gwiad_wiki_service/interface/lib/libwiki_interface.so $(GWIAD_DIR)/bin/
+	$(CP) gwiad_wiki_service/interface/lib/*wiki_interface$(SOEXT) \
+		$(GWIAD_DIR)/bin/
 
 
 install_gwiad_service:
 	-$(GWIAD_UNREGISTER_SCRIPT) 127.0.0.1:8080 service wiki_service
 	$(RM) -f $(GWIAD_DIR)/lib/libwiki_service.so
 	$(CP) $(INSTALL)/lib/diouzhtu/*$(SOEXT) $(GWIAD_DIR)/bin/
-	$(CP) gwiad_wiki_service/lib/libwiki_service.so $(GWIAD_DIR)/lib
+	$(CP) gwiad_wiki_service/lib/*wiki_service$(SOEXT) $(GWIAD_SERVICES)
 
 install_gwiad_website:
-	-$(GWIAD_UNREGISTER_SCRIPT) 127.0.0.1:8080 website $(GWIAD_DIR)/lib/libwiki_website.so
-	$(RM) -f $(GWIAD_DIR)/lib/libwiki_website.so
+	-$(GWIAD_UNREGISTER_SCRIPT) 127.0.0.1:8080 website \
+		$(GWIAD_DIR)/lib/*wiki_website$(SOEXT)
+	$(RM) -f $(GWIAD_DIR)/lib/*wiki_website$(SOEXT)
 	$(MKDIR) $(GWIAD_DIR)/plugins/wiki_website/example/templates/
 	$(MKDIR) $(GWIAD_DIR)/plugins/wiki_website/example/css
 	$(MKDIR) $(GWIAD_DIR)/plugins/wiki_website/example/js
-	$(CP) gwiad_wiki_service/website/config/config.ini $(GWIAD_DIR)/plugins/wiki_website/example/
+	$(CP) gwiad_wiki_service/website/config/config.ini \
+		$(GWIAD_DIR)/plugins/wiki_website/example/
 	$(CP) gwiad_wiki_service/website/templates/*.thtml \
 		$(GWIAD_DIR)/plugins/wiki_website/example/templates/
 	$(CP) gwiad_wiki_service/website/templates/wiki_website/css/*.css \
 		$(GWIAD_DIR)/plugins/wiki_website/example/css/
 	$(CP) external_libraries/highlight/*.js	\
 		$(GWIAD_DIR)/plugins/wiki_website/example/js/
-	$(CP) gwiad_wiki_service/lib/libwiki_website.so $(GWIAD_DIR)/lib/
+	$(CP) gwiad_wiki_service/lib/*wiki_website$(SOEXT) $(GWIAD_WEBSITES)
 
 gwiad_plugin_distrib:
 	$(MKDIR) -p $(PLUGIN_DISTRIB)
-	$(CP) gwiad_wiki_service/interface/lib/libwiki_interface.so $(PLUGIN_DISTRIB)/
-	$(CP) gwiad_wiki_service/lib/libwiki_website.so $(PLUGIN_DISTRIB)/
-	$(CP) gwiad_wiki_service/lib/libwiki_service.so $(PLUGIN_DISTRIB)/
+	$(CP) gwiad_wiki_service/interface/lib/*wiki_interface$(SOEXT) \
+		$(PLUGIN_DISTRIB)/
+	$(CP) gwiad_wiki_service/lib/*wiki_website$(SOEXT) $(PLUGIN_DISTRIB)/
+	$(CP) gwiad_wiki_service/lib/*wiki_service$(SOEXT) $(PLUGIN_DISTRIB)/
 	$(CP) gwiad_wiki_service/plugin/install.sh $(PLUGIN_DISTRIB)/
 	$(CP) $(INSTALL)/lib/diouzhtu/*$(SOEXT) $(PLUGIN_DISTRIB)/
 	$(TAR_DIR) $(PLUGIN_DISTRIB).tgz $(PLUGIN_DISTRIB)
