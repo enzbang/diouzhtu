@@ -21,12 +21,12 @@
 
 with Ada.Text_IO;
 with Diouzhtu.To_HTML;
-with Gwiad.Services.Register;
+with Gwiad.Registry.Services.Register;
 
 package body Wiki_Service is
 
    use Diouzhtu.To_HTML;
-   use Gwiad.Services;
+   use Gwiad.Registry.Services;
 
    function Builder return access Service'Class;
    --  Build a new test plugin
@@ -82,7 +82,7 @@ package body Wiki_Service is
 
 
 begin
-   Gwiad.Services.Register.Register
+   Gwiad.Registry.Services.Register.Register
      (Name        => "wiki_service",
       Description => "A wiki service for gwiad based on diouzhtu",
       Builder     => Builder'Access);

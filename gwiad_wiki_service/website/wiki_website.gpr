@@ -23,8 +23,8 @@ with "../../shared";
 with "aws";
 with "gwiad";
 with "gwiad-ecwf";
-with "gwiad-services";
-with "gwiad-websites";
+with "gwiad-registry-services";
+with "gwiad-registry-websites";
 with "gwiad-web";
 with "../interface/wiki_interface";
 

@@ -31,8 +31,10 @@ with AWS.Services.Dispatchers.URI;
 with AWS.MIME;
 
 with Gwiad.OS;
-with Gwiad.Websites.Register;
+with Gwiad.Registry.Websites.Register;
+with Gwiad.Registry.Services.Register;
 with Gwiad.Web.Register.Virtual_Host;
+with Gwiad.Iniparser;
 
 with Wiki_Website.Callbacks;
 with Wiki_Website.ECWF_Callbacks;
@@ -41,8 +43,6 @@ with Wiki_Website.Template_Defs.Edit;
 with Wiki_Website.Template_Defs.View;
 with Wiki_Website.Template_Defs.Preview;
 
-with Gwiad.Iniparser;
-with Gwiad.Services.Register;
 
 package body Wiki_Website.Service is
 
@@ -52,8 +52,8 @@ package body Wiki_Website.Service is
 
    use Wiki_Website.Callbacks;
    use Wiki_Website.ECWF_Callbacks;
-   use Gwiad.Services;
-   use Gwiad.Services.Register;
+   use Gwiad.Registry.Services;
+   use Gwiad.Registry.Services.Register;
 
    package Service_Maps is new Ada.Containers.Indefinite_Hashed_Maps
      (String, Service_Id, Ada.Strings.Hash, "=", "=");
@@ -131,7 +131,7 @@ package body Wiki_Website.Service is
          declare
             Wiki_Service_Id : Service_Id;
             Wiki_World_Service_Access : constant GW_Service_Access
-              := GW_Service_Access (Gwiad.Services.Register.Get
+              := GW_Service_Access (Gwiad.Registry.Services.Register.Get
                                     (Wiki_Service_Name));
             Get_Service               : GW_Service'Class :=
                                           Wiki_World_Service_Access.all;
@@ -143,7 +143,7 @@ package body Wiki_Website.Service is
                Img_Base_URL   => "/" & Wiki_Web_Image,
                Text_Directory => Wiki_Text_Dir (Name));
 
-            Wiki_Service_Id := Gwiad.Services.Register.Set
+            Wiki_Service_Id := Gwiad.Registry.Services.Register.Set
               (Wiki_Service_Name, Service_Access (Wiki_World_Service_Access));
             Services.Insert (Key       => String (Name),
                              New_Item  => Wiki_Service_Id);
@@ -154,11 +154,11 @@ package body Wiki_Website.Service is
          declare
             Wiki_Service_Id : constant Service_Id :=
                                 Services.Element (String (Name));
-            Wiki_World_Service_Access : constant GW_Service_Access :=
-                                          GW_Service_Access
-                                            (Gwiad.Services.Register.Get
-                                               (Wiki_Service_Name,
-                                                Wiki_Service_Id));
+            Wiki_World_Service_Access : constant GW_Service_Access
+              := GW_Service_Access
+              (Gwiad.Registry.Services.Register.Get
+                 (Wiki_Service_Name,
+                  Wiki_Service_Id));
             Get_Service               : GW_Service'Class :=
                                           Wiki_World_Service_Access.all;
          begin
@@ -233,7 +233,7 @@ package body Wiki_Website.Service is
         (Hostname => Virtual_Host,
          Action   => Main_Dispatcher);
 
-      Gwiad.Websites.Register.Register
+      Gwiad.Registry.Websites.Register.Register
         (Name        => String (Name),
          Description => Description,
          Unregister  => Unregister'Access);

@@ -30,7 +30,7 @@ with AWS.Parameters;
 with AWS.Services.Directory;
 with AWS.Services.ECWF.Registry;
 
-with Gwiad.Services.Register;
+with Gwiad.Registry.Services.Register;
 
 with Wiki_Interface;
 
@@ -137,7 +137,7 @@ package body Wiki_Website.Callbacks is
         (Translations,
          Templates.Assoc (Template_Defs.Top.WIKI_NAME, String (Name)));
 
-      if not Gwiad.Services.Register.Exists (Wiki_Service_Name) then
+      if not Gwiad.Registry.Services.Register.Exists (Wiki_Service_Name) then
          Templates.Insert
            (Translations,
             Templates.Assoc
@@ -247,7 +247,7 @@ package body Wiki_Website.Callbacks is
         (Translations,
          Templates.Assoc (Template_Defs.Top.WIKI_NAME, String (Name)));
 
-      if not Gwiad.Services.Register.Exists (Wiki_Service_Name) then
+      if not Gwiad.Registry.Services.Register.Exists (Wiki_Service_Name) then
          Templates.Insert
            (Translations,
             Templates.Assoc

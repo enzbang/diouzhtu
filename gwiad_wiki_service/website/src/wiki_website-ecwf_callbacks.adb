@@ -35,7 +35,7 @@ with Ada.Directories;
 with Ada.Text_IO;
 
 with Gwiad.OS;
-with Gwiad.Services.Register;
+with Gwiad.Registry.Services.Register;
 
 with Wiki_Interface;
 
@@ -307,7 +307,8 @@ package body Wiki_Website.ECWF_Callbacks is
       elsif Exists (Local_Filename)
         and then Kind (Local_Filename) = Ordinary_File
       then
-         if not Gwiad.Services.Register.Exists (Wiki_Service_Name) then
+         if not Gwiad.Registry.Services.Register.Exists
+           (Wiki_Service_Name) then
             Templates.Insert
               (Translations,
                Templates.Assoc ("ERROR", "<p>Service down</p>"));

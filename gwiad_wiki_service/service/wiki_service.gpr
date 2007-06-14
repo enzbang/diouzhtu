@@ -20,7 +20,7 @@
 ------------------------------------------------------------------------------
 
 with "aws";
-with "gwiad-services";
+with "gwiad-registry-services";
 with "../../diouzhtu/diouzhtu";
 with "../../shared";
 with "../interface/wiki_interface";
