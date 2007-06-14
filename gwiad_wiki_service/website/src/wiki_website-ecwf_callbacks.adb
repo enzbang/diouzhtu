@@ -34,7 +34,7 @@ with Wiki_Website.Template_Defs.Block_View;
 with Ada.Directories;
 with Ada.Text_IO;
 
-with Gwiad.OS;
+with Morzhol.OS;
 with Gwiad.Registry.Services.Register;
 
 with Wiki_Interface;
@@ -44,6 +44,8 @@ package body Wiki_Website.ECWF_Callbacks is
    use Ada;
    use Ada.Strings.Unbounded;
    use Ada.Text_IO;
+
+   use Morzhol.OS;
 
    use Wiki_Interface;
 
@@ -67,12 +69,12 @@ package body Wiki_Website.ECWF_Callbacks is
       Get_URI        : constant String := URI (Request);
       Name           : constant Wiki_Name := Get_Wiki_Name (Request);
       HTML_Root      : constant String
-        := Current_Directory & Gwiad.OS.Directory_Separator
+        := Current_Directory & Directory_Separator
           & Wiki_HTML_Dir (Name);
       HTML_Directory : constant String
-        := Current_Directory & Gwiad.OS.Directory_Separator
+        := Current_Directory & Directory_Separator
           & Containing_Directory (Wiki_HTML_Dir (Name)
-                                  & Gwiad.OS.Directory_Separator
+                                  & Directory_Separator
                                   & Get_Directory (Get_URI));
 
       procedure Menu
@@ -158,7 +160,7 @@ package body Wiki_Website.ECWF_Callbacks is
    function Menu_Template (Request : in Status.Data) return String is
       Name : constant Wiki_Name := Get_Wiki_Name (Request);
    begin
-      return Wiki_Root (Name) & Gwiad.OS.Directory_Separator
+      return Wiki_Root (Name) & Directory_Separator
         & Template_Defs.Block_Menu.Template;
    end Menu_Template;
 
@@ -181,10 +183,10 @@ package body Wiki_Website.ECWF_Callbacks is
       Local_Directory : constant String := Wiki_Text_Dir (Name);
       Local_Filename  : constant String :=
                           Local_Directory
-                            & Gwiad.OS.Directory_Separator & Filename;
+                            & Directory_Separator & Filename;
       HTML_Directory : constant String := Wiki_HTML_Dir (Name);
       HTML_Filename  : constant String :=
-                         HTML_Directory & Gwiad.OS.Directory_Separator
+                         HTML_Directory & Directory_Separator
                            & Filename;
       HTML_Text      : Unbounded_String := Null_Unbounded_String;
 
@@ -377,7 +379,7 @@ package body Wiki_Website.ECWF_Callbacks is
    function View_Template (Request : in Status.Data) return String is
       Name     : constant Wiki_Name := Get_Wiki_Name (Request);
    begin
-      return Wiki_Root (Name) & Gwiad.OS.Directory_Separator
+      return Wiki_Root (Name) & Directory_Separator
         & Template_Defs.Block_View.Template;
    end View_Template;
 

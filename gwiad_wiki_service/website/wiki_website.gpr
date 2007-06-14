@@ -26,6 +26,7 @@ with "gwiad-ecwf";
 with "gwiad-registry-services";
 with "gwiad-registry-websites";
 with "gwiad-web";
+with "morzhol";
 with "../interface/wiki_interface";
 
 Project Wiki_Website is

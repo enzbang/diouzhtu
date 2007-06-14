@@ -30,11 +30,12 @@ with AWS.Services.ECWF.Registry;
 with AWS.Services.Dispatchers.URI;
 with AWS.MIME;
 
-with Gwiad.OS;
+with Morzhol.OS;
+with Morzhol.Iniparser;
+
 with Gwiad.Registry.Websites.Register;
 with Gwiad.Registry.Services.Register;
 with Gwiad.Web.Register.Virtual_Host;
-with Gwiad.Iniparser;
 
 with Wiki_Website.Callbacks;
 with Wiki_Website.ECWF_Callbacks;
@@ -49,6 +50,7 @@ package body Wiki_Website.Service is
    use AWS;
    use Ada;
    use Ada.Exceptions;
+   use Morzhol.OS;
 
    use Wiki_Website.Callbacks;
    use Wiki_Website.ECWF_Callbacks;
@@ -62,7 +64,7 @@ package body Wiki_Website.Service is
 
    type Attribute is (Description, Virtual_Host);
 
-   package Conf is new Gwiad.Iniparser (Attribute);
+   package Conf is new Morzhol.Iniparser (Attribute);
 
    procedure Discover_Wiki_Websites;
    --  Search wiki website on plugin root path
@@ -91,7 +93,7 @@ package body Wiki_Website.Service is
                --  Now read the config file if any
 
                Conf.IO.Open
-                 (Path & Gwiad.OS.Directory_Separator & "config.ini");
+                 (Path & Directory_Separator & "config.ini");
                Conf.IO.Close;
 
                Wiki_Website.Service.Register
@@ -174,7 +176,7 @@ package body Wiki_Website.Service is
      (Virtual_Host  : String; Name : Wiki_Name; Description : String)
    is
       Template_Dir : constant String    := Wiki_Root (Name);
-      Sep          : constant Character := Gwiad.OS.Directory_Separator;
+      Sep          : constant Character := Directory_Separator;
 
       Main_Dispatcher : AWS.Services.Dispatchers.URI.Handler;
    begin
