@@ -20,6 +20,7 @@
 ------------------------------------------------------------------------------
 
 with "aws";
+with "morzhol";
 with "gwiad-registry-services";
 with "../../diouzhtu/diouzhtu";
 with "../../shared";

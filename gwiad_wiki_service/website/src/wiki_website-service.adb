@@ -34,7 +34,8 @@ with Morzhol.OS;
 with Morzhol.Iniparser;
 
 with Gwiad.Registry.Websites.Register;
-with Gwiad.Registry.Services.Register;
+with Gwiad.Registry.Services.Cache;
+with Gwiad.Registry.Services;
 with Gwiad.Web.Register.Virtual_Host;
 
 with Wiki_Website.Callbacks;
@@ -43,7 +44,6 @@ with Wiki_Website.ECWF_Callbacks;
 with Wiki_Website.Template_Defs.Edit;
 with Wiki_Website.Template_Defs.View;
 with Wiki_Website.Template_Defs.Preview;
-
 
 package body Wiki_Website.Service is
 
@@ -55,7 +55,10 @@ package body Wiki_Website.Service is
    use Wiki_Website.Callbacks;
    use Wiki_Website.ECWF_Callbacks;
    use Gwiad.Registry.Services;
-   use Gwiad.Registry.Services.Register;
+   use Gwiad.Registry.Services.Cache;
+
+   Wiki_Website_Library_Path : constant String :=
+                                 Gwiad.Registry.Websites.Register.Library_Path;
 
    package Service_Maps is new Ada.Containers.Indefinite_Hashed_Maps
      (String, Service_Id, Ada.Strings.Hash, "=", "=");
@@ -131,10 +134,9 @@ package body Wiki_Website.Service is
 
       if not Services.Contains (String (Name)) then
          declare
-            Wiki_Service_Id : Service_Id;
+            Wiki_Service_Id : Cache.Service_Id;
             Wiki_World_Service_Access : constant GW_Service_Access
-              := GW_Service_Access (Gwiad.Registry.Services.Register.Get
-                                    (Wiki_Service_Name));
+              := GW_Service_Access (Get (Wiki_Service_Name));
             Get_Service               : GW_Service'Class :=
                                           Wiki_World_Service_Access.all;
          begin
@@ -145,7 +147,7 @@ package body Wiki_Website.Service is
                Img_Base_URL   => "/" & Wiki_Web_Image,
                Text_Directory => Wiki_Text_Dir (Name));
 
-            Wiki_Service_Id := Gwiad.Registry.Services.Register.Set
+            Wiki_Service_Id := Set
               (Wiki_Service_Name, Service_Access (Wiki_World_Service_Access));
             Services.Insert (Key       => String (Name),
                              New_Item  => Wiki_Service_Id);
@@ -157,10 +159,7 @@ package body Wiki_Website.Service is
             Wiki_Service_Id : constant Service_Id :=
                                 Services.Element (String (Name));
             Wiki_World_Service_Access : constant GW_Service_Access
-              := GW_Service_Access
-              (Gwiad.Registry.Services.Register.Get
-                 (Wiki_Service_Name,
-                  Wiki_Service_Id));
+              := GW_Service_Access (Get (Wiki_Service_Id));
             Get_Service               : GW_Service'Class :=
                                           Wiki_World_Service_Access.all;
          begin
@@ -236,9 +235,10 @@ package body Wiki_Website.Service is
          Action   => Main_Dispatcher);
 
       Gwiad.Registry.Websites.Register.Register
-        (Name        => String (Name),
+        (Name        => Website_Name (Name),
          Description => Description,
-         Unregister  => Unregister'Access);
+         Unregister   => Unregister'Access,
+         Library_Path => Wiki_Website_Library_Path);
    exception
       when E : others =>
          Ada.Text_IO.Put_Line ("registering fails : " &
@@ -249,8 +249,8 @@ package body Wiki_Website.Service is
    -- Unregister --
    ----------------
 
-   procedure Unregister (Website_Name : in String) is
-      Host     : constant String := Wiki_Host (Wiki_Name (Website_Name));
+   procedure Unregister (Name : in Website_Name) is
+      Host     : constant String := Wiki_Host (Wiki_Name (Name));
    begin
       Gwiad.Web.Register.Virtual_Host.Unregister (Hostname => Host);
    end Unregister;

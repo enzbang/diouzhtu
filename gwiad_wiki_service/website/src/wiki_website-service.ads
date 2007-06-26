@@ -21,10 +21,12 @@
 
 with Wiki_Interface;
 with Wiki_Website.Config;
+with Gwiad.Registry.Websites;
 
 private package Wiki_Website.Service is
 
    use Wiki_Website.Config;
+   use Gwiad.Registry.Websites;
 
    function Get (Name : Wiki_Name) return Wiki_Interface.GW_Service'Class;
    --  Returns the service
@@ -33,7 +35,7 @@ private package Wiki_Website.Service is
      (Virtual_Host : String; Name : Wiki_Name; Description : String);
    --  Register a website
 
-   procedure Unregister (Website_Name : String);
+   procedure Unregister (Name : Website_Name);
    --  Unregister a website
 
 

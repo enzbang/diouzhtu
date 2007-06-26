@@ -22,13 +22,16 @@
 with Ada.Directories;
 with AWS.Status;
 
+with Gwiad.Registry.Services.Register;
+
 private package Wiki_Website.Config is
 
    type Wiki_Name is new String;
 
    Wiki_Config_Exception : exception;
 
-   Wiki_Service_Name   : constant String := "wiki_service";
+   Wiki_Service_Name   : constant Gwiad.Registry.Services.Register.Service_Name
+     := "wiki_service";
    --  Gwiad wiki Service name
 
    Plugin_Root : constant String :=
