@@ -45,7 +45,8 @@ package body Wiki_Service is
    -- HTML --
    ----------
 
-   overriding function HTML
+   overriding
+   function HTML
      (S : Wiki_Service; Filename : String) return String is
    begin
       return To_HTML (S.Information, Filename);
@@ -55,7 +56,8 @@ package body Wiki_Service is
    -- HTML_Preview --
    ------------------
 
-   overriding function HTML_Preview
+   overriding
+   function HTML_Preview
      (S : Wiki_Service; Text : String) return String is
    begin
       return Text_To_HTML (S.Information, Text);
@@ -65,7 +67,8 @@ package body Wiki_Service is
    -- Initialize --
    ----------------
 
-   overriding procedure Initialize
+   overriding
+   procedure Initialize
      (S              : in out Wiki_Service;
       Text_Directory : in     String;
       Base_URL       : in     String;
@@ -79,7 +82,6 @@ package body Wiki_Service is
    begin
       S.Information := Wiki;
    end Initialize;
-
 
 begin
    Gwiad.Registry.Services.Register.Register

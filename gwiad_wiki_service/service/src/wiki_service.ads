@@ -31,16 +31,19 @@ package Wiki_Service is
 
    type Wiki_Service_Access is access all Wiki_Service;
 
-   overriding procedure Initialize
+   overriding
+   procedure Initialize
      (S              : in out Wiki_Service;
       Text_Directory : in     String;
       Base_URL       : in     String;
       Img_Base_URL   : in     String);
 
-   overriding function HTML_Preview
+   overriding
+   function HTML_Preview
      (S : Wiki_Service; Text : String) return String;
 
-   overriding function HTML
+   overriding
+   function HTML
      (S : Wiki_Service; Filename : String) return String;
 
 private
