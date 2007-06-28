@@ -25,7 +25,7 @@ package Wiki_Interface is
 
    use Gwiad.Registry.Services;
 
-   type Wiki2HTML_Interface is interface;
+   type Wiki2HTML_Interface is limited interface;
 
    procedure Initialize
      (S              : in out Wiki2HTML_Interface;
