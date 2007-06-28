@@ -36,7 +36,7 @@ with Morzhol.Iniparser;
 with Gwiad.Registry.Websites.Register;
 with Gwiad.Registry.Services.Cache;
 with Gwiad.Registry.Services;
-with Gwiad.Web.Register.Virtual_Host;
+with Gwiad.Web.Virtual_Host;
 
 with Wiki_Website.Callbacks;
 with Wiki_Website.ECWF_Callbacks;
@@ -230,7 +230,7 @@ package body Wiki_Website.Service is
 
       Config.Add_Config (Name => Name, Hostname => Virtual_Host);
 
-      Gwiad.Web.Register.Virtual_Host.Register
+      Gwiad.Web.Virtual_Host.Register
         (Hostname => Virtual_Host,
          Action   => Main_Dispatcher);
 
@@ -252,7 +252,7 @@ package body Wiki_Website.Service is
    procedure Unregister (Name : in Website_Name) is
       Host     : constant String := Wiki_Host (Wiki_Name (Name));
    begin
-      Gwiad.Web.Register.Virtual_Host.Unregister (Hostname => Host);
+      Gwiad.Web.Virtual_Host.Unregister (Hostname => Host);
    end Unregister;
 
 begin
