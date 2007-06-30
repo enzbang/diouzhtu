@@ -21,7 +21,7 @@
 
 with "../../shared";
 with "gwiad";
-with "gwiad-registry-services";
+with "gwiad-plugins-services";
 
 Project Wiki_Interface is
 

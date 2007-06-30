@@ -21,7 +21,7 @@
 
 with "aws";
 with "morzhol";
-with "gwiad-registry-services";
+with "gwiad-plugins-services";
 with "../../diouzhtu/diouzhtu";
 with "../../shared";
 with "../interface/wiki_interface";
