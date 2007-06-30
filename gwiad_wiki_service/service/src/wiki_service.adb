@@ -47,7 +47,7 @@ package body Wiki_Service is
 
    overriding
    function HTML
-     (S : Wiki_Service; Filename : String) return String is
+     (S : in Wiki_Service; Filename : in String) return String is
    begin
       return To_HTML (S.Information, Filename);
    end HTML;
@@ -58,7 +58,7 @@ package body Wiki_Service is
 
    overriding
    function HTML_Preview
-     (S : Wiki_Service; Text : String) return String is
+     (S : in Wiki_Service; Text : in String) return String is
    begin
       return Text_To_HTML (S.Information, Text);
    end HTML_Preview;

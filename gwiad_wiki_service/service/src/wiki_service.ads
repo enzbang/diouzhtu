@@ -40,13 +40,14 @@ package Wiki_Service is
 
    overriding
    function HTML_Preview
-     (S : Wiki_Service; Text : String) return String;
+     (S : in Wiki_Service; Text : in String) return String;
 
    overriding
    function HTML
-     (S : Wiki_Service; Filename : String) return String;
+     (S : in Wiki_Service; Filename : in String) return String;
 
 private
+
    type Wiki_Service is new GW_Service with record
       Information : Diouzhtu.Wiki_Information;
    end record;
