@@ -46,7 +46,24 @@ Project Wiki_Website is
    for Library_Kind use "dynamic";
    for Library_Auto_Init use "false";
 
+   case Shared.OS is
+      when "Windows_NT" =>
+         --  ??? for linker library ordering
+         for Library_Options use ("-laws", "-laws_win32", "-lws2_32");
+      when others =>
+         null;
+   end case;
+
+   --------------
+   -- Compiler --
+   --------------
+
    package Compiler renames Shared.Compiler;
+
+   ---------
+   -- Ide --
+   ---------
+
    package Ide renames Shared.Ide;
 
 end Wiki_Website;

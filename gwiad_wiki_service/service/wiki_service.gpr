@@ -39,12 +39,22 @@ Project Wiki_Service is
 
    case Shared.OS is
       when "Windows_NT" =>
-         for Library_Options use ("-lgnarl-6.0");
+         --  ??? for linker library ordering
+         for Library_Options use ("-laws", "-laws_win32", "-lws2_32");
       when others =>
          null;
    end case;
 
+   --------------
+   -- Compiler --
+   --------------
+
    package Compiler renames Shared.Compiler;
+
+   ---------
+   -- Ide --
+   ---------
+
    package Ide renames Shared.Ide;
 
 end Wiki_Service;
