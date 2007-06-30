@@ -33,9 +33,9 @@ with AWS.MIME;
 with Morzhol.OS;
 with Morzhol.Iniparser;
 
-with Gwiad.Registry.Websites.Register;
-with Gwiad.Registry.Services.Cache;
-with Gwiad.Registry.Services;
+with Gwiad.Plugins.Websites.Registry;
+with Gwiad.Plugins.Services.Cache;
+with Gwiad.Plugins.Services;
 with Gwiad.Web.Virtual_Host;
 
 with Wiki_Website.Callbacks;
@@ -54,11 +54,11 @@ package body Wiki_Website.Service is
 
    use Wiki_Website.Callbacks;
    use Wiki_Website.ECWF_Callbacks;
-   use Gwiad.Registry.Services;
-   use Gwiad.Registry.Services.Cache;
+   use Gwiad.Plugins.Services;
+   use Gwiad.Plugins.Services.Cache;
 
    Wiki_Website_Library_Path : constant String :=
-                                 Gwiad.Registry.Websites.Register.Library_Path;
+                                 Gwiad.Plugins.Websites.Registry.Library_Path;
 
    package Service_Maps is new Ada.Containers.Indefinite_Hashed_Maps
      (String, Service_Id, Ada.Strings.Hash, "=", "=");
@@ -234,7 +234,7 @@ package body Wiki_Website.Service is
         (Hostname => Virtual_Host,
          Action   => Main_Dispatcher);
 
-      Gwiad.Registry.Websites.Register.Register
+      Gwiad.Plugins.Websites.Registry.Register
         (Name        => Website_Name (Name),
          Description => Description,
          Unregister   => Unregister'Access,
@@ -250,7 +250,7 @@ package body Wiki_Website.Service is
    ----------------
 
    procedure Unregister (Name : in Website_Name) is
-      Host     : constant String := Wiki_Host (Wiki_Name (Name));
+      Host     : constant String := Wiki_Host (Wiki_Name (String (Name)));
    begin
       Gwiad.Web.Virtual_Host.Unregister (Hostname => Host);
    end Unregister;

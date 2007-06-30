@@ -35,7 +35,7 @@ with Ada.Directories;
 with Ada.Text_IO;
 
 with Morzhol.OS;
-with Gwiad.Registry.Services.Register;
+with Gwiad.Plugins.Services.Registry;
 
 with Wiki_Interface;
 
@@ -309,7 +309,7 @@ package body Wiki_Website.ECWF_Callbacks is
       elsif Exists (Local_Filename)
         and then Kind (Local_Filename) = Ordinary_File
       then
-         if not Gwiad.Registry.Services.Register.Exists
+         if not Gwiad.Plugins.Services.Registry.Exists
            (Wiki_Service_Name) then
             Templates.Insert
               (Translations,

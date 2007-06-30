@@ -22,7 +22,7 @@
 with Ada.Directories;
 with AWS.Status;
 
-with Gwiad.Registry.Services.Register;
+with Gwiad.Plugins.Services.Registry;
 
 private package Wiki_Website.Config is
 
@@ -30,7 +30,7 @@ private package Wiki_Website.Config is
 
    Wiki_Config_Exception : exception;
 
-   Wiki_Service_Name   : constant Gwiad.Registry.Services.Register.Service_Name
+   Wiki_Service_Name : constant Gwiad.Plugins.Services.Registry.Service_Name
      := "wiki_service";
    --  Gwiad wiki Service name
 

@@ -21,12 +21,12 @@
 
 with Wiki_Interface;
 with Wiki_Website.Config;
-with Gwiad.Registry.Websites;
+with Gwiad.Plugins.Websites;
 
 private package Wiki_Website.Service is
 
    use Wiki_Website.Config;
-   use Gwiad.Registry.Websites;
+   use Gwiad.Plugins.Websites;
 
    function Get (Name : Wiki_Name) return Wiki_Interface.GW_Service'Class;
    --  Returns the service
