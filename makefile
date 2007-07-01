@@ -130,6 +130,9 @@ install_gwiad_website:
 		$(GWIAD_DIR)/plugins/wiki_website/example/js/
 	$(CP) gwiad_wiki_service/lib/*wiki_website$(SOEXT) $(GWIAD_WEBSITES)
 
+install_gwiad_all: install_gwiad_interface install_gwiad_service \
+	install_gwiad_website
+
 gwiad_plugin_distrib:
 	$(MKDIR) -p $(PLUGIN_DISTRIB)
 	$(CP) gwiad_wiki_service/interface/lib/*wiki_interface$(SOEXT) \
