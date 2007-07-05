@@ -28,4 +28,5 @@ clean:
 	-gnat clean -r -Pdiouzhtu
 
 check:
+	gnat check -dd -Pdiouzhtu -rules -from=../diouzhtu.check
 setup:

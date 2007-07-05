@@ -28,6 +28,7 @@ clean:
 	-gnat clean -r -Pdiouzhtu2html
 
 check:
-	make -C all
+	gnat check -dd -Pdiouzhtu2html -rules -from=../diouzhtu.check
+	make -C test
 
 setup:
