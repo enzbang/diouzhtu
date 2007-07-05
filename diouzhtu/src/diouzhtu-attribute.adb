@@ -34,7 +34,7 @@ package body Diouzhtu.Attribute is
    -------------
 
    function Extract
-     (Content : String; Add_Class : String := "") return String is
+     (Content : in String; Add_Class : in String := "") return String is
       PM : constant Pattern_Matcher :=
         Compile (Pattern, Case_Insensitive);
       Matches : Match_Array (0 .. 3);

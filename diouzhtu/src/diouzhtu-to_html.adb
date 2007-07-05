@@ -35,7 +35,7 @@ package body Diouzhtu.To_HTML is
    use Ada.Text_IO;
    use Ada.Strings.Unbounded;
 
-   function CR_Delete (S : String) return String;
+   function CR_Delete (S : in String) return String;
    --  Delete all CR characters
 
    function Web_Escape (S : in String) return String;
@@ -45,8 +45,8 @@ package body Diouzhtu.To_HTML is
    -- CR_Delete --
    ---------------
 
-   function CR_Delete (S : String) return String is
-      CR : constant String (1 .. 1) := (1 => ASCII.CR);
+   function CR_Delete (S : in String) return String is
+      CR : constant String (1 .. 1) := String'(1 => ASCII.CR);
    begin
       return Strings.Fixed.Trim
         (Strings.Fixed.Translate
@@ -59,7 +59,8 @@ package body Diouzhtu.To_HTML is
    -- Text_To_HTML --
    ------------------
 
-   function Text_To_HTML (Wiki : Wiki_Information; S : String) return String is
+   function Text_To_HTML
+     (Wiki : in Wiki_Information; S : in String) return String is
       Text : constant String := CR_Delete (S);
 
       Content       : Unbounded_String := Null_Unbounded_String;
@@ -109,7 +110,7 @@ package body Diouzhtu.To_HTML is
    -------------
 
    function To_HTML
-     (Wiki : Wiki_Information; Filename : String) return String
+     (Wiki : in Wiki_Information; Filename : in String) return String
    is
       Diouzhtu_File : File_Type;
       Result        : Unbounded_String := Null_Unbounded_String;
@@ -199,7 +200,7 @@ package body Diouzhtu.To_HTML is
       return To_String (Result);
    end Web_Escape;
 
-begin
+begin  -- Diouzhtu.TO_HTML Register block and inline transformation
    Diouzhtu.Block.Register;
    Diouzhtu.Inline.Register;
 end Diouzhtu.To_HTML;

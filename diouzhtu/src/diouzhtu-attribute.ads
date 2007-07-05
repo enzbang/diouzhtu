@@ -24,7 +24,8 @@ package Diouzhtu.Attribute is
    function Get_Pattern return String;
    --  Returns the pattern matching attributes
 
-   function Extract (Content : String; Add_Class : String := "") return String;
+   function Extract
+     (Content : in String; Add_Class : in String := "") return String;
    --  Extract class and id
 
 end Diouzhtu.Attribute;

@@ -26,14 +26,14 @@ package body Diouzhtu.Code is
 
    use GNAT.Regpat;
 
-   function End_Code (Block : String) return String;
+   function End_Code (Block : in String) return String;
    --  Search for a "end code." to close a block code
 
    --------------
    -- End_Code --
    --------------
 
-   function End_Code (Block : String) return String is
+   function End_Code (Block : in String) return String is
       Extract  : constant Pattern_Matcher :=
         Compile (".*?(end code.)", Case_Insensitive + Single_Line);
       Matches : Match_Array (0 .. 1);
@@ -83,44 +83,47 @@ package body Diouzhtu.Code is
          Match (Extract, Block, Matches);
          if Matches (0) = No_Match then
             Append (Result, Diouzhtu.Parse (Wiki, Block_Level, Block));
-            return;
-         end if;
+         else
+            --  This is a code block
 
-         --  This is a code block
+            Is_Code_Block := True;
 
-         Is_Code_Block := True;
+            Result := To_Unbounded_String ("<p><pre><code");
 
-         Result := To_Unbounded_String ("<p><pre><code");
+            if Matches (2) /= No_Match then
+               Append
+                 (Result, Attribute.Extract
+                    (Block (Matches (2).First .. Matches (2).Last),
+                     Block (Matches (1).First + 1 .. Matches (1).Last)));
+            elsif Matches (1) /= No_Match then
+               Append (Result, " class='" &
+                       Block (Matches (1).First + 1 .. Matches (1).Last) &
+                       "'");
+            end if;
 
-         if Matches (2) /= No_Match then
-            Append (Result, Attribute.Extract
-                      (Block (Matches (2).First .. Matches (2).Last),
-                       Block (Matches (1).First + 1 .. Matches (1).Last)));
-         elsif Matches (1) /= No_Match then
-            Append (Result, " class='" &
-                      Block (Matches (1).First + 1 .. Matches (1).Last) &
-                      "'");
-         end if;
+            Append (Result, ">");
 
-         Append (Result, ">");
-
-         if Matches (Count) /= No_Match
-           and then Matches (Count).First < Block'Last then
-            declare
-               End_Code_Block : constant String :=
-                 End_Code (Block (Matches (Count).First .. Block'Last));
-            begin
-               if End_Code_Block /= "" then
-                  Is_Code_Block := False;
-                  Append (Result, End_Code_Block);
-               else
-                  Append (Result, Block (Matches (Count).First .. Block'Last));
-               end if;
-            end;
+            if Matches (Count) /= No_Match
+              and then Matches (Count).First < Block'Last then
+               declare
+                  End_Code_Block : constant String
+                    := End_Code (Block (Matches (Count).First .. Block'Last));
+               begin
+                  if End_Code_Block /= "" then
+                     Is_Code_Block := False;
+                     Append (Result, End_Code_Block);
+                  else
+                     Append (Result,
+                             Block (Matches (Count).First .. Block'Last));
+                  end if;
+               end;
+            end if;
          end if;
       end Begin_Code;
 
    begin
+
+      Result := Null_Unbounded_String;
 
       if not Is_Code_Block then
          Begin_Code;

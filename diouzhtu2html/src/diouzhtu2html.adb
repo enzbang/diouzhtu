@@ -28,7 +28,8 @@ procedure Diouzhtu2Html is
    use Ada.Command_Line;
    use Ada.Text_IO;
 
-   Wiki : Diouzhtu.Wiki_Information := Diouzhtu.Initialize ("", "", ".");
+   Wiki : constant Diouzhtu.Wiki_Information :=
+            Diouzhtu.Initialize ("", "", ".");
 begin
 
    if Argument_Count = 1 then

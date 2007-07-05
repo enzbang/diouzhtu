@@ -21,10 +21,12 @@
 
 package Diouzhtu.To_HTML is
 
-   function Text_To_HTML (Wiki : Wiki_Information; S : String) return String;
+   function Text_To_HTML
+     (Wiki : in Wiki_Information; S : in String) return String;
    --  Converts a diouzhtu string to HTML
 
-   function To_HTML (Wiki : Wiki_Information; Filename : String) return String;
+   function To_HTML
+     (Wiki : in Wiki_Information; Filename : in String) return String;
    --  Converts a diouzhtu formatted file to HTML
 
 end Diouzhtu.To_HTML;

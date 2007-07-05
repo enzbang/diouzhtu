@@ -24,15 +24,17 @@ with Ada.Text_IO;
 with Ada.Command_Line;
 
 procedure Check_Mem is
-   use Diouzhtu.To_HTML;
    use Ada.Command_Line;
    use Ada.Text_IO;
 
-   Wiki : Diouzhtu.Wiki_Information := Diouzhtu.Initialize ("", "", ".");
+   Wiki : constant Diouzhtu.Wiki_Information :=
+            Diouzhtu.Initialize ("", "", ".");
 
 begin
 
    declare
+      use Diouzhtu.To_HTML;
+
       Filename  : constant String   := Argument (1);
       Iteration : constant Positive := Positive'Value (Argument (2));
 

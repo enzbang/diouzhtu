@@ -30,23 +30,28 @@ package body Diouzhtu.Block is
    use Diouzhtu;
 
    function Blockquote
-     (Wiki : Wiki_Information; Index : Positive; Block : String) return String;
+     (Wiki : in Wiki_Information; Index : in Positive; Block : in String)
+      return String;
    --  bq. Blockquote element
 
    function Header
-     (Wiki : Wiki_Information; Index : Positive; Block : String) return String;
+     (Wiki : in Wiki_Information; Index : in Positive; Block : in String)
+      return String;
    --  <h1>, <h2>, ... element
 
    function List
-     (Wiki : Wiki_Information; Index : Positive; Block : String) return String;
+     (Wiki : in Wiki_Information; Index : in Positive; Block : in String)
+      return String;
    --  list element <ul>, <ol>
 
    function Paragraph
-     (Wiki : Wiki_Information; Index : Positive; Block : String) return String;
+     (Wiki : in Wiki_Information; Index : in Positive; Block : in String)
+      return String;
    --  <p> element
 
    function Table
-     (Wiki : Wiki_Information; Index : Positive; Block : String) return String;
+     (Wiki : in Wiki_Information; Index : in Positive; Block : in String)
+      return String;
    --  table element
 
    ----------------
@@ -54,7 +59,7 @@ package body Diouzhtu.Block is
    ----------------
 
    function Blockquote
-     (Wiki : Wiki_Information; Index : Positive; Block : String)
+     (Wiki : in Wiki_Information; Index : in Positive; Block : in String)
       return String is
       Extract : constant Pattern_Matcher :=
         Compile ("^bq" & Attribute.Get_Pattern & "\.\s(.*)$",
@@ -91,7 +96,8 @@ package body Diouzhtu.Block is
    ------------
 
    function Header
-     (Wiki : Wiki_Information; Index : Positive; Block : String) return String
+     (Wiki : in Wiki_Information; Index : in Positive; Block : in String)
+      return String
    is
       Extract : constant Pattern_Matcher :=
         Compile ("^h(\d)" & Attribute.Get_Pattern & "\.\s(.*)$",
@@ -131,10 +137,14 @@ package body Diouzhtu.Block is
    end Header;
 
    function List
-     (Wiki : Wiki_Information; Index : Positive; Block : String) return String
+     (Wiki : in Wiki_Information; Index : in Positive; Block : in String)
+      return String
    is
-      Element     : constant array (1 .. 2) of String (1 .. 2) := ("ol", "ul");
-      Tag         : constant array (1 .. 2) of Character := ('#', '*');
+      type Elements is array (1 .. 2) of String (1 .. 2);
+      type Tags is array (1 .. 2) of Character;
+
+      Element     : constant Elements  := Elements'(1 => "ol", 2 => "ul");
+      Tag         : constant Tags := Tags'(1 => '#', 2 => '*');
       Indentation : constant String := "  ";
 
       Get_Element : String (1 .. 2);
@@ -149,15 +159,15 @@ package body Diouzhtu.Block is
          Level      : in out List_Level;
          Line_Level : in List_Level);
 
-      function Get_Current_Level (Line : String) return List_Level;
+      function Get_Current_Level (Line : in String) return List_Level;
 
-      function Indent (Level : List_Level) return String;
+      function Indent (Level : in List_Level) return String;
 
       -----------------------
       -- Get_Current_Level --
       -----------------------
 
-      function Get_Current_Level (Line : String) return List_Level is
+      function Get_Current_Level (Line : in String) return List_Level is
          Level : List_Level := 0;
       begin
          for K in Line'Range loop
@@ -171,7 +181,7 @@ package body Diouzhtu.Block is
       -- Indent --
       ------------
 
-      function Indent (Level : List_Level) return String is
+      function Indent (Level : in List_Level) return String is
          pragma Warnings (Off);
          N : Natural;
       begin
@@ -212,23 +222,24 @@ package body Diouzhtu.Block is
                Parse_Line (Wiki, Line, Level, Line_Level);
             end if;
          else
-            if Line = "" then
-               return;
+            if Line /= "" then
+               Append (Result, Indent (Level) & Indentation);
+               declare
+                  Content_First : constant Positive :=
+                                    Line'First + Natural (Level) + 1;
+                  Content_Last  : Positive := Line'Last;
+               begin
+                  if Line (Content_Last) = ASCII.Lf then
+                     Content_Last := Content_Last - 1;
+                  end if;
+                  Append
+                    (Result, "<li>" &
+                     Parse
+                       (Wiki, Inline_Level,
+                        Line (Content_First .. Content_Last))
+                     &  "</li>" & ASCII.Lf);
+               end;
             end if;
-            Append (Result, Indent (Level) & Indentation);
-            declare
-               Content_First : constant Positive :=
-                 Line'First + Natural (Level) + 1;
-               Content_Last  : Positive := Line'Last;
-            begin
-               if Line (Content_Last) = ASCII.Lf then
-                  Content_Last := Content_Last - 1;
-               end if;
-               Append (Result, "<li>" &
-                         Parse (Wiki, Inline_Level,
-                                Line (Content_First .. Content_Last))
-                         &  "</li>" & ASCII.Lf);
-            end;
          end if;
       end Parse_Line;
 
@@ -274,7 +285,8 @@ package body Diouzhtu.Block is
    ---------------
 
    function Paragraph
-     (Wiki : Wiki_Information; Index : Positive; Block : String) return String
+     (Wiki : in Wiki_Information; Index : in Positive; Block : in String)
+      return String
    is
       pragma Unreferenced (Index);
       Extract : constant Pattern_Matcher :=
@@ -326,7 +338,8 @@ package body Diouzhtu.Block is
    -----------
 
    function Table
-     (Wiki : Wiki_Information; Index : Positive; Block : String) return String
+     (Wiki : in Wiki_Information; Index : in Positive; Block : in String)
+      return String
    is
 
       Nb_Cols     : Natural          := 0;
@@ -340,17 +353,18 @@ package body Diouzhtu.Block is
       procedure Get_Dimension is
          Line_Nb_Cols  : Natural := 0;
       begin
+         Main_Loop :
          for I in Table_Block'Range loop
             if Table_Block (I) = ASCII.Lf then
                if I > Table_Block'First + 1
                  and then Table_Block (I - 2 .. I - 1) /= " |" then
                   --  A table line MUST end with |
-                  return;
+                  exit Main_Loop;
                end if;
                if I < Table_Block'Last - 1
                  and then Table_Block (I + 1 .. I + 2) /= "| " then
                   --  A table line MUST begin with |
-                  return;
+                  exit Main_Loop;
                end if;
                if Line_Nb_Cols > Nb_Cols then
                   Nb_Cols := Line_Nb_Cols;
@@ -372,7 +386,7 @@ package body Diouzhtu.Block is
                   Table_Block (I) := ' ';
                end if;
             end if;
-         end loop;
+         end loop Main_Loop;
       end Get_Dimension;
 
    begin

@@ -53,5 +53,11 @@ project Diouzhtu2Html is
 
    package Linker renames Shared.Linker;
 
+   ---------
+   -- Ide --
+   ---------
+
+   package Ide renames Shared.Ide;
+
 end Diouzhtu2Html;
 

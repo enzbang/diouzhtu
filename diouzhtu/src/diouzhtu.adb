@@ -28,25 +28,30 @@ package body Diouzhtu is
 
    type Callback is record
       To_HTML : access
-        function (Wiki  : Wiki_Information;
-                  Index   : Positive;
-                  Block   : String) return String;
+        function (Wiki  : in Wiki_Information;
+                  Index : in Positive;
+                  Block : in String) return String;
    end record;
 
    package Callbacks is new Containers.Vectors
-     (Positive, Callback, "=");
+     (Index_Type   => Positive,
+      Element_Type => Callback,
+      "="          => "=");
    use Callbacks;
 
-   Blocks  : Vector;
-   Inlines : Vector;
+   Blocks  : Vector := Empty_Vector;
+   Inlines : Vector := Empty_Vector;
 
    function Initialize
-     (Base_URL : String; Img_Base_URL : String; Text_Directory : String)
+     (Base_URL     : in String;
+      Img_Base_URL   : in String;
+      Text_Directory : in String)
       return Wiki_Information is
    begin
-      return (Base_URL       => To_Unbounded_String (Base_URL),
-              Img_Base_URL   => To_Unbounded_String (Img_Base_URL),
-              Text_Directory => To_Unbounded_String (Text_Directory));
+      return Wiki_Information'
+        (Base_URL       => To_Unbounded_String (Base_URL),
+         Img_Base_URL   => To_Unbounded_String (Img_Base_URL),
+         Text_Directory => To_Unbounded_String (Text_Directory));
    end Initialize;
 
    -----------------------
@@ -54,12 +59,12 @@ package body Diouzhtu is
    -----------------------
 
    procedure Internal_Register
-     (Level   : Register_Level;
+     (Level   : in Register_Level;
       To_HTML : access
         function
-        (Wiki  : Wiki_Information;
-        Index : Positive;
-        Content : String) return String)
+        (Wiki   : in Wiki_Information;
+         Index   : in Positive;
+         Content : in String) return String)
    is
       Register_Callback : Callback;
    begin
@@ -76,13 +81,13 @@ package body Diouzhtu is
    -----------
 
    function Parse
-     (Wiki    : Wiki_Information;
-      Level   : Register_Level;
-      Content : String;
-      Index   : Natural := 0)
+     (Wiki    : in Wiki_Information;
+      Level   : in Register_Level;
+      Content : in String;
+      Index   : in Natural := 0)
      return String
    is
-      Text      : Unbounded_String := To_Unbounded_String (Content);
+      Text      : constant Unbounded_String := To_Unbounded_String (Content);
       Current   : Positive;
       Container : Vector;
    begin
@@ -111,12 +116,12 @@ package body Diouzhtu is
    --------------
 
    procedure Register
-     (Level   : Register_Level;
+     (Level   : in Register_Level;
       To_HTML : access
         function
-        (Wiki  : Wiki_Information;
-        Index : Positive;
-        Content : String) return String)
+        (Wiki    : in Wiki_Information;
+         Index   : in Positive;
+         Content : in String) return String)
    is
       Register_Callback : Callback;
    begin

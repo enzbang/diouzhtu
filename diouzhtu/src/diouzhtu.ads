@@ -26,19 +26,21 @@ package Diouzhtu is
    type Wiki_Information is private;
 
    function Initialize
-     (Base_URL : String; Img_Base_URL : String; Text_Directory : String)
+     (Base_URL     : in String;
+      Img_Base_URL   : in String;
+      Text_Directory : in String)
       return Wiki_Information;
    --  Creates a new wiki
 
    type Register_Level is (Block_Level, Inline_Level);
 
    procedure Register
-     (Level   : Register_Level;
+     (Level   : in Register_Level;
       To_HTML : access
         function
-          (Wiki  : Wiki_Information;
-           Index : Positive;
-           Content : String) return String);
+          (Wiki  : in Wiki_Information;
+           Index : in Positive;
+           Content : in String) return String);
    --  Register a new recursive callback
 
 private
@@ -50,19 +52,19 @@ private
    end record;
 
    procedure Internal_Register
-     (Level   : Register_Level;
+     (Level   : in Register_Level;
       To_HTML : access
         function
-          (Wiki  : Wiki_Information;
-           Index : Positive;
-           Content : String) return String);
+          (Wiki  : in Wiki_Information;
+           Index : in Positive;
+           Content : in String) return String);
    --  Register a new recursive callback
 
    function Parse
-     (Wiki    : Wiki_Information;
-      Level   : Register_Level;
-      Content : String;
-      Index   : Natural := 0)
+     (Wiki    : in Wiki_Information;
+      Level   : in Register_Level;
+      Content : in String;
+      Index   : in Natural := 0)
      return String;
    --  Parse using all registered callbacks
 

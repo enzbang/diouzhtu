@@ -35,35 +35,42 @@ package body Diouzhtu.Inline is
    use Ada.Strings.Unbounded;
 
    function Code
-     (Wiki : Wiki_Information; Index : Positive; S : String) return String;
+     (Wiki : in Wiki_Information; Index : in Positive; S : in String)
+      return String;
    --  Code phrases can be surrounded by @.
    --  @code@
 
    function Default
-     (Wiki : Wiki_Information; Index : Positive; S : String) return String;
+     (Wiki : in Wiki_Information; Index : in Positive; S : in String)
+      return String;
    --  Default callback
 
    function Emphasis
-     (Wiki : Wiki_Information; Index : Positive; S : String) return String;
+     (Wiki : in Wiki_Information; Index : in Positive; S : in String)
+      return String;
    --  Emphasis to text is added by surrounding a phrase with underscores.
    --  _emphasized_ (e.g., italics)
 
    function Image
-     (Wiki : Wiki_Information; Index : Positive; S : String) return String;
+     (Wiki : in Wiki_Information; Index : in Positive; S : in String)
+      return String;
    --  !(class)image.url(tooltip)!
    --  The tooltip act as alt text
 
    function Link
-     (Wiki : Wiki_Information; Index : Positive; S : String) return String;
+     (Wiki : in Wiki_Information; Index : in Positive; S : in String)
+      return String;
    --  "(class)link name(tooltip)":http ://u.r.l
    --  "(class)link name(tooltip)":relative/url
 
    function Single_Link
-     (Wiki : Wiki_Information; Index : Positive; S : String) return String;
+     (Wiki : in Wiki_Information; Index : in Positive; S : in String)
+      return String;
    --  http://u.r.l
 
    function Strong
-     (Wiki : Wiki_Information; Index : Positive; S : String) return String;
+     (Wiki : in Wiki_Information; Index : in Positive; S : in String)
+      return String;
    --  Strength can be give to text by surrounding with asterisks.
    --  *strongly emphasized* (e.g., boldface)
 
@@ -72,7 +79,8 @@ package body Diouzhtu.Inline is
    ----------
 
    function Code
-     (Wiki : Wiki_Information; Index : Positive; S : String) return String
+     (Wiki : in Wiki_Information; Index : in Positive; S : in String)
+      return String
    is
       Extract  : constant Pattern_Matcher :=
         Compile ("@(.*?)@", Case_Insensitive);
@@ -117,7 +125,8 @@ package body Diouzhtu.Inline is
    -------------
 
    function Default
-     (Wiki : Wiki_Information; Index : Positive; S : String) return String
+     (Wiki : in Wiki_Information; Index : in Positive; S : in String)
+      return String
    is
       pragma Unreferenced (Wiki, Index);
 
@@ -194,7 +203,8 @@ package body Diouzhtu.Inline is
    --------------
 
    function Emphasis
-     (Wiki : Wiki_Information; Index : Positive; S : String) return String
+     (Wiki : in Wiki_Information; Index : in Positive; S : in String)
+      return String
    is
       Extract  : constant Pattern_Matcher :=
         Compile ("_(.*?)_", Case_Insensitive);
@@ -238,7 +248,8 @@ package body Diouzhtu.Inline is
    -----------
 
    function Image
-     (Wiki : Wiki_Information; Index : Positive; S : String) return String
+     (Wiki : in Wiki_Information; Index : in Positive; S : in String)
+      return String
    is
       Extract  : constant Pattern_Matcher
         := Compile ("!(\([\w-_]+?\))??((http://)??[\w._-]+?)(\([\w-_]+?\))??!",
@@ -308,7 +319,8 @@ package body Diouzhtu.Inline is
    ----------
 
    function Link
-     (Wiki : Wiki_Information; Index : Positive; S : String) return String
+     (Wiki : in Wiki_Information; Index : in Positive; S : in String)
+      return String
    is
       Extract  : constant Pattern_Matcher :=
         Compile ("""(\([\w-_]+?\))??([^\(\)]+?)(\(.*\))??"":" &
@@ -404,7 +416,8 @@ package body Diouzhtu.Inline is
    -----------------
 
    function Single_Link
-     (Wiki : Wiki_Information; Index : Positive; S : String) return String
+     (Wiki : in Wiki_Information; Index : in Positive; S : in String)
+      return String
    is
       Extract : constant Pattern_Matcher :=
         Compile ("(http://[^ \s\[\]]+)(\s|$)",
@@ -456,7 +469,8 @@ package body Diouzhtu.Inline is
    ------------
 
    function Strong
-     (Wiki : Wiki_Information; Index : Positive; S : String) return String
+        (Wiki : in Wiki_Information; Index : in Positive; S : in String)
+      return String
    is
       Extract  : constant Pattern_Matcher :=
         Compile ("\*(.*?)\*", Case_Insensitive);
