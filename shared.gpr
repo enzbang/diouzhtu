@@ -38,7 +38,15 @@ project Shared is
    -------------
 
    package Builder is
-      for Default_Switches ("Ada") use ("-m");
+
+      case Build is
+
+         when "Release" =>
+            for Default_Switches ("ada") use ("-m");
+
+         when "Debug" =>
+            for Default_Switches ("ada") use ("-m", "-fprofile-arcs", "-ftest-coverage");
+      end case;
    end Builder;
 
    --------------

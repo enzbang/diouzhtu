@@ -143,3 +143,7 @@ gwiad_plugin_distrib:
 	$(CP) $(INSTALL)/lib/diouzhtu/*$(SOEXT) $(PLUGIN_DISTRIB)/
 	$(TAR_DIR) $(PLUGIN_DISTRIB).tgz $(PLUGIN_DISTRIB)
 	$(RM) -r $(PLUGIN_DISTRIB)
+
+gcov_analyse:
+	(cd diouzhtu/obj/; gcov -abfu ../src/*)
+	(cd diouzhtu2html/obj/;gcov -abfu ../src/*)
