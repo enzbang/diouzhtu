@@ -99,6 +99,7 @@ install: install_dirs
 	$(CP) gwiad_wiki_service/interface/src/*.ads $(I_INC_W)
 	$(CP) diouzhtu/lib/* $(I_LIB)
 	$(CP) gwiad_wiki_service/interface/lib/* $(I_LIB_W)
+	$(CP) gwiad_wiki_service/interface/lib/*$(SOEXT) $(I_LIB_W)/..
 	$(CP) config/projects/diouzhtu.gpr $(I_GPR)
 	$(CP) config/projects/wiki_interface.gpr $(I_GPR)
 
