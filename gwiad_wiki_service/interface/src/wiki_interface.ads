@@ -34,10 +34,11 @@ package Wiki_Interface is
       Img_Base_URL   : in     String) is abstract;
 
    function HTML_Preview
-     (S : Wiki2HTML_Interface; Text : String) return String is abstract;
+     (S : in Wiki2HTML_Interface; Text : in String) return String is abstract;
 
    function HTML
-     (S : Wiki2HTML_Interface; Filename : String) return String is abstract;
+     (S : in Wiki2HTML_Interface; Filename : in String)
+      return String is abstract;
 
    type GW_Service is abstract new Service and Wiki2HTML_Interface
    with null record;

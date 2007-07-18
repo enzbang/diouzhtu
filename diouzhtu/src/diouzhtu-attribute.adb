@@ -29,6 +29,8 @@ package body Diouzhtu.Attribute is
 
    Pattern : constant String := "\(([\w-_]+?)??((#[\w-_]+?)??)\)";
 
+   Pattern_Match_Count : constant Match_Count := 3;
+
    -------------
    -- Extract --
    -------------
@@ -36,8 +38,8 @@ package body Diouzhtu.Attribute is
    function Extract
      (Content : in String; Add_Class : in String := "") return String is
       PM : constant Pattern_Matcher :=
-        Compile (Pattern, Case_Insensitive);
-      Matches : Match_Array (0 .. 3);
+        Compile (Expression => Pattern, Flags => Case_Insensitive);
+      Matches : Match_Array (0 .. Pattern_Match_Count);
       Result  : Unbounded_String := Null_Unbounded_String;
 
       Class_Attr   : constant String := " class='";
@@ -53,6 +55,7 @@ package body Diouzhtu.Attribute is
          end if;
       end if;
 
+      Extract_Attributes :
       declare
          Class_Length : constant Integer :=
            Matches (1).Last - Matches (1).First;
@@ -75,7 +78,7 @@ package body Diouzhtu.Attribute is
                       "'");
          end if;
          return To_String (Result);
-      end;
+      end Extract_Attributes;
    end Extract;
 
    -----------------

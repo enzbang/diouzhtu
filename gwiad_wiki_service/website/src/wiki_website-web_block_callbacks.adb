@@ -95,18 +95,17 @@ package body Wiki_Website.Web_Block_Callbacks is
          Start_Search (Search    => S,
                        Directory => From,
                        Pattern   => "*",
-                       Filter    => (Directory     => True,
-                                     Ordinary_File => True,
-                                     Special_File  => False));
+                       Filter    => Filter_Type'(Directory     => True,
+                                                 Ordinary_File => True,
+                                                 Special_File  => False));
          while More_Entries (S) loop
             Get_Next_Entry (S, D);
+            Add_To_Menu :
             declare
                Name      : constant String := Simple_Name (D);
                Full_Name : constant String := Directories.Full_Name (D);
             begin
-               if Name /= "." and Name /= ".." then
-                  --  Now read the config file if any
-
+               if Name /= "." and then Name /= ".." then
                   if Kind (D) = Directory  then
                      Filenames := Filenames
                        & (Full_Name (Full_Name'First + HTML_Root'Length
@@ -131,7 +130,7 @@ package body Wiki_Website.Web_Block_Callbacks is
 
                   end if;
                end if;
-            end;
+            end Add_To_Menu;
          end loop;
          Filenames := Filenames & Template_Defs.Block_Menu.Set.SET_END_BLOCK;
       end Menu;
@@ -208,12 +207,13 @@ package body Wiki_Website.Web_Block_Callbacks is
          Start_Search (Search    => S,
                        Directory => Dir,
                        Pattern   => "*",
-                       Filter    => (Ordinary_File => True,
-                                     Directory     => False,
-                                     Special_File  => False));
+                       Filter    => Filter_Type'(Ordinary_File => True,
+                                                 Directory     => False,
+                                                 Special_File  => False));
 
          if More_Entries (S) then
             Get_Next_Entry (S, D);
+            In_Current_Directory :
             declare
                Full_Name : constant String := Directories.Full_Name (D);
             begin
@@ -221,7 +221,7 @@ package body Wiki_Website.Web_Block_Callbacks is
                                             From    => Full_Name'First,
                                             Through => Full_Name'First +
                                               Current_Directory'Length);
-            end;
+            end In_Current_Directory;
          end if;
 
          --  Not file in directory. Search in subdirectories
@@ -229,15 +229,17 @@ package body Wiki_Website.Web_Block_Callbacks is
          Start_Search (Search    => S,
                        Directory => Dir,
                        Pattern   => "*",
-                       Filter    => (Ordinary_File => False,
-                                     Directory     => True,
-                                     Special_File  => False));
+                       Filter    => Filter_Type'(Ordinary_File => False,
+                                                 Directory     => True,
+                                                 Special_File  => False));
          while More_Entries (S) loop
             Get_Next_Entry (S, D);
+            Search_In_Subdirs :
             declare
                SN : constant String := Simple_Name (D);
             begin
                if SN (SN'First) /= '.' then
+                  Check_If_Non_Empty :
                   declare
                      First_Filename : constant String
                        := Get_First_Filename (Directories.Full_Name (D));
@@ -245,9 +247,9 @@ package body Wiki_Website.Web_Block_Callbacks is
                      if First_Filename /= "" then
                         return First_Filename;
                      end if;
-                  end;
+                  end Check_If_Non_Empty;
                end if;
-            end;
+            end Search_In_Subdirs;
          end loop;
 
          --  No files found.
@@ -316,6 +318,7 @@ package body Wiki_Website.Web_Block_Callbacks is
                Templates.Assoc ("ERROR", "<p>Service down</p>"));
          end if;
 
+         Create_HTML_File :
          declare
             Get_Service : constant GW_Service'Class := Service.Get (Name);
             New_HTML    : constant String  := HTML (Get_Service, Filename);
@@ -335,21 +338,23 @@ package body Wiki_Website.Web_Block_Callbacks is
             Put (HTML_File, New_HTML);
 
             Close (HTML_File);
-         end;
+         end Create_HTML_File;
       else
          --  Search the first filename in this directory or subdirectories
 
          if HTML_Filename = ""
               or else HTML_Filename (HTML_Filename'Last) = '/'
          then
+            View_HTML_File :
             declare
                First_Filename : constant String :=
                                   Get_First_Filename (HTML_Filename);
             begin
                Ada.Text_IO.Put_Line ("His " & First_Filename);
                View_File (First_Filename);
-            end;
+            end View_HTML_File;
          else
+            View_In_Containing_Directory :
             declare
                First_Filename : constant String :=
                                   Get_First_Filename
@@ -358,7 +363,7 @@ package body Wiki_Website.Web_Block_Callbacks is
                Ada.Text_IO.Put_Line ("Her " & First_Filename);
 
                View_File (First_Filename);
-            end;
+            end View_In_Containing_Directory;
          end if;
       end if;
 

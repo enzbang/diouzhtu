@@ -27,4 +27,5 @@ clean:
 	-gnat clean -r -Pwiki_interface
 
 check:
+	gnat check -dd -Pwiki_interface -rules -from=../../diouzhtu.check
 setup:

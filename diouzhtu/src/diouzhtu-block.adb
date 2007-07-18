@@ -62,15 +62,18 @@ package body Diouzhtu.Block is
      (Wiki : in Wiki_Information; Index : in Positive; Block : in String)
       return String is
       Extract : constant Pattern_Matcher :=
-        Compile ("^bq" & Attribute.Get_Pattern & "\.\s(.*)$",
-                 Case_Insensitive + Single_Line);
+        Compile (Expression => "^bq" & Attribute.Get_Pattern & "\.\s(.*)$",
+                 Flags      => Case_Insensitive + Single_Line);
       Count   : constant Match_Count := Paren_Count (Extract);
       Matches : Match_Array (0 .. Paren_Count (Extract));
       Result  : Unbounded_String := Null_Unbounded_String;
    begin
       Match (Extract, Block, Matches);
       if Matches (0) = No_Match then
-         return Parse (Wiki, Block_Level, Block, Index);
+         return Parse (Wiki    => Wiki,
+                       Level   => Block_Level,
+                       Content => Block,
+                       Index   => Index);
       end if;
 
       Result := To_Unbounded_String ("<blockquote");
@@ -100,8 +103,8 @@ package body Diouzhtu.Block is
       return String
    is
       Extract : constant Pattern_Matcher :=
-        Compile ("^h(\d)" & Attribute.Get_Pattern & "\.\s(.*)$",
-                 Case_Insensitive + Single_Line);
+        Compile (Expression => "^h(\d)" & Attribute.Get_Pattern & "\.\s(.*)$",
+                 Flags => Case_Insensitive + Single_Line);
 
       --  Get all hn.
       Count   : constant Match_Count := Paren_Count (Extract);
@@ -112,7 +115,10 @@ package body Diouzhtu.Block is
       --   Search for block level
       Match (Extract, Block, Matches);
       if Matches (0) = No_Match then
-         return Parse (Wiki, Block_Level, Block, Index);
+         return Parse (Wiki    => Wiki,
+                       Level   => Block_Level,
+                       Content => Block,
+                       Index   => Index);
       end if;
 
       Header := Block (Matches (1).First);
@@ -170,10 +176,11 @@ package body Diouzhtu.Block is
       function Get_Current_Level (Line : in String) return List_Level is
          Level : List_Level := 0;
       begin
+         Get_Level :
          for K in Line'Range loop
-            exit when Block (K) /= Get_Tag;
+            exit Get_Level when Block (K) /= Get_Tag;
             Level := Level + 1;
-         end loop;
+         end loop Get_Level;
          return Level;
       end Get_Current_Level;
 
@@ -224,6 +231,7 @@ package body Diouzhtu.Block is
          else
             if Line /= "" then
                Append (Result, Indent (Level) & Indentation);
+               Append_Last_Content :
                declare
                   Content_First : constant Positive :=
                                     Line'First + Natural (Level) + 1;
@@ -238,14 +246,17 @@ package body Diouzhtu.Block is
                        (Wiki, Inline_Level,
                         Line (Content_First .. Content_Last))
                      &  "</li>" & ASCII.Lf);
-               end;
+               end Append_Last_Content;
             end if;
          end if;
       end Parse_Line;
 
    begin
       if Block'Length < 3 then
-         return Parse (Wiki, Block_Level, Block, Index);
+         return Parse (Wiki    => Wiki,
+                       Level   => Block_Level,
+                       Content => Block,
+                       Index   => Index);
       end if;
 
       Get_Tag := Block (Block'First);
@@ -255,9 +266,13 @@ package body Diouzhtu.Block is
       elsif Block (Block'First .. Block'First + 1) = Tag (2) & ' ' then
          Get_Element := Element (2);
       else
-         return Parse (Wiki, Block_Level, Block, Index);
+         return Parse (Wiki    => Wiki,
+                       Level   => Block_Level,
+                       Content => Block,
+                       Index   => Index);
       end if;
 
+      Parse_Lines :
       declare
          Last       : Positive   := Block'First;
          Last_Level : List_Level := 0; -- List_Level'First
@@ -266,17 +281,24 @@ package body Diouzhtu.Block is
             if K = Block'Last
               or else (Block (K) = ASCII.Lf and then Block (K + 1) = Get_Tag)
             then
+               Parse_Current_Line :
                declare
                   Line       : constant String := Block (Last .. K);
                   Line_Level : constant List_Level := Get_Current_Level (Line);
                begin
-                  Parse_Line (Wiki, Line, Last_Level, Line_Level);
+                  Parse_Line (Wiki       => Wiki,
+                              Line       => Line,
+                              Level      => Last_Level,
+                              Line_Level => Line_Level);
                   Last := K + 1;
-               end;
+               end Parse_Current_Line;
             end if;
          end loop;
-         Parse_Line (Wiki, "", Last_Level, 0);
-      end;
+         Parse_Line (Wiki       => Wiki,
+                     Line       => "",
+                     Level      => Last_Level,
+                     Line_Level => 0);
+      end Parse_Lines;
       return To_String (Result);
    end List;
 
@@ -290,8 +312,8 @@ package body Diouzhtu.Block is
    is
       pragma Unreferenced (Index);
       Extract : constant Pattern_Matcher :=
-        Compile ("^p" & Attribute.Get_Pattern & "\.\s(.*)$",
-                 Case_Insensitive + Single_Line);
+        Compile (Expression => "^p" & Attribute.Get_Pattern & "\.\s(.*)$",
+                 Flags      => Case_Insensitive + Single_Line);
       Count   : constant Match_Count := Paren_Count (Extract);
       Matches : Match_Array (0 .. Paren_Count (Extract));
       Result  : Unbounded_String := Null_Unbounded_String;
@@ -393,9 +415,13 @@ package body Diouzhtu.Block is
       Get_Dimension;
 
       if Nb_Cols = 0 or else Nb_Rows = 0 then
-         return Parse (Wiki, Block_Level, Table_Block, Index);
+         return Parse (Wiki    => Wiki,
+                       Level   => Block_Level,
+                       Content => Table_Block,
+                       Index   => Index);
       end if;
 
+      Parse_Lines :
       declare
          Line_Cols     : Natural := 0;
          Last_Position : Natural := 0;
@@ -416,13 +442,14 @@ package body Diouzhtu.Block is
             end if;
             if Table_Block (K) = ASCII.Lf or else K = Table_Block'Last then
                if Line_Cols < Nb_Cols then
+                  Adds_Empty_Cols :
                   declare
                      Nb_Empty_Cols : constant Natural := Nb_Cols - Line_Cols;
                      Empty_Col     : constant String := "<td></td>" & ASCII.Lf;
                   begin
                      Append (Result, "</td>" & ASCII.Lf &
                              (Nb_Empty_Cols - 1) * Empty_Col);
-                  end;
+                  end Adds_Empty_Cols;
                end if;
                if K /= Table_Block'Last then
                   Append (Result, "</tr>" & ASCII.Lf & "<tr>" & ASCII.Lf);
@@ -432,7 +459,7 @@ package body Diouzhtu.Block is
                Line_Cols := 0;
             end if;
          end loop;
-      end;
+      end Parse_Lines;
       return "<table>" & ASCII.Lf & "<tr>" & ASCII.Lf
         & To_String (Result) & "</table>" & ASCII.Lf;
    end Table;

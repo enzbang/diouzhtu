@@ -25,18 +25,24 @@ with Ada.Strings.Unbounded;
 with Ada.Containers.Indefinite_Hashed_Maps;
 with Ada.Strings.Hash;
 with Ada.Strings.Fixed;
+with Morzhol.Strings;
 
 package body Wiki_Website.Config is
 
    use Ada;
    use Ada.Strings.Unbounded;
+   use Morzhol.Strings;
 
    type Wiki_Data is record
       Host_Name : Unbounded_String;
    end record;
 
    package Config_Maps is new Ada.Containers.Indefinite_Hashed_Maps
-     (String, Wiki_Data, Strings.Hash, "=", "=");
+     (Key_Type        => String,
+      Element_Type    => Wiki_Data,
+      Hash            => Strings.Hash,
+      Equivalent_Keys => "=",
+      "="             => "=");
    use Config_Maps;
 
    Configs : Map;
@@ -45,19 +51,18 @@ package body Wiki_Website.Config is
    -- Add_Config --
    ----------------
 
-   procedure Add_Config (Name : Wiki_Name; Hostname : String)
+   procedure Add_Config (Name : in Wiki_Name; Hostname : in String)
    is
    begin
       Configs.Insert (Key       => String (Name),
-                      New_Item  => (Host_Name =>
-                                      To_Unbounded_String (Hostname)));
+                      New_Item  => Wiki_Data'(Host_Name => +Hostname));
    end Add_Config;
 
    -------------------
    -- Get_Directory --
    -------------------
 
-   function Get_Directory (URI : String) return String
+   function Get_Directory (URI : in String) return String
    is
       Filename : constant String := Get_Filename (URI);
    begin
@@ -72,7 +77,7 @@ package body Wiki_Website.Config is
    -- Get_Filename --
    ------------------
 
-   function Get_Filename (URI : String) return String is
+   function Get_Filename (URI : in String) return String is
       Name : constant String := URI (URI'First + 1 .. URI'Last);
    begin
       if Name = Wiki_Web_Edit or else Name = Wiki_Web_Preview then
@@ -101,15 +106,15 @@ package body Wiki_Website.Config is
    -- Get_Wiki_Name --
    -------------------
 
-   function Get_Wiki_Name (Request : AWS.Status.Data) return Wiki_Name is
-      function Get_Hostname (Hostname : String) return String;
+   function Get_Wiki_Name (Request : in AWS.Status.Data) return Wiki_Name is
+      function Get_Hostname (Hostname : in String) return String;
       --  Get hostname
 
       ------------------
       -- Get_Hostname --
       ------------------
 
-      function Get_Hostname (Hostname : String) return String is
+      function Get_Hostname (Hostname : in String) return String is
          K : Natural;
       begin
          K := Strings.Fixed.Index (Hostname, ":");
@@ -130,13 +135,14 @@ package body Wiki_Website.Config is
 
       Position := Configs.First;
       while Position /= No_Element loop
+         Check_Name :
          declare
             Wiki : constant Wiki_Data := Element (Position);
          begin
             if Wiki.Host_Name = Hostname then
                return Wiki_Name (Key (Position));
             end if;
-         end;
+         end Check_Name;
          Next (Position);
       end loop;
 
@@ -149,7 +155,7 @@ package body Wiki_Website.Config is
    -- Wiki_CSS_Root --
    -------------------
 
-   function Wiki_CSS_Root (Name : Wiki_Name) return String is
+   function Wiki_CSS_Root (Name : in Wiki_Name) return String is
    begin
       return Ada.Directories.Compose
         (Containing_Directory => Wiki_Root (Name),
@@ -160,7 +166,7 @@ package body Wiki_Website.Config is
    -- Wiki_Data_Root --
    --------------------
 
-   function Wiki_Data_Root (Name : Wiki_Name) return String is
+   function Wiki_Data_Root (Name : in Wiki_Name) return String is
    begin
       return Ada.Directories.Compose
         (Containing_Directory => Wiki_Root (Name),
@@ -171,7 +177,7 @@ package body Wiki_Website.Config is
    -- Wiki_Host --
    ---------------
 
-   function Wiki_Host (Name : Wiki_Name) return String is
+   function Wiki_Host (Name : in Wiki_Name) return String is
    begin
       return To_String (Configs.Element (String (Name)).Host_Name);
    end Wiki_Host;
@@ -180,7 +186,7 @@ package body Wiki_Website.Config is
    -- Wiki_HTML_Dir --
    -------------------
 
-   function Wiki_HTML_Dir (Name : Wiki_Name) return String is
+   function Wiki_HTML_Dir (Name : in Wiki_Name) return String is
    begin
       return Ada.Directories.Compose
         (Containing_Directory => Wiki_Data_Root (Name),
@@ -191,7 +197,7 @@ package body Wiki_Website.Config is
    -- Wiki_Image_Dir --
    --------------------
 
-   function Wiki_Image_Dir (Name : Wiki_Name) return String is
+   function Wiki_Image_Dir (Name : in Wiki_Name) return String is
    begin
       return Ada.Directories.Compose
         (Containing_Directory => Wiki_Data_Root (Name),
@@ -202,7 +208,7 @@ package body Wiki_Website.Config is
    -- Wiki_JS_Root --
    ------------------
 
-   function Wiki_JS_Root (Name : Wiki_Name) return String is
+   function Wiki_JS_Root (Name : in Wiki_Name) return String is
    begin
       return Ada.Directories.Compose
         (Containing_Directory => Wiki_Root (Name),
@@ -213,7 +219,7 @@ package body Wiki_Website.Config is
    -- Wiki_Root --
    ---------------
 
-   function Wiki_Root (Name : Wiki_Name) return String is
+   function Wiki_Root (Name : in Wiki_Name) return String is
    begin
       return Ada.Directories.Compose
         (Containing_Directory => Plugin_Root,
@@ -224,7 +230,7 @@ package body Wiki_Website.Config is
    -- Wiki_Text_Dir --
    -------------------
 
-   function Wiki_Text_Dir (Name : Wiki_Name) return String is
+   function Wiki_Text_Dir (Name : in Wiki_Name) return String is
    begin
       return Ada.Directories.Compose
         (Containing_Directory => Wiki_Data_Root (Name),

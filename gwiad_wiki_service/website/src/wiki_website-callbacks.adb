@@ -80,6 +80,7 @@ package body Wiki_Website.Callbacks is
    function Default_Callback (Request : in Status.Data) return Response.Data is
       use type Messages.Status_Code;
    begin
+      Default_Callback_Body :
       declare
          URI          : constant String := Status.URI (Request);
          Translations : Templates.Translate_Set;
@@ -98,7 +99,7 @@ package body Wiki_Website.Callbacks is
          else
             return Web_Page;
          end if;
-      end;
+      end Default_Callback_Body;
    exception
       when E : others => Ada.Text_IO.Put_Line
            ("(Default_Callback) : Failed ! "
@@ -255,69 +256,70 @@ package body Wiki_Website.Callbacks is
          return;
       end if;
 
-      declare
-         Get_Service : GW_Service'Class := Service.Get (Name);
-      begin
-         if Save /= "" then
-            declare
+      if Save /= "" then
+         Save_Preview :
+         declare
+            Filename    : constant String :=
+                            Wiki_Text_Dir (Name) & "/" & Wiki_Filename;
+            Text_File   : File_Type;
+            Update_HTML : Boolean := False;
+         begin
 
-               Filename    : constant String :=
-                               Wiki_Text_Dir (Name) & "/" & Wiki_Filename;
-               Text_File   : File_Type;
-               Update_HTML : Boolean := False;
-            begin
+            Text_IO.Put_Line (Filename);
 
-               Text_IO.Put_Line (Filename);
+            if Exists (Filename) and then
+              Kind (Filename) = Ordinary_File then
+               --  ??? Here we should add RCS
 
-               if Exists (Filename) and then
-                 Kind (Filename) = Ordinary_File then
-                  --  ??? Here we should add RCS
+               Delete_File (Filename);
 
-                  Delete_File (Filename);
+               Update_HTML := True;
+            else
+               Create_Path (Containing_Directory (Filename));
+            end if;
 
-                  Update_HTML := True;
-               else
-                  Create_Path (Containing_Directory (Filename));
-               end if;
+            Ada.Text_IO.Put_Line (Filename);
 
-               Ada.Text_IO.Put_Line (Filename);
+            Create (File => Text_File,
+                    Mode => Out_File,
+                    Name => Filename);
 
-               Create (File => Text_File,
-                       Mode => Out_File,
-                       Name => Filename);
+            Put (File => Text_File,
+                 Item => Text_Plain);
 
-               Put (File => Text_File,
-                    Item => Text_Plain);
+            Close (File => Text_File);
 
-               Close (File => Text_File);
+            if Update_HTML and then Ada.Directories.Exists
+              (Wiki_HTML_Dir (Name) & "/" & Wiki_Filename) then
+               Ada.Directories.Delete_File
+                 (Wiki_HTML_Dir (Name) & "/" & Wiki_Filename);
+            end if;
 
-               if Update_HTML and then Ada.Directories.Exists
-                 (Wiki_HTML_Dir (Name) & "/" & Wiki_Filename) then
-                  Ada.Directories.Delete_File
-                    (Wiki_HTML_Dir (Name) & "/" & Wiki_Filename);
-               end if;
-
-            end;
             Templates.Insert
               (Translations,
                Templates.Assoc (Template_Defs.Preview.HAS_BEEN_SAVED,
                  Wiki_Filename));
-
-         else
+         end Save_Preview;
+      else
+         Generate_Preview :
+         declare
+            Get_Service : constant GW_Service'Class := Service.Get (Name);
+         begin
             Templates.Insert
               (Translations,
                Templates.Assoc
                  (Template_Defs.Preview.PREVIEW,
                   HTML_Preview (Get_Service, Text_Plain)));
-            Templates.Insert
-              (Translations,
-               Templates.Assoc (Template_Defs.Preview.TEXT_PLAIN, Text_Plain));
-            Templates.Insert
-              (Translations,
-               Templates.Assoc
-                 (Template_Defs.Preview.FILENAME, Wiki_Filename));
-         end if;
-      end;
+         end Generate_Preview;
+
+         Templates.Insert
+           (Translations,
+            Templates.Assoc (Template_Defs.Preview.TEXT_PLAIN, Text_Plain));
+         Templates.Insert
+           (Translations,
+            Templates.Assoc
+              (Template_Defs.Preview.FILENAME, Wiki_Filename));
+      end if;
    end Preview_Page;
 
 end Wiki_Website.Callbacks;

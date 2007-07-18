@@ -83,20 +83,26 @@ package body Diouzhtu.Inline is
       return String
    is
       Extract  : constant Pattern_Matcher :=
-        Compile ("@(.*?)@", Case_Insensitive);
+        Compile (Expression => "@(.*?)@", Flags => Case_Insensitive);
       Matches  : Match_Array (0 .. 1);
       Current  : Natural := S'First;
       Result   : Unbounded_String := Null_Unbounded_String;
    begin
+      Extract_All_Code_Blocks :
       loop
-         Match (Extract, S, Matches, Current);
-         exit when Matches (0) = No_Match;
+         Match (Self       => Extract,
+                Data       => S,
+                Matches    => Matches,
+                Data_First => Current);
+         exit Extract_All_Code_Blocks when Matches (0) = No_Match;
 
          if Matches (1).First > Current + 1 then
             Append
               (Result,
-               Parse (Wiki, Inline_Level,
-                      S (Current .. Matches (1).First - 2), Index));
+               Parse (Wiki    => Wiki,
+                      Level   => Inline_Level,
+                      Content => S (Current .. Matches (1).First - 2),
+                      Index   => Index));
          end if;
 
          if Matches (1).First = Matches (1).Last + 1 then
@@ -109,14 +115,20 @@ package body Diouzhtu.Inline is
                       "</code>");
          end if;
          Current := Matches (1).Last + 2;
-      end loop;
+      end loop Extract_All_Code_Blocks;
 
       if Current = S'First then
          --  No match, try next inline callback
-         return Parse (Wiki, Inline_Level, S, Index);
+         return Parse (Wiki    => Wiki,
+                       Level   => Inline_Level,
+                       Content => S,
+                       Index   => Index);
       end if;
       Append (Result,
-              Parse (Wiki, Inline_Level, S (Current .. S'Last), Index));
+        Parse (Wiki    => Wiki,
+               Level   => Inline_Level,
+               Content => S (Current .. S'Last),
+               Index   => Index));
       return To_String (Result);
    end Code;
 
@@ -207,39 +219,55 @@ package body Diouzhtu.Inline is
       return String
    is
       Extract  : constant Pattern_Matcher :=
-        Compile ("_(.*?)_", Case_Insensitive);
+        Compile (Expression => "_(.*?)_", Flags => Case_Insensitive);
       Matches  : Match_Array (0 .. 1);
       Current  : Natural := S'First;
       Result   : Unbounded_String := Null_Unbounded_String;
    begin
+      Extract_All :
       loop
-         Match (Extract, S, Matches, Current);
-         exit when Matches (0) = No_Match;
+         Match (Self       => Extract,
+                Data       => S,
+                Matches    => Matches,
+                Data_First => Current);
+
+         exit Extract_All when Matches (0) = No_Match;
 
          if Matches (1).First > Current + 1 then
             Append
               (Result,
-               Parse (Wiki, Inline_Level,
-                      S (Current .. Matches (1).First - 2), Index));
+               Parse (Wiki    => Wiki,
+                      Level   => Inline_Level,
+                      Content => S (Current .. Matches (1).First - 2),
+                      Index   => Index));
          end if;
 
+         Emphasis_Content :
          declare
             In_Content : constant String :=
-              Parse (Wiki, Inline_Level,
-                     S (Matches (1).First .. Matches (1).Last),
-                     Index);
+                           Parse (Wiki    => Wiki,
+                                  Level   => Inline_Level,
+                                  Content =>
+                                    S (Matches (1).First .. Matches (1).Last),
+                                  Index   => Index);
          begin
             Append (Result, "<em>" & In_Content & "</em>");
-         end;
+         end Emphasis_Content;
          Current := Matches (1).Last + 2;
-      end loop;
+      end loop Extract_All;
 
       if Current = S'First then
          --  No match, try next inline callback
-         return Parse (Wiki, Inline_Level, S, Index);
+         return Parse (Wiki    => Wiki,
+                       Level   => Inline_Level,
+                       Content => S,
+                       Index   => Index);
       end if;
       Append (Result,
-              Parse (Wiki, Inline_Level, S (Current .. S'Last), Index));
+        Parse (Wiki    => Wiki,
+               Level   => Inline_Level,
+               Content => S (Current .. S'Last),
+               Index   => Index));
       return To_String (Result);
    end Emphasis;
 
@@ -252,27 +280,39 @@ package body Diouzhtu.Inline is
       return String
    is
       Extract  : constant Pattern_Matcher
-        := Compile ("!(\([\w-_]+?\))??((http://)??[\w._-]+?)(\([\w-_]+?\))??!",
-                    Case_Insensitive);
+        := Compile
+          (Expression =>
+               "!(\([\w-_]+?\))??((http://)??[\w._-]+?)(\([\w-_]+?\))??!",
+           Flags => Case_Insensitive);
+
       Matches  : Match_Array (0 .. 5);
       Current  : Natural := S'First;
       Result   : Unbounded_String := Null_Unbounded_String;
    begin
+      Extract_All :
       loop
-         Match (Extract, S, Matches, Current);
-         exit when Matches (0) = No_Match;
+         Match (Self       => Extract,
+                Data       => S,
+                Matches    => Matches,
+                Data_First => Current);
+
+         exit Extract_All when Matches (0) = No_Match;
 
          if Matches (0).First > Current + 1 then
             Append
               (Result,
-               Parse (Wiki, Inline_Level,
-                      S (Current .. Matches (0).First - 1), Index));
+               Parse (Wiki    => Wiki,
+                      Level   => Inline_Level,
+                      Content => S (Current .. Matches (0).First - 1),
+                      Index   => Index));
          end if;
 
+         Extract_Image :
          declare
-            URL         : constant String :=
-              Parse (Wiki, Inline_Level,
-                     S (Matches (2).First .. Matches (2).Last));
+            URL         : constant String
+              := Parse (Wiki    => Wiki,
+                        Level   => Inline_Level,
+                        Content => S (Matches (2).First .. Matches (2).Last));
             Http_Prefix : constant String := "http://";
          begin
             if URL'Length >= Http_Prefix'Length and then
@@ -283,7 +323,7 @@ package body Diouzhtu.Inline is
                Append (Result, "<img src='"
                        & Wiki.Img_Base_URL & "/" & URL & "'");
             end if;
-         end;
+         end Extract_Image;
 
          if Matches (1) /= No_Match then
             Append
@@ -303,14 +343,20 @@ package body Diouzhtu.Inline is
          Append
            (Result, '>');
          Current := Matches (0).Last + 1;
-      end loop;
+      end loop Extract_All;
 
       if Current = S'First then
          --  No match, try next inline callback
-         return Parse (Wiki, Inline_Level, S, Index);
+         return Parse (Wiki    => Wiki,
+                       Level   => Inline_Level,
+                       Content => S,
+                       Index   => Index);
       end if;
       Append (Result,
-              Parse (Wiki, Inline_Level, S (Current .. S'Last), Index));
+        Parse (Wiki    => Wiki,
+               Level   => Inline_Level,
+               Content => S (Current .. S'Last),
+               Index   => Index));
       return To_String (Result);
    end Image;
 
@@ -323,24 +369,33 @@ package body Diouzhtu.Inline is
       return String
    is
       Extract  : constant Pattern_Matcher :=
-        Compile ("""(\([\w-_]+?\))??([^\(\)]+?)(\(.*\))??"":" &
+        Compile (Expression => """(\([\w-_]+?\))??([^\(\)]+?)(\(.*\))??"":" &
                  "((http://)??[^ \s\[\]]+)(\s|$)",
-                 Case_Insensitive + Single_Line);
+                 Flags      => Case_Insensitive + Single_Line);
+
       Matches  : Match_Array (0 .. 6);
       Current  : Natural := S'First;
       Result   : Unbounded_String := Null_Unbounded_String;
    begin
+      Extract_All :
       loop
-         Match (Extract, S, Matches, Current);
-         exit when Matches (0) = No_Match;
+         Match (Self       => Extract,
+                Data       => S,
+                Matches    => Matches,
+                Data_First => Current);
+
+         exit Extract_All when Matches (0) = No_Match;
 
          if Matches (0).First > Current + 1 then
             Append
               (Result,
-               Parse (Wiki, Inline_Level,
-                      S (Current .. Matches (0).First - 1), Index));
+               Parse (Wiki    => Wiki,
+                      Level   => Inline_Level,
+                      Content => S (Current .. Matches (0).First - 1),
+                      Index   => Index));
          end if;
 
+         Extract_Link :
          declare
             URL         : constant String :=
                              S (Matches (4).First .. Matches (4).Last);
@@ -356,7 +411,7 @@ package body Diouzhtu.Inline is
                Append (Result, "<a href='"
                        & Wiki.Base_URL & "/" & URL & "'");
             end if;
-         end;
+         end Extract_Link;
 
          if Matches (1) /= No_Match then
             Append
@@ -372,20 +427,28 @@ package body Diouzhtu.Inline is
 
          if Matches (2) /= No_Match then
             Append
-              (Result, '>' & Parse
-                 (Wiki, Inline_Level,
-                  S (Matches (2).First .. Matches (2).Last),
-                 Index + 1) & "</a> ");
+              (Result, '>'
+               & Parse (Wiki    => Wiki,
+                        Level   => Inline_Level,
+                        Content => S (Matches (2).First .. Matches (2).Last),
+                        Index   => Index + 1)
+               & "</a> ");
          end if;
          Current := Matches (0).Last + 1;
-      end loop;
+      end loop Extract_All;
 
       if Current = S'First then
          --  No match, try next inline callback
-         return Parse (Wiki, Inline_Level, S, Index);
+         return Parse (Wiki    => Wiki,
+                       Level   => Inline_Level,
+                       Content => S,
+                       Index   => Index);
       end if;
       Append (Result,
-              Parse (Wiki, Inline_Level, S (Current .. S'Last), Index));
+        Parse (Wiki    => Wiki,
+               Level   => Inline_Level,
+               Content => S (Current .. S'Last),
+               Index   => Index));
       return To_String (Result);
    exception
       when E : others => Ada.Text_IO.Put_Line (Exception_Information (E));
@@ -420,23 +483,32 @@ package body Diouzhtu.Inline is
       return String
    is
       Extract : constant Pattern_Matcher :=
-        Compile ("(http://[^ \s\[\]]+)(\s|$)",
-                 Case_Insensitive + Single_Line);
+        Compile (Expression => "(http://[^ \s\[\]]+)(\s|$)",
+                 Flags      => Case_Insensitive + Single_Line);
+
       Matches : Match_Array (0 .. 2);
       Current : Natural := S'First;
       Result  : Unbounded_String := Null_Unbounded_String;
    begin
+      Extract_All :
       loop
-         Match (Extract, S, Matches, Current);
-         exit when Matches (0) = No_Match;
+         Match (Self       => Extract,
+                Data       => S,
+                Matches    => Matches,
+                Data_First => Current);
+
+         exit Extract_All when Matches (0) = No_Match;
 
          if Matches (1).First > Current + 1 then
             Append
               (Result,
-               Parse (Wiki, Inline_Level,
-                      S (Current .. Matches (1).First - 1), Index));
+               Parse (Wiki    => Wiki,
+                      Level   => Inline_Level,
+                      Content => S (Current .. Matches (1).First - 1),
+                      Index   => Index));
          end if;
 
+         Extract_Single_Link :
          declare
             End_Content : constant Character := S (Matches (1).Last);
             In_Content : constant String :=
@@ -453,12 +525,15 @@ package body Diouzhtu.Inline is
                Append (Result, "<a href="""
                        & In_Content & """>" & In_Content & "</a> ");
             end if;
-         end;
+         end Extract_Single_Link;
          Current := Matches (1).Last + 2;
-      end loop;
+      end loop Extract_All;
 
       Append (Result,
-              Parse (Wiki, Inline_Level, S (Current .. S'Last), Index));
+        Parse (Wiki    => Wiki,
+               Level   => Inline_Level,
+               Content => S (Current .. S'Last),
+               Index   => Index));
       return To_String (Result);
    exception
       when others => return "";
@@ -473,35 +548,48 @@ package body Diouzhtu.Inline is
       return String
    is
       Extract  : constant Pattern_Matcher :=
-        Compile ("\*(.*?)\*", Case_Insensitive);
+        Compile (Expression => "\*(.*?)\*", Flags => Case_Insensitive);
       Matches  : Match_Array (0 .. 1);
       Current  : Natural := S'First;
       Result   : Unbounded_String := Null_Unbounded_String;
    begin
+      Extract_All :
       loop
-         Match (Extract, S, Matches, Current);
-         exit when Matches (0) = No_Match;
+         Match (Self       => Extract,
+                Data       => S,
+                Matches    => Matches,
+                Data_First => Current);
+
+         exit Extract_All when Matches (0) = No_Match;
 
          if Matches (1).First > Current + 1 then
             Append
               (Result,
-               Parse (Wiki, Inline_Level,
-                 S (Current .. Matches (1).First - 2), Index));
+               Parse (Wiki    => Wiki,
+                      Level   => Inline_Level,
+                      Content => S (Current .. Matches (1).First - 2),
+                      Index   => Index));
          end if;
 
+         Extract_Strong :
          declare
             In_Content : constant String :=
-              Parse (Wiki, Inline_Level,
-                     S (Matches (1).First .. Matches (1).Last),
-                     Index);
+                           Parse (Wiki    => Wiki,
+                                  Level   => Inline_Level,
+                                  Content =>
+                                    S (Matches (1).First .. Matches (1).Last),
+                                  Index   => Index);
          begin
             Append (Result, "<strong>" & In_Content & "</strong>");
-         end;
+         end Extract_Strong;
          Current := Matches (1).Last + 2;
-      end loop;
+      end loop Extract_All;
 
       Append (Result,
-              Parse (Wiki, Inline_Level, S (Current .. S'Last), Index));
+        Parse (Wiki    => Wiki,
+               Level   => Inline_Level,
+               Content => S (Current .. S'Last),
+               Index   => Index));
       return To_String (Result);
    end Strong;
 

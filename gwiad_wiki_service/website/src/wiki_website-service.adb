@@ -61,13 +61,17 @@ package body Wiki_Website.Service is
                                  Gwiad.Plugins.Websites.Registry.Library_Path;
 
    package Service_Maps is new Ada.Containers.Indefinite_Hashed_Maps
-     (String, Service_Id, Ada.Strings.Hash, "=", "=");
+     (Key_Type     => String,
+      Element_Type => Service_Id,
+      Hash         => Ada.Strings.Hash,
+      Equivalent_Keys => "=",
+      "="             => "=");
 
    Services : Service_Maps.Map;
 
    type Attribute is (Description, Virtual_Host);
 
-   package Conf is new Morzhol.Iniparser (Attribute);
+   package Conf is new Morzhol.Iniparser (Parameter_Name => Attribute);
 
    procedure Discover_Wiki_Websites;
    --  Search wiki website on plugin root path
@@ -84,15 +88,17 @@ package body Wiki_Website.Service is
       Start_Search (Search    => S,
                     Directory => Wiki_Website.Config.Plugin_Root,
                     Pattern   => "*",
-                    Filter    => (Directory => True, others => False));
+                    Filter    => Filter_Type'(Directory => True,
+                                              others    => False));
 
       while More_Entries (S) loop
          Get_Next_Entry (S, D);
+         Read_Configuration :
          declare
             Path : constant String    := Full_Name (D);
             Name : constant Wiki_Name := Wiki_Name (Simple_Name (D));
          begin
-            if Name /= "." and Name /= ".." then
+            if Name /= "." and then Name /= ".." then
                --  Now read the config file if any
 
                Conf.IO.Open
@@ -115,7 +121,7 @@ package body Wiki_Website.Service is
             when Text_IO.Name_Error =>
                Ada.Text_IO.Put_Line ("Does not exit");
                null;
-         end;
+         end Read_Configuration;
       end loop;
 
    exception
@@ -127,17 +133,18 @@ package body Wiki_Website.Service is
    -- Get --
    ---------
 
-   function Get (Name : Wiki_Name) return Wiki_Interface.GW_Service'Class
+   function Get (Name : in Wiki_Name) return Wiki_Interface.GW_Service'Class
    is
       use Wiki_Interface;
    begin
 
       if not Services.Contains (String (Name)) then
+         Create_Custom_Wiki_Service :
          declare
             Wiki_Service_Id : Cache.Service_Id;
             Wiki_World_Service_Access : constant GW_Service_Access
               := GW_Service_Access (Get (Wiki_Service_Name));
-            Get_Service               : GW_Service'Class :=
+            Get_Service               : constant GW_Service'Class :=
                                           Wiki_World_Service_Access.all;
          begin
             Initialize
@@ -153,18 +160,19 @@ package body Wiki_Website.Service is
                              New_Item  => Wiki_Service_Id);
 
             return Get_Service;
-         end;
+         end Create_Custom_Wiki_Service;
       else
+         Get_From_Service_Id :
          declare
             Wiki_Service_Id : constant Service_Id :=
                                 Services.Element (String (Name));
             Wiki_World_Service_Access : constant GW_Service_Access
               := GW_Service_Access (Get (Wiki_Service_Id));
-            Get_Service               : GW_Service'Class :=
+            Get_Service               : constant GW_Service'Class :=
                                           Wiki_World_Service_Access.all;
          begin
             return Get_Service;
-         end;
+         end Get_From_Service_Id;
       end if;
    exception
       when E : others => Ada.Text_IO.Put_Line (Exception_Information (E));
@@ -172,7 +180,7 @@ package body Wiki_Website.Service is
    end Get;
 
    procedure Register
-     (Virtual_Host  : String; Name : Wiki_Name; Description : String)
+     (Virtual_Host  : in String; Name : in Wiki_Name; Description : in String)
    is
       Template_Dir : constant String    := Wiki_Root (Name);
       Sep          : constant Character := Directory_Separator;
@@ -255,8 +263,7 @@ package body Wiki_Website.Service is
       Gwiad.Web.Virtual_Host.Unregister (Hostname => Host);
    end Unregister;
 
-begin
-   --  Load all wiki websites
+begin  --  Wiki_Website.Service : Load all wiki websites
 
    Discover_Wiki_Websites;
 

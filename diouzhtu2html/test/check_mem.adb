@@ -32,6 +32,7 @@ procedure Check_Mem is
 
 begin
 
+   Run_To_HTML :
    declare
       use Diouzhtu.To_HTML;
 
@@ -43,7 +44,7 @@ begin
       for K in 1 .. Iteration loop
          Put_Line (To_HTML (Wiki, Filename));
       end loop;
-   end;
+   end Run_To_HTML;
 
 exception
    when others => Put_Line ("Usage : " & Command_Name &

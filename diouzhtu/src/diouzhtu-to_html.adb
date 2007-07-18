@@ -168,12 +168,14 @@ package body Diouzhtu.To_HTML is
 
       To_Skip : Natural := 0;
    begin
+      Escape :
       for I in S'Range loop
          if To_Skip /= 0 then
             To_Skip := To_Skip - 1;
          else
             case S (I) is
                when '&'    =>
+                  XML_Entities :
                   for K in I + 1 .. S'Last loop
                      if not Ada.Characters.Handling.Is_Letter (S (K)) then
                         if S (K) /= ';' then
@@ -182,16 +184,16 @@ package body Diouzhtu.To_HTML is
                            --  Allow xml entities &copy; &reg; &quot; ...
                            To_Skip := K - I;
                         end if;
-                        exit;
+                        exit XML_Entities;
                      end if;
-                  end loop;
+                  end loop XML_Entities;
                when '>'    => Append_To_Result ("&gt;", Last, I - 1);
                when '<'    => Append_To_Result ("&lt;", Last, I - 1);
                --  when '"'    => Append_To_Result ("&quot;", Last, I - 1);
                when others => null;
             end case;
          end if;
-      end loop;
+      end loop Escape;
 
       if Last <= S'Last then
          Append (Result, S (Last .. S'Last));

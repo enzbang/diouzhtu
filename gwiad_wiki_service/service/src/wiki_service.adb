@@ -74,7 +74,7 @@ package body Wiki_Service is
       Base_URL       : in     String;
       Img_Base_URL   : in     String)
    is
-      Wiki : Diouzhtu.Wiki_Information :=
+      Wiki : constant Diouzhtu.Wiki_Information :=
                Diouzhtu.Initialize
                  (Base_URL       => Base_URL,
                   Img_Base_URL   => Img_Base_URL,
@@ -83,7 +83,8 @@ package body Wiki_Service is
       S.Information := Wiki;
    end Initialize;
 
-begin
+begin  -- Wiki_Service : Register service
+
    Gwiad.Plugins.Services.Registry.Register
      (Name        => "wiki_service",
       Description => "A wiki service for gwiad based on diouzhtu",

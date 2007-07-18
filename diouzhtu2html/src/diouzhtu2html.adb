@@ -35,11 +35,16 @@ begin
    if Argument_Count = 1 then
       Put_Line (To_HTML (Wiki, Argument (1)));
    elsif Argument_Count >= 2 then
+      Create_Result_File :
       declare
          File : File_Type;
       begin
-         Create (File, Out_File, Argument (2));
+         Create (File => File,
+                 Mode => Out_File,
+                 Name => Argument (2));
+
          if Argument_Count = 5 and then Argument (3) = "-create-all-page" then
+            Adds_Header :
             declare
                Header_File : File_Type;
             begin
@@ -47,10 +52,11 @@ begin
                while not End_Of_File (Header_File) loop
                   Put (File, Get_Line (Header_File));
                end loop;
-            end;
+            end Adds_Header;
          end if;
          Put (File, To_HTML (Wiki, Argument (1)));
          if Argument_Count = 5 then
+            Adds_Footer :
             declare
                Footer_File : File_Type;
             begin
@@ -58,10 +64,10 @@ begin
                while not End_Of_File (Footer_File) loop
                   Put (File, Get_Line (Footer_File));
                end loop;
-            end;
+            end Adds_Footer;
             Close (File);
          end if;
-      end;
+      end Create_Result_File;
    else
       Put_Line ("Usage : " & Command_Name & " [FILENAME]");
       Set_Exit_Status (Failure);

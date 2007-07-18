@@ -28,14 +28,14 @@ private package Wiki_Website.Service is
    use Wiki_Website.Config;
    use Gwiad.Plugins.Websites;
 
-   function Get (Name : Wiki_Name) return Wiki_Interface.GW_Service'Class;
+   function Get (Name : in Wiki_Name) return Wiki_Interface.GW_Service'Class;
    --  Returns the service
 
    procedure Register
-     (Virtual_Host : String; Name : Wiki_Name; Description : String);
+     (Virtual_Host : in String; Name : in Wiki_Name; Description : in String);
    --  Register a website
 
-   procedure Unregister (Name : Website_Name);
+   procedure Unregister (Name : in Website_Name);
    --  Unregister a website
 
 

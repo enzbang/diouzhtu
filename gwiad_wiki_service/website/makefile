@@ -38,3 +38,4 @@ clean:
 	-gnat clean -r -Pwiki_website
 
 check:
+	gnat check -dd -Pwiki_website -rules -from=../../diouzhtu.check

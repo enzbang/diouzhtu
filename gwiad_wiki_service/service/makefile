@@ -30,4 +30,5 @@ clean:
 	-gnat clean -r -Pwiki_service
 
 check:
+	gnat check -dd -Pwiki_service -rules -from=../../diouzhtu.check
 setup:

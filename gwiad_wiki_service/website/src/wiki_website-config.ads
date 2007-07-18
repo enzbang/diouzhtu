@@ -35,7 +35,9 @@ private package Wiki_Website.Config is
    --  Gwiad wiki Service name
 
    Plugin_Root : constant String :=
-                   Ada.Directories.Compose ("plugins", "wiki_website");
+                   Ada.Directories.Compose
+                     (Containing_Directory => "plugins",
+                      Name                 => "wiki_website");
 
    Wiki_Web_Image   : constant String := "img";
    Wiki_Web_Edit    : constant String := "edit";
@@ -43,39 +45,39 @@ private package Wiki_Website.Config is
    Wiki_Web_CSS     : constant String := "css";
    Wiki_Web_JS      : constant String := "js";
 
-   procedure Add_Config (Name : Wiki_Name; Hostname : String);
+   procedure Add_Config (Name : in Wiki_Name; Hostname : in String);
    --  Adds a new config (a new wiki website)
 
-   function Get_Wiki_Name (Request : AWS.Status.Data) return Wiki_Name;
+   function Get_Wiki_Name (Request : in AWS.Status.Data) return Wiki_Name;
    --  Returns wiki name from URI
 
-   function Get_Directory (URI : String) return String;
+   function Get_Directory (URI : in String) return String;
    --  Get directory from URI
 
-   function Get_Filename (URI : String) return String;
+   function Get_Filename (URI : in String) return String;
    --  Get filename from URI
 
-   function Wiki_Host (Name : Wiki_Name) return String;
+   function Wiki_Host (Name : in Wiki_Name) return String;
    --  Returns wiki host
 
-   function Wiki_Root (Name : Wiki_Name) return String;
+   function Wiki_Root (Name : in Wiki_Name) return String;
    --  Returns wiki root
 
-   function Wiki_Text_Dir (Name : Wiki_Name) return String;
+   function Wiki_Text_Dir (Name : in Wiki_Name) return String;
    --  Returns wiki text dir
 
-   function Wiki_Image_Dir (Name : Wiki_Name) return String;
+   function Wiki_Image_Dir (Name : in Wiki_Name) return String;
    --  Returns wiki image dir
 
-   function Wiki_HTML_Dir (Name : Wiki_Name) return String;
+   function Wiki_HTML_Dir (Name : in Wiki_Name) return String;
    --  Returns wiki HTML Dir
 
-   function Wiki_Data_Root (Name : Wiki_Name) return String;
+   function Wiki_Data_Root (Name : in Wiki_Name) return String;
    --  Returns wiki data root
 
-   function Wiki_CSS_Root (Name : Wiki_Name) return String;
+   function Wiki_CSS_Root (Name : in Wiki_Name) return String;
    --  Returns wiki css root
 
-   function Wiki_JS_Root (Name : Wiki_Name) return String;
+   function Wiki_JS_Root (Name : in Wiki_Name) return String;
    --  Returns wiki JS root
 end Wiki_Website.Config;

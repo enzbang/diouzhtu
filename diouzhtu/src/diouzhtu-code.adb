@@ -35,7 +35,8 @@ package body Diouzhtu.Code is
 
    function End_Code (Block : in String) return String is
       Extract  : constant Pattern_Matcher :=
-        Compile (".*?(end code.)", Case_Insensitive + Single_Line);
+                   Compile (Expression => ".*?(end code.)",
+                            Flags      => Case_Insensitive + Single_Line);
       Matches : Match_Array (0 .. 1);
       Result  : Unbounded_String := Null_Unbounded_String;
    begin
@@ -74,9 +75,9 @@ package body Diouzhtu.Code is
 
       procedure Begin_Code is
          Extract  : constant Pattern_Matcher :=
-                      Compile ("^code(_[a-zA-Z]+?)??" &
+                      Compile (Expression => "^code(_[a-zA-Z]+?)??" &
                                Attribute.Get_Pattern & "\.\s(.*?)$",
-                               Case_Insensitive + Single_Line);
+                               Flags      => Case_Insensitive + Single_Line);
          Count    : constant Match_Count := Paren_Count (Extract);
          Matches  : Match_Array (0 .. Count);
       begin
@@ -93,8 +94,10 @@ package body Diouzhtu.Code is
             if Matches (2) /= No_Match then
                Append
                  (Result, Attribute.Extract
-                    (Block (Matches (2).First .. Matches (2).Last),
-                     Block (Matches (1).First + 1 .. Matches (1).Last)));
+                    (Content   =>
+                       Block (Matches (2).First .. Matches (2).Last),
+                     Add_Class =>
+                       Block (Matches (1).First + 1 .. Matches (1).Last)));
             elsif Matches (1) /= No_Match then
                Append (Result, " class='" &
                        Block (Matches (1).First + 1 .. Matches (1).Last) &
@@ -105,6 +108,8 @@ package body Diouzhtu.Code is
 
             if Matches (Count) /= No_Match
               and then Matches (Count).First < Block'Last then
+
+               End_Of_Block :
                declare
                   End_Code_Block : constant String
                     := End_Code (Block (Matches (Count).First .. Block'Last));
@@ -116,7 +121,7 @@ package body Diouzhtu.Code is
                      Append (Result,
                              Block (Matches (Count).First .. Block'Last));
                   end if;
-               end;
+               end End_Of_Block;
             end if;
          end if;
       end Begin_Code;
@@ -128,6 +133,7 @@ package body Diouzhtu.Code is
       if not Is_Code_Block then
          Begin_Code;
       else
+         End_Of_Block :
          declare
             End_Code_Block : constant String := End_Code (Block);
          begin
@@ -137,7 +143,7 @@ package body Diouzhtu.Code is
             else
                Append (Result, ASCII.Lf & ASCII.Lf & Block);
             end if;
-         end;
+         end End_Of_Block;
       end if;
    end Parse;
 
