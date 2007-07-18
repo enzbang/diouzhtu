@@ -22,7 +22,7 @@
 with AWS.Status;
 with AWS.Response;
 with AWS.Templates;
-with AWS.Services.ECWF.Context;
+with AWS.Services.Web_Block.Context;
 
 private package Wiki_Website.Callbacks is
 
@@ -42,13 +42,13 @@ private package Wiki_Website.Callbacks is
 
    procedure Edit_Page
      (Request      : in     Status.Data;
-      Context      : access AWS.Services.ECWF.Context.Object;
+      Context      : access AWS.Services.Web_Block.Context.Object;
       Translations : in out Templates.Translate_Set);
    --  Edit a page
 
    procedure Preview_Page
      (Request      : in     Status.Data;
-      Context      : access AWS.Services.ECWF.Context.Object;
+      Context      : access AWS.Services.Web_Block.Context.Object;
       Translations : in out Templates.Translate_Set);
    --  Preview a page (uses wiki service)
 

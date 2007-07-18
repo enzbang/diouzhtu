@@ -22,7 +22,6 @@
 with "../../shared";
 with "aws";
 with "gwiad";
-with "gwiad-ecwf";
 with "gwiad-plugins-services";
 with "gwiad-plugins-websites";
 with "gwiad-web";

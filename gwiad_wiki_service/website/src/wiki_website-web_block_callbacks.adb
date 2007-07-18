@@ -39,7 +39,7 @@ with Gwiad.Plugins.Services.Registry;
 
 with Wiki_Interface;
 
-package body Wiki_Website.ECWF_Callbacks is
+package body Wiki_Website.Web_Block_Callbacks is
 
    use Ada;
    use Ada.Strings.Unbounded;
@@ -58,7 +58,7 @@ package body Wiki_Website.ECWF_Callbacks is
 
    procedure Menu
      (Request      : in     Status.Data;
-      Context      : access AWS.Services.ECWF.Context.Object;
+      Context      : access AWS.Services.Web_Block.Context.Object;
       Translations : in out Templates.Translate_Set)
    is
       pragma Unreferenced (Context);
@@ -170,7 +170,7 @@ package body Wiki_Website.ECWF_Callbacks is
 
    procedure View
      (Request      : in     Status.Data;
-      Context      : access AWS.Services.ECWF.Context.Object;
+      Context      : access AWS.Services.Web_Block.Context.Object;
       Translations : in out Templates.Translate_Set)
    is
       pragma Unreferenced (Context);
@@ -383,4 +383,4 @@ package body Wiki_Website.ECWF_Callbacks is
         & Template_Defs.Block_View.Template;
    end View_Template;
 
-end Wiki_Website.ECWF_Callbacks;
+end Wiki_Website.Web_Block_Callbacks;

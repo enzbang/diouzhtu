@@ -28,7 +28,7 @@ with AWS.MIME;
 with AWS.Messages;
 with AWS.Parameters;
 with AWS.Services.Directory;
-with AWS.Services.ECWF.Registry;
+with AWS.Services.Web_Block.Registry;
 
 with Gwiad.Plugins.Services.Registry;
 
@@ -86,7 +86,7 @@ package body Wiki_Website.Callbacks is
          Web_Page     : Response.Data;
       begin
 
-         Web_Page := AWS.Services.ECWF.Registry.Build
+         Web_Page := AWS.Services.Web_Block.Registry.Build
            (URI, Request, Translations,
             Cache_Control => Messages.Prevent_Cache);
 
@@ -115,7 +115,7 @@ package body Wiki_Website.Callbacks is
 
    procedure Edit_Page
      (Request      : in     Status.Data;
-      Context      : access AWS.Services.ECWF.Context.Object;
+      Context      : access AWS.Services.Web_Block.Context.Object;
       Translations : in out Templates.Translate_Set)
    is
       use AWS.Status;
@@ -226,7 +226,7 @@ package body Wiki_Website.Callbacks is
 
    procedure Preview_Page
      (Request      : in     Status.Data;
-      Context      : access AWS.Services.ECWF.Context.Object;
+      Context      : access AWS.Services.Web_Block.Context.Object;
       Translations : in out Templates.Translate_Set)
    is
       use Ada.Directories;

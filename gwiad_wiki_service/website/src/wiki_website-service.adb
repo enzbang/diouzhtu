@@ -26,7 +26,7 @@ with Ada.Directories;
 with Ada.Containers.Indefinite_Hashed_Maps;
 with Ada.Strings.Hash;
 with AWS.Dispatchers.Callback;
-with AWS.Services.ECWF.Registry;
+with AWS.Services.Web_Block.Registry;
 with AWS.Services.Dispatchers.URI;
 with AWS.MIME;
 
@@ -39,7 +39,7 @@ with Gwiad.Plugins.Services;
 with Gwiad.Web.Virtual_Host;
 
 with Wiki_Website.Callbacks;
-with Wiki_Website.ECWF_Callbacks;
+with Wiki_Website.Web_Block_Callbacks;
 
 with Wiki_Website.Template_Defs.Edit;
 with Wiki_Website.Template_Defs.View;
@@ -53,7 +53,7 @@ package body Wiki_Website.Service is
    use Morzhol.OS;
 
    use Wiki_Website.Callbacks;
-   use Wiki_Website.ECWF_Callbacks;
+   use Wiki_Website.Web_Block_Callbacks;
    use Gwiad.Plugins.Services;
    use Gwiad.Plugins.Services.Cache;
 
@@ -203,25 +203,25 @@ package body Wiki_Website.Service is
       AWS.Services.Dispatchers.URI.Register_Default_Callback
         (Main_Dispatcher,
          Dispatchers.Callback.Create (Default_Callback'Access));
-      --  This default callback will handle all ECWF callbacks
+      --  This default callback will handle all Web_Block callbacks
 
-      --  Register ECWF pages
+      --  Register Web_Block pages
 
-      AWS.Services.ECWF.Registry.Register
+      AWS.Services.Web_Block.Registry.Register
         (Key          => "/" & Wiki_Web_Edit,
          Template     => Template_Dir & Sep & Template_Defs.Edit.Template,
          Data_CB      => Edit_Page'Access,
          Content_Type => MIME.Text_HTML,
          Prefix       => True);
 
-      AWS.Services.ECWF.Registry.Register
+      AWS.Services.Web_Block.Registry.Register
         (Key          => "/" & Wiki_Web_Preview,
          Template     => Template_Dir & Sep & Template_Defs.Preview.Template,
          Data_CB      => Preview_Page'Access,
          Content_Type => MIME.Text_HTML,
          Prefix       => True);
 
-      AWS.Services.ECWF.Registry.Register
+      AWS.Services.Web_Block.Registry.Register
         (Key          => "/",
          Template     => Template_Dir & Sep & Template_Defs.View.Template,
          Data_CB      => View'Access,

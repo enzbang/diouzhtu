@@ -21,15 +21,15 @@
 
 with AWS.Status;
 with AWS.Templates;
-with AWS.Services.ECWF.Context;
+with AWS.Services.Web_Block.Context;
 
-private package Wiki_Website.ECWF_Callbacks is
+private package Wiki_Website.Web_Block_Callbacks is
 
    use AWS;
 
    procedure Menu
      (Request      : in     Status.Data;
-      Context      : access AWS.Services.ECWF.Context.Object;
+      Context      : access AWS.Services.Web_Block.Context.Object;
       Translations : in out Templates.Translate_Set);
    --  Display the menu
 
@@ -38,11 +38,11 @@ private package Wiki_Website.ECWF_Callbacks is
 
    procedure View
      (Request      : in     Status.Data;
-      Context      : access AWS.Services.ECWF.Context.Object;
+      Context      : access AWS.Services.Web_Block.Context.Object;
       Translations : in out Templates.Translate_Set);
    --  View a wiki page
 
    function View_Template (Request : in Status.Data) return String;
    --  Returns the view template corresponding to the wiki website
 
-end Wiki_Website.ECWF_Callbacks;
+end Wiki_Website.Web_Block_Callbacks;
