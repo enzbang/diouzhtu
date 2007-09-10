@@ -58,7 +58,7 @@ package body Wiki_Website.Service is
    use Gwiad.Plugins.Services.Cache;
 
    Wiki_Website_Library_Path : constant String :=
-                                 Gwiad.Plugins.Websites.Registry.Library_Path;
+                                 Gwiad.Plugins.Get_Last_Library_Path;
 
    package Service_Maps is new Ada.Containers.Indefinite_Hashed_Maps
      (Key_Type     => String,
