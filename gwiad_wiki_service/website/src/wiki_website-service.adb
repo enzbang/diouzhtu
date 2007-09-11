@@ -22,9 +22,9 @@
 with Ada.Text_IO;
 with Ada.Exceptions;
 with Ada.Directories;
-
 with Ada.Containers.Indefinite_Hashed_Maps;
 with Ada.Strings.Hash;
+
 with AWS.Dispatchers.Callback;
 with AWS.Services.Web_Block.Registry;
 with AWS.Services.Dispatchers.URI;
@@ -123,7 +123,6 @@ package body Wiki_Website.Service is
                null;
          end Read_Configuration;
       end loop;
-
    exception
       when E : others =>
          Ada.Text_IO.Put_Line (Exception_Information (E));
@@ -133,8 +132,7 @@ package body Wiki_Website.Service is
    -- Get --
    ---------
 
-   function Get (Name : in Wiki_Name) return Wiki_Interface.GW_Service'Class
-   is
+   function Get (Name : in Wiki_Name) return Wiki_Interface.GW_Service'Class is
       use Wiki_Interface;
    begin
 
@@ -180,7 +178,7 @@ package body Wiki_Website.Service is
    end Get;
 
    procedure Register
-     (Virtual_Host  : in String; Name : in Wiki_Name; Description : in String)
+     (Virtual_Host : in String; Name : in Wiki_Name; Description : in String)
    is
       Template_Dir : constant String    := Wiki_Root (Name);
       Sep          : constant Character := Directory_Separator;
@@ -247,6 +245,7 @@ package body Wiki_Website.Service is
          Description => Description,
          Unregister   => Unregister'Access,
          Library_Path => Wiki_Website_Library_Path);
+
    exception
       when E : others =>
          Ada.Text_IO.Put_Line ("registering fails : " &

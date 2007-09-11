@@ -20,6 +20,7 @@
 ------------------------------------------------------------------------------
 
 with "../../shared";
+with "aws";
 with "gwiad";
 with "gwiad-plugins-services";
 

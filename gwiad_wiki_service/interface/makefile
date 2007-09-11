@@ -20,6 +20,7 @@
 ##############################################################################
 
 all:
+	mkdir -p obj lib
 	gnat make -XPRJ_BUILD=$(MODE) -Pwiki_interface
 	gnat make -XPRJ_BUILD=$(MODE) -Pwiki_interface
 

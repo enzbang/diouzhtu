@@ -137,7 +137,7 @@ package body Wiki_Website.Config is
       while Position /= No_Element loop
          Check_Name :
          declare
-            Wiki : constant Wiki_Data := Element (Position);
+            Wiki : constant Wiki_Data := Wiki_Data (Element (Position));
          begin
             if Wiki.Host_Name = Hostname then
                return Wiki_Name (Key (Position));
@@ -178,8 +178,9 @@ package body Wiki_Website.Config is
    ---------------
 
    function Wiki_Host (Name : in Wiki_Name) return String is
+      Element : Wiki_Data := Wiki_Data (Configs.Element (String (Name)));
    begin
-      return To_String (Configs.Element (String (Name)).Host_Name);
+      return To_String (Element.Host_Name);
    end Wiki_Host;
 
    -------------------

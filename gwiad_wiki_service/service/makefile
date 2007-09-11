@@ -20,6 +20,7 @@
 ##############################################################################
 
 all:
+	mkdir -p lib/ obj/
 # Workaround for GNAT bug with ali directory
 	chmod -R a+w lib/
 ##  When building without cleaning first. Build failed to delete old ALI files

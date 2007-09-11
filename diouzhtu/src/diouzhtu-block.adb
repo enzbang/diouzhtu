@@ -352,7 +352,6 @@ package body Diouzhtu.Block is
       Internal_Register (Block_Level, Blockquote'Access);
       Internal_Register (Block_Level, Table'Access);
       Internal_Register (Block_Level, Paragraph'Access);
-
    end Register;
 
    -----------

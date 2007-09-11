@@ -20,6 +20,7 @@
 ##############################################################################
 
 all:
+	mkdir -p obj lib
 	gnat make -XPRJ_BUILD=$(MODE) -XPRJ_LIB_KIND=$(LIB_KIND) -Pdiouzhtu
 	gnat make -XPRJ_BUILD=$(MODE) -XPRJ_LIB_KIND=$(LIB_KIND) -Pdiouzhtu
 

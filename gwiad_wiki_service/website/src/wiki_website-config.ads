@@ -80,4 +80,5 @@ private package Wiki_Website.Config is
 
    function Wiki_JS_Root (Name : in Wiki_Name) return String;
    --  Returns wiki JS root
+
 end Wiki_Website.Config;

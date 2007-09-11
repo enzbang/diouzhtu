@@ -29,7 +29,9 @@ procedure Diouzhtu2Html is
    use Ada.Text_IO;
 
    Wiki : constant Diouzhtu.Wiki_Information :=
-            Diouzhtu.Initialize ("", "", ".");
+            Diouzhtu.Initialize (Base_URL       => "",
+                                 Img_Base_URL   => "",
+                                 Text_Directory => ".");
 begin
 
    if Argument_Count = 1 then

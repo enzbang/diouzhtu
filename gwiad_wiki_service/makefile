@@ -21,7 +21,7 @@
 
 # Modules support
 
-MODULES = service interface website
+MODULES = interface service website
 
 MODULES_BUILD = ${MODULES:%=%_build}
 
@@ -33,9 +33,12 @@ MODULES_CHECK = ${MODULES:%=%_check}
 
 # Targets
 
-all: $(MODULES_BUILD)
+all: create_directories $(MODULES_BUILD)
 
 clean: $(MODULES_CLEAN)
+
+create_directories:
+	mkdir -p lib
 
 setup: $(MODULES_SETUP)
 

@@ -20,16 +20,22 @@
 ------------------------------------------------------------------------------
 
 with Ada.Text_IO;
+with Ada.Exceptions;
+
 with Diouzhtu.To_HTML;
 with Gwiad.Plugins.Services.Registry;
 
 package body Wiki_Service is
 
    use Diouzhtu.To_HTML;
+   use Ada.Exceptions;
    use Gwiad.Plugins.Services;
 
    function Builder return access Service'Class;
    --  Build a new test plugin
+
+   procedure Unregister is null;
+   --  Unregister service
 
    -------------
    -- Builder --
@@ -85,12 +91,15 @@ package body Wiki_Service is
 
 begin  -- Wiki_Service : Register service
 
+   Gwiad.Plugins.Set_Unload_CB (Unregister'Access);
+
    Gwiad.Plugins.Services.Registry.Register
      (Name        => "wiki_service",
       Description => "A wiki service for gwiad based on diouzhtu",
       Builder     => Builder'Access);
 
 exception
-   when others =>
+   when E : others =>
+      Ada.Text_IO.Put_Line (Exception_Information (E));
       Ada.Text_IO.Put_Line ("wiki_service registration failed");
 end Wiki_Service;

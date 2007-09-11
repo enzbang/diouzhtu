@@ -39,8 +39,13 @@ package body Diouzhtu is
       "="          => "=");
    use Callbacks;
 
+
    Blocks  : Vector := Empty_Vector;
    Inlines : Vector := Empty_Vector;
+
+   ----------------
+   -- Initialize --
+   ----------------
 
    function Initialize
      (Base_URL     : in String;
@@ -87,7 +92,6 @@ package body Diouzhtu is
       Index   : in Natural := 0)
      return String
    is
-      Text      : constant Unbounded_String := To_Unbounded_String (Content);
       Current   : Positive;
       Container : Vector;
    begin
@@ -104,11 +108,11 @@ package body Diouzhtu is
       end if;
 
       if Last_Index (Container) >= Current then
-         return Element (Container, Current).To_HTML
-           (Wiki, Current, To_String (Text));
+         return Callback (Element (Container, Current)).To_HTML
+           (Wiki, Current, Content);
       end if;
 
-      return To_String (Text);
+      return Content;
    end Parse;
 
    --------------
@@ -138,4 +142,5 @@ package body Diouzhtu is
                          New_Item => Register_Callback);
       end if;
    end Register;
+
 end Diouzhtu;

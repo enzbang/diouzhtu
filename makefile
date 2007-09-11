@@ -23,8 +23,11 @@
 
 include mk.config
 
-OPTIONS = MODE="$(MODE)" CP="$(CP)" MKDIR="$(MKDIR)" RM="$(RM)" \
-	LIB_KIND="$(LIB_KIND)"
+GENERAL_OPTIONS = CP="$(CP)" MKDIR="$(MKDIR)" RM="$(RM)" \
+	GNATMAKE="$(GNATMAKE)" GNATCLEAN="$(GNATCLEAN)" EXEEXT="$(EXEEXT)" \
+	LIB_KIND="$(LIB_KIND)" DIFF="$(DIFF)"
+
+OPTIONS = MODE="$(MODE)" $(GENERAL_OPTIONS)
 
 ifeq ($(OS),Windows_NT)
 SOEXT=.dll
@@ -107,7 +110,6 @@ install_gwiad_interface:
 	$(CP) gwiad_wiki_service/interface/lib/*wiki_interface$(SOEXT) \
 		$(GWIAD_DIR)/bin/
 
-
 install_gwiad_service:
 	-$(GWIAD_UNREGISTER_SCRIPT) 127.0.0.1:8080 service wiki_service
 	$(RM) -f $(GWIAD_DIR)/lib/libwiki_service.so
@@ -148,3 +150,15 @@ gwiad_plugin_distrib:
 gcov_analyse:
 	(cd diouzhtu/obj/; gcov -abfu ../src/*)
 	(cd diouzhtu2html/obj/;gcov -abfu ../src/*)
+
+regtests: force
+# 	make -C diouzhtu2html/test MODE="Profile" $(GENERAL_OPTIONS)
+# 	rm -f diouzhtu2html/test/obj/*	# To avoid error in lcov_analyse ???
+# 	rm -fr diouzhtu2html/obj/*
+	make -C gwiad_wiki_service/regtests MODE="Profile" $(GENERAL_OPTIONS)
+	make lcov_analyse
+
+lcov_analyse: force
+	sh analyse.sh
+
+force:
