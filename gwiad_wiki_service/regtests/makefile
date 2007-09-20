@@ -31,8 +31,8 @@ all: check_mem
 force:
 
 clean:
-	$(GNATCLEAN) -q -Pregtests
-	rm -f alldifs run1 run2 check_mem.run1 check_mem.run2
+	-$(GNATCLEAN) -q -Pregtests
+	-rm -f alldifs run1 run2 check_mem.run1 check_mem.run2
 
 check_mem: clean
 	mkdir -p obj/
