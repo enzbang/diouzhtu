@@ -19,13 +19,11 @@
 ##  Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.       ##
 ##############################################################################
 
-IS_SETUP = if [ `ls tsrc/ | wc -l` -eq 0 ];then \
-               echo -e "\n\nPlease run \"make setup\"\n";\
-               exit 1; fi;
-
 all:
 	mkdir -p lib obj tsrc
-	$(IS_SETUP)
+ifeq ($(shell ls tsrc/ | wc -l), 0)
+	$(error "Please run 'make setup'")
+endif
 # Workaround for GNAT bug with Ali_Directory
 	chmod -R a+w lib/
 ##  When building without cleaning first. Build failed to delete old ALI files

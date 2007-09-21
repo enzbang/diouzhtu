@@ -49,6 +49,14 @@ MODULES_CLEAN = ${MODULES:%=%_clean}
 
 MODULES_CHECK = ${MODULES:%=%_check}
 
+ifeq ("$(INSTALL)", "..")
+$(error "Wrong install path : INSTALL='$(INSTALL)'")
+else
+ifeq ("$(INSTALL)", "")
+$(error "Wrong install path : empty INSTALL var")
+endif
+endif
+
 # Targets
 
 all: $(MODULES_BUILD)
@@ -67,6 +75,7 @@ I_INC_W = $(INSTALL)/include/wiki_interface
 I_LIB	= $(INSTALL)/lib/diouzhtu
 I_LIB_W	= $(INSTALL)/lib/wiki_interface
 I_GPR	= $(INSTALL)/lib/gnat
+I_DLIB  = $(INSTALL)/share/diouzhtu/dlib
 
 PLUGIN_DISTRIB = gwiad_wiki_plugin
 GWIAD_SERVICES = $(GWIAD_DIR)/lib/services
@@ -96,6 +105,7 @@ install_dirs: install_clean
 	$(MKDIR) $(I_LIB)
 	$(MKDIR) $(I_LIB_W)
 	$(MKDIR) $(I_GPR)
+	$(MKDIR) $(I_DLIB)
 
 install: install_dirs
 	$(CP) diouzhtu/src/*.ad[sb] $(I_INC)
@@ -103,6 +113,7 @@ install: install_dirs
 	$(CP) diouzhtu/lib/* $(I_LIB)
 	$(CP) gwiad_wiki_service/interface/lib/* $(I_LIB_W)
 	$(CP) gwiad_wiki_service/interface/lib/*$(SOEXT) $(I_LIB_W)/..
+	$(CP) gwiad_wiki_service/lib/*$(SOEXT) $(I_DLIB)
 	$(CP) config/projects/diouzhtu.gpr $(I_GPR)
 	$(CP) config/projects/wiki_interface.gpr $(I_GPR)
 
