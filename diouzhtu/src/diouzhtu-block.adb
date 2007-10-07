@@ -163,7 +163,8 @@ package body Diouzhtu.Block is
         (Wiki       : in Wiki_Information;
          Line       : in String;
          Level      : in out List_Level;
-         Line_Level : in List_Level);
+         Line_Level : in List_Level;
+         First_Line : in Boolean := False);
 
       function Get_Current_Level (Line : in String) return List_Level;
 
@@ -207,29 +208,32 @@ package body Diouzhtu.Block is
         (Wiki       : in Wiki_Information;
          Line       : in String;
          Level      : in out List_Level;
-         Line_Level : in List_Level) is
+         Line_Level : in List_Level;
+         First_Line : in Boolean := False) is
          pragma Warnings (Off);
       begin
          if Line_Level > Level then
             if Line_Level > 1 then
-               Append (Result, Indent (Level) & Indentation);
-               Append (Result, "<li>" & ASCII.Lf);
+               Append (Result, ASCII.Lf);
             end if;
             Level := Level + 1;
             Append (Result, Indent (Level)
                       & '<' & Get_Element & '>' & ASCII.Lf);
-            Parse_Line (Wiki, Line, Level, Line_Level);
+            Parse_Line (Wiki, Line, Level, Line_Level, True);
          elsif Line_Level < Level then
-            Append (Result, Indent (Level)
-                      & "</" & Get_Element & '>' & ASCII.Lf);
+            Append (Result, ASCII.Lf & Indent (Level) & Indentation
+                    & "</li>" & ASCII.Lf & Indent (Level)
+                    & "</" & Get_Element & '>');
             if Level > 1 then
                Level := Level - 1;
-               Append (Result, Indent (Level) & Indentation
-                         & "</li>" & ASCII.Lf);
                Parse_Line (Wiki, Line, Level, Line_Level);
             end if;
          else
             if Line /= "" then
+               if not First_Line then
+                  Append (Result, ASCII.Lf & Indent (Level) & Indentation
+                          & "</li>" & ASCII.Lf);
+               end if;
                Append (Result, Indent (Level) & Indentation);
                Append_Last_Content :
                declare
@@ -244,8 +248,7 @@ package body Diouzhtu.Block is
                     (Result, "<li>" &
                      Parse
                        (Wiki, Inline_Level,
-                        Line (Content_First .. Content_Last))
-                     &  "</li>" & ASCII.Lf);
+                        Line (Content_First .. Content_Last)));
                end Append_Last_Content;
             end if;
          end if;
@@ -299,7 +302,7 @@ package body Diouzhtu.Block is
                      Level      => Last_Level,
                      Line_Level => 0);
       end Parse_Lines;
-      return To_String (Result);
+      return To_String (Result) & ASCII.Lf;
    end List;
 
    ---------------
