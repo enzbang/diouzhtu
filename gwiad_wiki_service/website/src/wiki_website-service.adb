@@ -217,21 +217,21 @@ package body Wiki_Website.Service is
       --  Register Web_Block pages
 
       AWS.Services.Web_Block.Registry.Register
-        (Key          => "/" & Wiki_Web_Edit,
+        (Key          => Virtual_Host & "/" & Wiki_Web_Edit,
          Template     => Template_Dir & Sep & Template_Defs.Edit.Template,
          Data_CB      => Edit_Page'Access,
          Content_Type => MIME.Text_HTML,
          Prefix       => True);
 
       AWS.Services.Web_Block.Registry.Register
-        (Key          => "/" & Wiki_Web_Preview,
+        (Key          => Virtual_Host & "/" & Wiki_Web_Preview,
          Template     => Template_Dir & Sep & Template_Defs.Preview.Template,
          Data_CB      => Preview_Page'Access,
          Content_Type => MIME.Text_HTML,
          Prefix       => True);
 
       AWS.Services.Web_Block.Registry.Register
-        (Key          => "/",
+        (Key          => Virtual_Host & "/",
          Template     => Template_Dir & Sep & Template_Defs.View.Template,
          Data_CB      => View'Access,
          Content_Type => MIME.Text_HTML,

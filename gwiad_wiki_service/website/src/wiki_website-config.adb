@@ -24,8 +24,11 @@ with Ada.Strings.Unbounded;
 
 with Ada.Containers.Indefinite_Hashed_Maps;
 with Ada.Strings.Hash;
-with Ada.Strings.Fixed;
+
+with Gwiad.Web.Virtual_Host;
+with Gwiad.Plugins.Websites.Registry;
 with Morzhol.Strings;
+with Gwiad.Plugins.Websites;
 
 package body Wiki_Website.Config is
 
@@ -122,29 +125,10 @@ package body Wiki_Website.Config is
    -------------------
 
    function Get_Wiki_Name (Request : in AWS.Status.Data) return Wiki_Name is
-      function Get_Hostname (Hostname : in String) return String;
-      --  Get hostname
-
-      ------------------
-      -- Get_Hostname --
-      ------------------
-
-      function Get_Hostname (Hostname : in String) return String is
-         K : Natural;
-      begin
-         K := Strings.Fixed.Index (Hostname, ":");
-
-         if K = 0 then
-            K := Hostname'Last;
-         else
-            K := K - 1;
-         end if;
-         return Hostname (Hostname'First .. K);
-      end Get_Hostname;
-
-
       URI      : constant String := AWS.Status.URI (Request);
-      Hostname : constant String := Get_Hostname (AWS.Status.Host (Request));
+      Hostname : constant String :=
+                   Gwiad.Web.Virtual_Host.Get_Hostname
+                     (AWS.Status.Host (Request));
       Position : Cursor := No_Element;
    begin
 

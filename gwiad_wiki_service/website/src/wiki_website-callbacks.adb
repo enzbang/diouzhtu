@@ -31,7 +31,7 @@ with AWS.Services.Directory;
 with AWS.Services.Web_Block.Registry;
 
 with Gwiad.Plugins.Services.Registry;
-
+with Gwiad.Web.Virtual_Host;
 with Wiki_Interface;
 
 with Wiki_Website.Config;
@@ -88,7 +88,10 @@ package body Wiki_Website.Callbacks is
       begin
 
          Web_Page := AWS.Services.Web_Block.Registry.Build
-           (URI, Request, Translations,
+           (Key           => Gwiad.Web.Virtual_Host.Get_Hostname
+              (AWS.Status.Host (Request)) & URI,
+            Request       => Request,
+            Translations  => Translations,
             Cache_Control => Messages.Prevent_Cache);
 
          if Response.Status_Code (Web_Page) = Messages.S404 then
