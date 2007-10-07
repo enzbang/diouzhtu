@@ -160,6 +160,7 @@ gcov_analyse:
 	(cd diouzhtu2html/obj/;gcov -abfu ../src/*)
 
 regtests: force
+	make -C diouzhtu2html regtests $(GENERAL_OPTIONS)
 # 	make -C diouzhtu2html/test MODE="Profile" $(GENERAL_OPTIONS)
 # 	rm -f diouzhtu2html/test/obj/*	# To avoid error in lcov_analyse ???
 # 	rm -fr diouzhtu2html/obj/*
