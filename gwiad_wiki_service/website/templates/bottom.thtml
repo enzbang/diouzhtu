@@ -1,8 +1,11 @@
 @@IF@@ @_MODIFICATION_DATE_@ /= ""
+<div id="footer">
 <p class="footdate">
   Updated @_FORMAT_DATE(%A %B %d %Y @ %T ):MODIFICATION_DATE_@
 </p>
+</div>
 @@END_IF@@
+</div>
 </div>
 </body>
 </html>

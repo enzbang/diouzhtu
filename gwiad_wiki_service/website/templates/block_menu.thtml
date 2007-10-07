@@ -13,7 +13,13 @@
       @@IF@@ @_SLICE(2..0):NAME_V_@ = @_FILENAME_@
       class="selected"
       @@END_IF@@
-      ><p><a href="@_URI_@@_NAME_V_@">@_SIMPLE_NAME_V_@</a></p></li>
+      ><p><a href="@_URI_@@_NAME_V_@">
+      @@IF@@ @_SLICE(2..0):NAME_V_@ = @_FILENAME_@
+»
+      @@ELSE@@
+›
+      @@END_IF@@
+ @_SIMPLE_NAME_V_@</a></p></li>
 
     @@END_IF@@
   @@END_IF@@

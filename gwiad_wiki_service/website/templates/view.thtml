@@ -1,15 +1,17 @@
 @@INCLUDE@@ top.thtml @_REPLACE_ALL((.*\/)/):FILENAME_@
-
   <ul id="control_menu">
     <li>
        <a href="@_WIKI_WEB_ROOT_@/edit/@_FILENAME_@">
           Edit </a>
     </li>
   </ul>
+</div>
 
-<div id="menu">
+<div id="lazy_menu">
 @_LAZY_MENU_@
 </div>
-@_LAZY_VIEW_@
 
+<div id="lazy_view">
+@_LAZY_VIEW_@
+</div>
 @@INCLUDE@@ bottom.thtml
