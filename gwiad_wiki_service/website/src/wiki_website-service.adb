@@ -236,6 +236,10 @@ package body Wiki_Website.Service is
 
       Config.Add_Config (Name => Name, Hostname => Virtual_Host);
 
+      Directories.Create_Path (Wiki_HTML_Dir (Name));
+
+      Directories.Create_Path (Wiki_Text_Dir (Name));
+
       Gwiad.Web.Virtual_Host.Register
         (Hostname => Virtual_Host,
          Action   => Main_Dispatcher);
