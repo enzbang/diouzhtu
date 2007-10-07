@@ -2,8 +2,8 @@
 
   <ul id="control_menu">
     <li>
-       <a href="@_WIKI_WEB_ROOT_@/edit/@_REPLACE_ALL((.*\/)/):FILENAME_@">
-          Edit</a>
+       <a href="@_WIKI_WEB_ROOT_@/edit/@_FILENAME_@">
+          Edit </a>
     </li>
   </ul>
 
