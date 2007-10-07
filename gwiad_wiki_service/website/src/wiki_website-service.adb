@@ -151,8 +151,8 @@ package body Wiki_Website.Service is
             Initialize
               (S              =>
                  GW_Service'Class (Wiki_World_Service_Access.all),
-               Base_URL       => "/",
-               Img_Base_URL   => "/" & Wiki_Web_Image,
+               Base_URL       => "",
+               Img_Base_URL   => Wiki_Web_Image,
                Text_Directory => Wiki_Text_Dir (Name));
 
             Wiki_Service_Id := Set
