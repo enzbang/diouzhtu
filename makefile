@@ -122,15 +122,12 @@ install_gwiad_interface:
 		$(GWIAD_DIR)/bin/
 
 install_gwiad_service:
-	-$(GWIAD_UNREGISTER_SCRIPT) 127.0.0.1:8080 service wiki_service
-	$(RM) -f $(GWIAD_DIR)/lib/libwiki_service.so
+	$(RM) $(GWIAD_SERVICES)/libwiki_service.so
 	$(CP) $(INSTALL)/lib/diouzhtu/*$(SOEXT) $(GWIAD_DIR)/bin/
 	$(CP) gwiad_wiki_service/lib/*wiki_service$(SOEXT) $(GWIAD_SERVICES)
 
 install_gwiad_website:
-	-$(GWIAD_UNREGISTER_SCRIPT) 127.0.0.1:8080 website \
-		$(GWIAD_DIR)/lib/*wiki_website$(SOEXT)
-	$(RM) -f $(GWIAD_DIR)/lib/*wiki_website$(SOEXT)
+	$(RM) $(GWIAD_WEBSITES)/*wiki_website$(SOEXT)
 	$(MKDIR) $(GWIAD_DIR)/plugins/wiki_website/example/templates/
 	$(MKDIR) $(GWIAD_DIR)/plugins/wiki_website/example/css
 	$(MKDIR) $(GWIAD_DIR)/plugins/wiki_website/example/js
