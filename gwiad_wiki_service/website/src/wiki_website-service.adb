@@ -76,6 +76,9 @@ package body Wiki_Website.Service is
    procedure Discover_Wiki_Websites;
    --  Search wiki website on plugin root path
 
+   procedure Reload;
+   --  Reload configuration
+
    ----------------------------
    -- Discover_Wiki_Websites --
    ----------------------------
@@ -256,6 +259,18 @@ package body Wiki_Website.Service is
                                Exception_Information (E));
    end Register;
 
+   ------------
+   -- Reload --
+   ------------
+
+   procedure Reload is
+   begin
+      Ada.Text_IO.Put_Line ("Reload wikis");
+      Delete_All_Config;
+      Discover_Wiki_Websites;
+      Ada.Text_IO.Put_Line ("Reload wikis done");
+   end Reload;
+
    ----------------
    -- Unregister --
    ----------------
@@ -269,5 +284,6 @@ package body Wiki_Website.Service is
 begin  --  Wiki_Website.Service : Load all wiki websites
 
    Discover_Wiki_Websites;
+   Gwiad.Plugins.Set_Reload_CB (Reload'Access);
 
 end Wiki_Website.Service;

@@ -48,6 +48,9 @@ private package Wiki_Website.Config is
    procedure Add_Config (Name : in Wiki_Name; Hostname : in String);
    --  Adds a new config (a new wiki website)
 
+   procedure Delete_All_Config;
+   --  Delete all wiki websites and unregister them
+
    function Get_Wiki_Name (Request : in AWS.Status.Data) return Wiki_Name;
    --  Returns wiki name from URI
 

@@ -58,6 +58,21 @@ package body Wiki_Website.Config is
                       New_Item  => Wiki_Data'(Host_Name => +Hostname));
    end Add_Config;
 
+   -----------------------
+   -- Delete_All_Config --
+   -----------------------
+
+   procedure Delete_All_Config is
+      Position : Cursor := Configs.First;
+   begin
+      while Has_Element (Position) loop
+         Gwiad.Plugins.Websites.Registry.Unregister
+           (Gwiad.Plugins.Websites.Website_Name (Key (Position)));
+            Configs.Delete (Key (Position));
+         Position := Configs.First;
+      end loop;
+   end Delete_All_Config;
+
    -------------------
    -- Get_Directory --
    -------------------
