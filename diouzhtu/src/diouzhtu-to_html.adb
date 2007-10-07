@@ -20,8 +20,6 @@
 ------------------------------------------------------------------------------
 
 with Ada.Strings.Unbounded;
-with Ada.Strings.Fixed;
-with Ada.Strings.Maps;
 with Ada.Characters.Handling;
 with Ada.Text_IO;
 
@@ -46,13 +44,14 @@ package body Diouzhtu.To_HTML is
    ---------------
 
    function CR_Delete (S : in String) return String is
-      CR : constant String (1 .. 1) := String'(1 => ASCII.CR);
+      Result : Unbounded_String := Null_Unbounded_String;
    begin
-      return Strings.Fixed.Trim
-        (Strings.Fixed.Translate
-           (S, Strings.Maps.To_Mapping
-              (From => CR, To   => " ")),
-         Strings.Right);
+      for K in S'Range loop
+         if S (K) /= ASCII.CR then
+            Append (Result, S (K));
+         end if;
+      end loop;
+      return To_String (Result);
    end CR_Delete;
 
    ------------------
@@ -60,19 +59,19 @@ package body Diouzhtu.To_HTML is
    ------------------
 
    function Text_To_HTML
-     (Wiki : in Wiki_Information; S : in String) return String is
-      Text : constant String := CR_Delete (S);
+     (Wiki : in Wiki_Information; Source : in String) return String is
+      Text : constant String := CR_Delete (Source);
 
       Content       : Unbounded_String := Null_Unbounded_String;
       Parse_Result  : Unbounded_String := Null_Unbounded_String;
       Result        : Unbounded_String := Null_Unbounded_String;
-      Last          : Positive := S'First;
+      Last          : Positive := Text'First;
 
       In_Code_Block  : Boolean := False;
 
    begin
 
-      for K in S'Range loop
+      for K in Text'Range loop
          if Text (K) = ASCII.Lf then
             if Last < K - 1 then
                if Content /= Null_Unbounded_String then
@@ -93,7 +92,7 @@ package body Diouzhtu.To_HTML is
       end loop;
 
       if Last < Text'Last then
-         Append (Content, Web_Escape (Text (Last .. S'Last)));
+         Append (Content, Web_Escape (Text (Last .. Text'Last)));
       end if;
 
       if Content /= Null_Unbounded_String then
