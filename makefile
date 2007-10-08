@@ -135,7 +135,7 @@ install_gwiad_website:
 		$(GWIAD_DIR)/plugins/wiki_website/example/
 	$(CP) gwiad_wiki_service/website/templates/*.thtml \
 		$(GWIAD_DIR)/plugins/wiki_website/example/templates/
-	$(CP) gwiad_wiki_service/website/templates/wiki_website/css/*.css \
+	$(CP) gwiad_wiki_service/website/css/*.css \
 		$(GWIAD_DIR)/plugins/wiki_website/example/css/
 	$(CP) external_libraries/highlight/*.js	\
 		$(GWIAD_DIR)/plugins/wiki_website/example/js/
