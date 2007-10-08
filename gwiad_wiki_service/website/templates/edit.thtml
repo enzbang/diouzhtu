@@ -1,17 +1,21 @@
 @@IF@@ @_FILENAME_@ /= ""
-   @@INCLUDE@@ top.thtml "Edit : @_FILENAME_@"
+   @@INCLUDE@@ top.thtml "Edit : @_REPLACE_ALL((.*\/)/):FILENAME_@" edit_page
+   </div>
+   <h1>Edit : <em>@_REPLACE_ALL((.*\/)/):FILENAME_@</em></h1>
 @@ELSE@@
-   @@INCLUDE@@ top.thtml "Edit"
+   @@INCLUDE@@ top.thtml "Edit" edit_page
+   </div>
 @@END_IF@@
-<h1>@_FILENAME_@</h1>
+
 
 @_ERROR_@
 
 @@IF@@ @_FILENAME_@ /= ""
 <form method="post" action="@_WIKI_WEB_ROOT_@/preview/@_FILENAME_@">
-  <textarea rows="40" cols="80"
+  <p><input type="submit" name="submit_top" value="Preview"/></p>
+  <textarea 
             name="text_plain" id="text_plain">@_TEXT_PLAIN_@</textarea>
-  <p><input type="submit" name="submit"/></p>
+  <p><input type="submit" name="submit"  value="Preview"/></p>
 </form>
 @@ELSE@@
 @@IF@@ @_URI_@ /= ""

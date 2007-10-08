@@ -1,29 +1,43 @@
-@@INCLUDE@@ top.thtml "PREVIEW VERSION OF @_FILENAME_@"
+@@IF@@ @_FILENAME_@ /= ""
+   @@INCLUDE@@ top.thtml "Preview : @_REPLACE_ALL((.*\/)/):FILENAME_@" preview_page
+   </div>
+@@ELSE@@
+   @@INCLUDE@@ top.thtml "Error" preview_page
+   </div>
+@@END_IF@@
 
 @@IF@@ @_HAS_BEEN_SAVED_@ /= ""
+<div id="hasbeensaved">
 <h1>Thanks !</h1>
 <p>Thanks for editing this page.</p>
 <p>Now you can :</p>
 <ul>
-  <li><p>Jump to the <a href="@_WIKI_WEB_ROOT_@/@_HAS_BEEN_SAVED_@">@_HAS_BEEN_SAVED_@</a> page</p></li>
+  <li><p>Jump to the <a href="@_WIKI_WEB_ROOT_@/@_HAS_BEEN_SAVED_@">@_REPLACE_ALL((.*\/)/):HAS_BEEN_SAVED_@</a> page</p></li>
   <li><p><a href="@_WIKI_WEB_ROOT_@/edit/@_HAS_BEEN_SAVED_@">Edit it again</a></p></li>
 </ul>
-
+</div>
 <div id="preview_zone">
 @_LAZY_VIEW_@
 </div>
+
 @@ELSE@@
-<h1>@_FILENAME_@</h1>
+   <p class="quickmenu"><a href="#edit_zone">Go to edit</a></p>
+
+   <h1 class="title">Preview : <em>@_REPLACE_ALL((.*\/)/):FILENAME_@</em></h1>
 @_ERROR_@
 
 <div id="preview_zone">@_PREVIEW_@</div>
 
 <div id="edit_zone">
   <form method="post" action="@_WIKI_WEB_ROOT_@/preview/@_FILENAME_@">
-    <textarea rows="40" cols="80"
+   <p>
+      <input type="submit" name="save" value="save"/>
+      <input type="submit" value="preview" />
+    </p>
+     <textarea rows="40" cols="80"
               name="text_plain" id="text_plain">@_TEXT_PLAIN_@</textarea>
     <p>
-      <input type="submit" name="save" id="save" value="save"/>
+      <input type="submit" name="save" value="save"/>
       <input type="submit" value="preview" />
     </p>
   </form>

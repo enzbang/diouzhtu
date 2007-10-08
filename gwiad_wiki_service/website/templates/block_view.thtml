@@ -1,8 +1,8 @@
 @@IF@@ @_VIEW_@ /= ""
-   <h1>@_REPLACE_ALL((.*\/)/):FILENAME_@</h1>
+   <h1 class="title">@_REPLACE_ALL((.*\/)/):FILENAME_@</h1>
    @_VIEW_@
 @@ELSIF@@ @_FILENAME_@ /= ""
-   <h1>@_REPLACE_ALL((.*\/)/):FILENAME_@</h1>
+   <h1 class="title">@_REPLACE_ALL((.*\/)/):FILENAME_@</h1>
    <p id="doesnotexist">This page does not exist !
       <a href="@_WIKI_WEB_ROOT_@/edit/@_FILENAME_@">Create it ?</a>
    </p>

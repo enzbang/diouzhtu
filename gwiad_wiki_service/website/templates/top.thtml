@@ -1,4 +1,5 @@
 @@SET@@ PAGE_TITLE = $1
+@@SET@@ BODY_CLASS = $2
 @@--
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
@@ -25,7 +26,7 @@
 @@--
     </style>
   </head>
-<body class="wiki_website_example">
+<body class="@_BODY_CLASS_@">
 <div id="contents">
 
 <div id="topbar">
