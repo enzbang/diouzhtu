@@ -161,6 +161,8 @@ package body Wiki_Website.Web_Block_Callbacks is
                                    & Directory_Separator
                                    & Get_Directory (Get_URI));
 
+      Sel_Dir : Unbounded_String := Null_Unbounded_String;
+
       Filenames    : Templates.Vector_Tag;
       Simple_Names : Templates.Vector_Tag;
    begin
@@ -173,22 +175,28 @@ package body Wiki_Website.Web_Block_Callbacks is
 
          --  Selected directory is the directory containing a file
 
-         Menu (From         => Wiki_HTML_Dir (Name),
-               Root         => HTML_Root,
-               Selected_Dir => Current_Directory & Directory_Separator
-                 & Ada.Directories.Containing_Directory
-                 (Directories.Get_First_Filename (Relative_Selected_Dir)),
-               Filenames    => Filenames,
-               Simple_Names => Simple_Names);
+         declare
+            First_Filename : constant String :=
+                               Directories.Get_First_Filename
+                                 (Relative_Selected_Dir);
+         begin
+
+            if First_Filename /= "" then
+               Sel_Dir := To_Unbounded_String
+                 (Current_Directory & Directory_Separator
+                  & Ada.Directories.Containing_Directory (First_Filename));
+            end if;
+         end;
       else
-         Menu (From         => Wiki_HTML_Dir (Name),
-               Root         => HTML_Root,
-               Selected_Dir =>
-                 Current_Directory & Directory_Separator
-                 & Relative_Selected_Dir,
-               Filenames    => Filenames,
-               Simple_Names => Simple_Names);
+         Sel_Dir :=  To_Unbounded_String
+           (Current_Directory & Directory_Separator & Relative_Selected_Dir);
       end if;
+
+      Menu (From         => Wiki_HTML_Dir (Name),
+            Root         => HTML_Root,
+            Selected_Dir => To_String (Sel_Dir),
+            Filenames    => Filenames,
+            Simple_Names => Simple_Names);
 
       Templates.Insert
         (Translations,
@@ -340,7 +348,9 @@ package body Wiki_Website.Web_Block_Callbacks is
                                   Wiki_Website.Directories.Get_First_Filename
                                     (Containing_Directory (HTML_Filename));
             begin
-               View_File (First_Filename);
+               if First_Filename /= "" then
+                  View_File (First_Filename);
+               end if;
             end View_In_Containing_Directory;
          end if;
       end if;
