@@ -268,8 +268,6 @@ package body Wiki_Website.Callbacks is
             Update_HTML : Boolean := False;
          begin
 
-            Text_IO.Put_Line (Filename);
-
             if Exists (Filename) and then
               Kind (Filename) = Ordinary_File then
                --  ??? Here we should add RCS
@@ -281,16 +279,19 @@ package body Wiki_Website.Callbacks is
                Create_Path (Containing_Directory (Filename));
             end if;
 
-            Ada.Text_IO.Put_Line (Filename);
+            if Text_Plain /= "" then
 
-            Create (File => Text_File,
-                    Mode => Out_File,
-                    Name => Filename);
+               --  Do not create empty file
 
-            Put (File => Text_File,
-                 Item => Text_Plain);
+               Create (File => Text_File,
+                       Mode => Out_File,
+                       Name => Filename);
 
-            Close (File => Text_File);
+               Put (File => Text_File,
+                    Item => Text_Plain);
+
+               Close (File => Text_File);
+            end if;
 
             if Update_HTML and then Ada.Directories.Exists
               (Wiki_HTML_Dir (Name) & "/" & Wiki_Filename) then

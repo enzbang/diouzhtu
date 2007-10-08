@@ -24,13 +24,17 @@
    <p class="quickmenu"><a href="#edit_zone">Go to edit</a></p>
 
    <h1 class="title">Preview : <em>@_REPLACE_ALL((.*\/)/):FILENAME_@</em></h1>
-@_ERROR_@
+   @_ERROR_@
 
-<div id="preview_zone">@_PREVIEW_@</div>
-
-<div id="edit_zone">
-  <form method="post" action="@_WIKI_WEB_ROOT_@/preview/@_FILENAME_@">
-   <p>
+   @@IF@@ @_PREVIEW_@ /= ""
+     <div id="preview_zone">@_PREVIEW_@</div>
+   @@ELSE@@
+     <div id="preview_zone">
+        <p class="warn">Warning ! This page will be deleted</p></div>
+   @@END_IF@@
+   <div id="edit_zone">
+   <form method="post" action="@_WIKI_WEB_ROOT_@/preview/@_FILENAME_@">
+     <p>
       <input type="submit" name="save" value="save"/>
       <input type="submit" value="preview" />
     </p>
