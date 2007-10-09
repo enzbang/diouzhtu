@@ -33,14 +33,14 @@ MODULES_CHECK = ${MODULES:%=%_check}
 
 # Targets
 
-all: create_directories $(MODULES_BUILD)
+all: $(MODULES_BUILD)
 
 clean: $(MODULES_CLEAN)
 
 create_directories:
 	mkdir -p lib
 
-setup: $(MODULES_SETUP)
+setup: create_directories $(MODULES_SETUP)
 
 check :$(MODULES_CHECK)
 

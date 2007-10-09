@@ -20,7 +20,6 @@
 ##############################################################################
 
 all:
-	mkdir -p lib obj tsrc
 ifeq ($(shell ls tsrc/ | wc -l), 0)
 	$(error "Please run 'make setup'")
 endif
@@ -31,6 +30,7 @@ endif
 	gnat make -XPRJ_BUILD=$(MODE) -Pwiki_website
 
 setup:
+	mkdir -p lib obj tsrc
 	-$(MKDIR) gen
 	templates2ada -r -d templates -o gen/templates.cds \
 		-t templates/templates.tads
