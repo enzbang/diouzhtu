@@ -104,14 +104,14 @@ package body Wiki_Website.Config is
 
       if Name'Length > Wiki_Web_Edit'Length and then
         Name (Name'First ..
-                Name'First + Wiki_Web_Edit'Length - 1) = Wiki_Web_Edit
+                Name'First + Wiki_Web_Edit'Length) = Wiki_Web_Edit & "/"
       then
          return Name (Name'First + Wiki_Web_Edit'Length + 1 .. Name'Last);
       end if;
 
       if Name'Length > Wiki_Web_Preview'Length and then
         Name (Name'First ..
-                Name'First + Wiki_Web_Preview'Length - 1) = Wiki_Web_Preview
+                Name'First + Wiki_Web_Preview'Length) = Wiki_Web_Preview & "/"
       then
          return Name (Name'First +
                         Wiki_Web_Preview'Length + 1 .. Name'Last);
