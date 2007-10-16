@@ -32,9 +32,11 @@ OPTIONS = MODE="$(MODE)" $(GENERAL_OPTIONS)
 ifeq ($(OS),Windows_NT)
 SOEXT=.dll
 EXEEXT=.exe
+LN=cp -f
 else
 SOEXT=.so
 EXEEXT=
+LN=ln -sf
 endif
 
 # Modules support
@@ -72,7 +74,8 @@ check :$(MODULES_CHECK)
 I_BIN	= $(INSTALL)/bin
 I_INC	= $(INSTALL)/include/diouzhtu
 I_INC_W = $(INSTALL)/include/wiki_interface
-I_LIB	= $(INSTALL)/lib/diouzhtu
+I_LIB	= $(INSTALL)/lib/
+I_LIB_D	= $(INSTALL)/lib/diouzhtu
 I_LIB_W	= $(INSTALL)/lib/wiki_interface
 I_GPR	= $(INSTALL)/lib/gnat
 I_DLIB  = $(INSTALL)/share/diouzhtu/dlib
@@ -95,24 +98,29 @@ ${MODULES_CHECK}:
 
 install_clean:
 	$(RM) -fr $(I_INC)
-	$(RM) -fr $(I_LIB)
+	$(RM) -fr $(I_LIB_D)
 	$(RM) -f $(I_GPR)/diouzhtu.gpr
 
 install_dirs: install_clean
 	$(MKDIR) $(I_BIN)
 	$(MKDIR) $(I_INC)
 	$(MKDIR) $(I_INC_W)
-	$(MKDIR) $(I_LIB)
+	$(MKDIR) $(I_LIB_D)
 	$(MKDIR) $(I_LIB_W)
 	$(MKDIR) $(I_GPR)
 	$(MKDIR) $(I_DLIB)
 
 install: install_dirs
+	$(CP) diouzhtu/lib/* $(I_LIB_D)
+	for library in `ls $(I_LIB_D)/*$(SOEXT)`; do \
+		$(LN) $$library $(I_LIB); \
+	done
+	$(CP) gwiad_wiki_service/interface/lib/*$(SOEXT) $(I_LIB_W)
+	for library in `ls $(I_LIB_W)/*$(SOEXT)`; do \
+		$(LN) $$library $(I_LIB); \
+	done
 	$(CP) diouzhtu/src/*.ad[sb] $(I_INC)
 	$(CP) gwiad_wiki_service/interface/src/*.ads $(I_INC_W)
-	$(CP) diouzhtu/lib/* $(I_LIB)
-	$(CP) gwiad_wiki_service/interface/lib/* $(I_LIB_W)
-	$(CP) gwiad_wiki_service/interface/lib/*$(SOEXT) $(I_LIB_W)/..
 	$(CP) gwiad_wiki_service/lib/*$(SOEXT) $(I_DLIB)
 	$(CP) config/projects/diouzhtu.gpr $(I_GPR)
 	$(CP) config/projects/wiki_interface.gpr $(I_GPR)
