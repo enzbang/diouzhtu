@@ -38,25 +38,25 @@ li ul {
 
 img { border: 0px;}
 a { color: #0047B1; }
-table { 
-    border-width: 1px; 
-    border-style: solid; 
-    border-color: #000; 
-    border-collapse: collapse; 
+table {
+    border-width: 1px;
+    border-style: solid;
+    border-color: #000;
+    border-collapse: collapse;
 }
 
-th, td { 
-    border-width: 1px; 
-    border-style: solid; 
-    border-color: #000; 
+th, td {
+    border-width: 1px;
+    border-style: solid;
+    border-color: #000;
 }
 
-td { 
-    vertical-align: top; 
-    text-align: center; 
+td {
+    vertical-align: top;
+    text-align: center;
     padding:0.5em;
 }
- 
+
 #title a {
     font-size:2em;
     padding:0 0 0 2em;
@@ -115,12 +115,12 @@ td {
 /* View */
 
 #lazy_view {
-   padding: 0 2em;
-   margin-left:26%;
+    padding: 0 2em;
+    margin-left:26%;
 }
 
 li.selected a {
-   color:black !important;
+    color:black !important;
 }
 
 p {
@@ -154,19 +154,19 @@ p#doesnotexist {
 }
 
 #edit_zone p, .edit_page p {
-   padding:0 5%;
+    padding:0 5%;
 }
 
 #preview_zone {
-   margin:0 5% 2em 5%;
-   padding:1em 2em;
-   border:thin dashed  #0066FF; 
+    margin:0 5% 2em 5%;
+    padding:1em 2em;
+    border:thin dashed  #0066FF;
 }
 
 #hasbeensaved {
-   margin:0 5% 2em 5%;
-   padding:1em 2em;
-   color:#222;
+    margin:0 5% 2em 5%;
+    padding:1em 2em;
+    color:#222;
 }
 
 #hasbeensaved a {
@@ -191,21 +191,56 @@ pre {
     border: thin solid black;
 }
 
-.package .title {
-    color:red;
+pre code[class]:after {
+    background:white none repeat scroll 0%;
+    border-top:1px solid;
+    color:#CCCCCC;
+    content:'highlight: ' attr(class);
+    display:block;
+    font-size:smaller;
+    padding-top:0.5em;
+    text-align:right;
 }
-
-.keyword {
+pre code {
+    background:#F0F0F0 none repeat scroll 0%;
+    display:block;
+}
+pre code, .ruby .subst {
+    color:black;
+}
+.string, .function .title, .class .title,
+.tag .attribute .value, .css .rules .value,
+.preprocessor, .ruby .symbol,
+.built_in, .sql .aggregate, .django .template_tag,
+.django .variable, .smalltalk .class {
+    color:#880000;
+}
+.comment, .java .annotation, .template_comment {
+    color:#888888;
+}
+.number, .regexp, .javascript .literal, .smalltalk .symbol, .smalltalk .char {
+    color:#008800;
+}
+.javadoc, .ruby .string,
+.python .decorator,
+.django .filter .argument,
+.smalltalk .localvars,
+.smalltalk .array,
+.css .attr_selector, .xml .pi {
+    color:#8888FF;
+}
+.keyword,
+.css .id,
+.phpdoc,
+.function .title,
+.class .title,
+.vbscript .built_in,
+.sql .aggregate,
+.rsl .built_in,
+.smalltalk .class,
+.xml .tag .title {
     font-weight:bold;
-    color:white;
 }
-.comment {
-    font-style:italic;
-}
-.string {
-    font-style:italic;
-}
-
 
 @@-- Preview Zone
 
@@ -219,6 +254,3 @@ pre {
 
     padding-bottom:0.2em;
 }
-
-
-

@@ -18,9 +18,11 @@
           href="@_WIKI_WEB_ROOT_@/css/screen.css" media="screen" />
 @@--
 @@-- Highlight syntax in code with Highlight.js
-    <script type="text/javascript" src="@_WIKI_WEB_ROOT_@/js/highlight.js"></script>
+    <script type="text/javascript"
+            src="@_WIKI_WEB_ROOT_@/js/highlight.js"></script>
     <script type="text/javascript">
-      initHighlightingOnLoad();
+      initHighlightingOnLoad('ada', 'dynamic', 'elisp',
+                             'javascript', 'sql', 'static', 'html', 'css');
     </script>
 @@--
 @@--
