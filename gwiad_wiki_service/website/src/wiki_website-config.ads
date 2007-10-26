@@ -23,6 +23,7 @@ with Ada.Directories;
 with AWS.Status;
 
 with Gwiad.Plugins.Services.Registry;
+with Morzhol.VC.RCS;
 
 private package Wiki_Website.Config is
 
@@ -44,6 +45,8 @@ private package Wiki_Website.Config is
    Wiki_Web_Preview : constant String := "preview";
    Wiki_Web_CSS     : constant String := "css";
    Wiki_Web_JS      : constant String := "js";
+
+   VCS_Engine : Morzhol.VC.RCS.RCS; -- use RCS for revision control
 
    procedure Add_Config (Name : in Wiki_Name; Hostname : in String);
    --  Adds a new config (a new wiki website)

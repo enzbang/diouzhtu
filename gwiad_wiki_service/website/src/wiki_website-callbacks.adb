@@ -265,23 +265,30 @@ package body Wiki_Website.Callbacks is
             Filename    : constant String :=
                             Wiki_Text_Dir (Name) & "/" & Wiki_Filename;
             Text_File   : File_Type;
-            Update_HTML : Boolean := False;
+            Initial_Rev : Boolean := False;
          begin
 
             if Exists (Filename) and then
               Kind (Filename) = Ordinary_File then
-               --  ??? Here we should add RCS
 
                Delete_File (Filename);
-
-               Update_HTML := True;
             else
                Create_Path (Containing_Directory (Filename));
+               Initial_Rev := True;
             end if;
 
             if Text_Plain /= "" then
-
                --  Do not create empty file
+
+               if not Initial_Rev and then
+                 not VCS_Engine.Lock (Filename => Filename) then
+                  Templates.Insert
+                    (Translations,
+                     Templates.Assoc
+                       (Template_Defs.Edit.ERROR,
+                        "<p>File is currently locked</p>"));
+                  return;
+               end if;
 
                Create (File => Text_File,
                        Mode => Out_File,
@@ -291,18 +298,41 @@ package body Wiki_Website.Callbacks is
                     Item => Text_Plain);
 
                Close (File => Text_File);
-            end if;
 
-            if Update_HTML and then Ada.Directories.Exists
-              (Wiki_HTML_Dir (Name) & "/" & Wiki_Filename) then
-               Ada.Directories.Delete_File
-                 (Wiki_HTML_Dir (Name) & "/" & Wiki_Filename);
-            end if;
+               if Initial_Rev then
+                  if not VCS_Engine.Add (Filename => Filename,
+                                         Author   => "wiki author") then
+                     Templates.Insert
+                       (Translations,
+                        Templates.Assoc
+                          (Template_Defs.Edit.ERROR,
+                           "<p>Add Failed !</p>"));
+                     return;
+                  end if;
+               else
+                  if not VCS_Engine.Commit (Filename => Filename,
+                                            Message  => "wiki commit",
+                                            Author   => "wiki author") then
+                     Templates.Insert
+                       (Translations,
+                        Templates.Assoc
+                          (Template_Defs.Edit.ERROR,
+                           "<p>Commit Failed !</p>"));
+                     return;
+                  end if;
 
-            Templates.Insert
-              (Translations,
-               Templates.Assoc (Template_Defs.Preview.HAS_BEEN_SAVED,
-                 Wiki_Filename));
+                  if Ada.Directories.Exists
+                    (Wiki_HTML_Dir (Name) & "/" & Wiki_Filename) then
+                     Ada.Directories.Delete_File
+                       (Wiki_HTML_Dir (Name) & "/" & Wiki_Filename);
+                  end if;
+               end if;
+
+               Templates.Insert
+                 (Translations,
+                  Templates.Assoc (Template_Defs.Preview.HAS_BEEN_SAVED,
+                    Wiki_Filename));
+            end if;
          end Save_Preview;
       else
          Generate_Preview :
