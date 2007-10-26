@@ -1,62 +1,12 @@
 ﻿<!DOCTYPE html>
 <head>
   <title>Highlight</title>
-  <style>
-    code[class]:after {
-      content: 'highlight: ' attr(class);
-      display: block; text-align: right;
-      font-size: smaller;
-      color: #CCC; background: white;
-      border-top: solid 1px;
-      padding-top: 0.5em;
-    }
-    
-    code {
-      display: block;
-      background: #F0F0F0;
-    }
-    
-    .string,
-    .function .title,
-    .class .title, 
-    .tag .attribute .value,
-    .css .rules .value,
-    .cpp .preprocessor,
-    .ruby .symbol,
-    .vbscript .built_in {
-      color: #800;
-    }
-    
-    .comment,
-    .python .decorator,
-    .java .annotation {
-      color: #888;
-    }
-    
-    .number,
-    .regexp,
-    .javascript .literal {
-      color: #080;
-    }
-    
-    .javadoc,
-    .ruby .string {
-      color: #88F;
-    }
-    
-    .keyword,
-    .css .id,
-    .phpdoc,
-    .function .title,
-    .class .title,
-    .vbscript .built_in {
-      font-weight: bold;
-    }
-  </style>
+  
+  <link rel="stylesheet" href="sample.css">
   
   <script type="text/javascript" src="highlight.js"></script>
   <script type="text/javascript">
-    initHighlightingOnLoad();
+    initHighlightingOnLoad('1c', 'axapta', 'cpp', 'delphi', 'xml', 'html', 'css', 'django', 'java', 'javascript', 'perl', 'php', 'python', 'rib', 'rsl', 'ruby', 'smalltalk', 'sql', 'vbscript');
   </script>
 
 <body>
@@ -91,7 +41,7 @@ class CategoriesController &lt; ApplicationController
 
   def create
     @category = Category.create(params[:category])
-    flash[:notice] = "Category was successfully created"
+    flash[:notice] = "Category #{@category + "..."} was successfully created"
   end
 end
 </code></pre>
@@ -223,6 +173,18 @@ abstract class Zend_Uri
 }
 </code></pre>
 
+<p>A custom XML document:
+
+<pre><code>&lt;?xml version="1.0"?&gt;
+&lt;response value="ok"&gt;
+  &lt;text&gt;Ok&lt;/text&gt;
+  &lt;comment/&gt;
+  &lt;description&gt;&lt;![CDATA[ 
+  CDATA is &lt;not&gt; magical. 
+  ]]&gt;&lt;/description&gt;
+&lt;/response&gt;
+</code></pre>
+
 <p>Some HTML code:
 
 <pre><code>&lt;head&gt;
@@ -234,6 +196,26 @@ abstract class Zend_Uri
   &lt;p class&gt;Something&lt;/p&gt;
   &lt;p class="something" title="p"&gt;Something&lt;/p&gt;
 &lt;/body&gt;
+</code></pre>
+
+<p>HTML with Django templates:
+
+<pre><code>{% if articles|length %}
+{% for article in articles %}
+
+{# Striped table #}
+&lt;tr class="{% cycle odd,even %}"&gt;
+  &lt;td&gt;{{ article|default:"Hi... "|escape }}&lt;/td&gt;
+  &lt;td&gt;{{ article.date|date:"d.m.Y" }}&lt;/td&gt;
+&lt;/tr&gt;
+  
+{% endfor %}
+{% endif %}
+
+{% comment %}
+Comments may be long and
+multiline.
+{% endcomment %}
 </code></pre>
 
 <p>Some CSS code:
@@ -341,7 +323,7 @@ Begin
       ReadBufSize:=InFile.Read(Buffer,BufSize);
       OutFile.Write(Buffer,ReadBufSize);
     Until ReadBufSize&lt;&gt;BufSize;
-    Log('File '''+InFileName+''' copied');
+    Log('File '''+InFileName+''' copied'#13#10);
   Finally
     InFile.Free;
     OutFile.Free;
@@ -428,8 +410,198 @@ int main(int argc, char *argv[]) {
   for (unsigned i = 0; i &lt; 0xFFFF; i++)
     cout &lt;&lt; "Hello, World!" &lt;&lt; endl;
   
-  c = '\n'; // just a test 
+  char c = '\n'; // just a test 
+  char *s = "\\\\"; // another test
 }
+</code></pre>
+
+<p>Bet you didn't expect to see a highlighted RenderMan (both RenderMan 
+Shading Language and RenderMan Interface Bytestream):</p>
+
+<pre><code>#define TEST_DEFINE 3.14
+/*	plastic surface shader
+ *
+ * 	Pixie is:
+ * 	(c) Copyright 1999-2003 Okan Arikan. All rights reserved.
+ */
+
+surface plastic (float Ka = 1, Kd = 0.5, Ks = 0.5, roughness = 0.1;
+                 color specularcolor = 1;) {
+	normal Nf = faceforward (normalize(N),I);
+	Ci = Cs * (Ka*ambient() + Kd*diffuse(Nf)) + specularcolor * Ks*specular(Nf,-normalize(I),roughness);
+	Oi = Os;
+	Ci *= Oi;
+}
+</code></pre>
+
+<pre><code>FrameBegin 0
+Display "Scene" "framebuffer" "rgb"
+Option "searchpath" "shader" "+&:/home/kew"
+Option "trace" "int maxdepth" [4]
+Attribute "visibility" "trace" [1]
+Attribute "irradiance" "maxerror" [0.1]
+Attribute "visibility" "transmission" "opaque"
+Format 640 480 1.0
+ShadingRate 2
+PixelFilter "catmull-rom" 1 1
+PixelSamples 4 4
+Projection "perspective" "fov" 49.5502811377
+Scale 1 1 -1
+ConcatTransform [-0.105581186712 -0.336664259434 0.935686826706 0.0
+
+		      0.994097530842 -0.0121211335063 0.107810914516 0.0
+
+          -0.0249544940889 0.941546678543 0.335956931114 0.0
+
+          0.103667020798 -1.30126297474 -6.22769546509 1.0]
+
+WorldBegin
+
+ReadArchive "/home/qewerty/blends/my/instances/Lamp.002_Light/instance.rib"
+Surface "plastic"
+ReadArchive "/home/qewerty/blends/my/instances/Cube.004_Mesh/instance.rib"
+# ReadArchive "/home/qewerty/blends/my/instances/Sphere.010_Mesh/instance.rib"
+# ReadArchive "/home/qewerty/blends/my/instances/Sphere.009_Mesh/instance.rib"
+ReadArchive "/home/qewerty/blends/my/instances/Sphere.006_Mesh/instance.rib"
+
+WorldEnd
+FrameEnd
+</code></pre>
+
+<p>SQL:
+
+<pre><code>BEGIN;
+CREATE TABLE "cicero_topic" (
+    "id" serial NOT NULL PRIMARY KEY,
+    "forum_id" integer NOT NULL,
+    "subject" varchar(255) NOT NULL,
+    "created" timestamp with time zone NOT NULL
+);
+ALTER TABLE "cicero_topic" 
+ADD CONSTRAINT forum_id_refs_id_4be56999 
+FOREIGN KEY ("forum_id") 
+REFERENCES "cicero_forum" ("id") 
+DEFERRABLE INITIALLY DEFERRED;
+
+-- Initials
+insert into "cicero_forum" ("slug", "name", "group", "ordering") values ('test', 'Тест''овый форум', 'Тест', 0);
+
+-- Indices
+CREATE INDEX "cicero_topic_forum_id" ON "cicero_topic" ("forum_id");
+
+-- Test
+select count(*) from cicero_forum;
+
+COMMIT;
+</code></pre>
+
+<p>Good old classic SmallTalk:
+
+<pre><code>Object>>method: num
+    "comment 123"
+    | var1 var2 |
+    (1 to: num) do: [:i | |var| ^i].
+    Klass with: var1.
+    Klass new.
+    arr := #('123' 123.345 #hello Transcript var $@).
+    arr := #().
+    var2 = arr at: 3.
+    ^ self abc
+
+heapExample
+    "HeapTest new heapExample"
+    "Create a sorted collection of numbers, remove the elements
+    sequentially and add new objects randomly.
+    Note: This is the kind of benchmark a heap is designed for."
+    | n rnd array time sorted |
+    n := 5000.
+    "# of elements to sort"
+    rnd := Random new.
+    array := (1 to: n)
+                collect: [:i | rnd next].
+    "First, the heap version"
+    time := Time
+                millisecondsToRun: [sorted := Heap withAll: array.
+    1
+        to: n
+        do: [:i |
+            sorted removeFirst.
+            sorted add: rnd next]].
+    Transcript cr; show: 'Time for Heap: ' , time printString , ' msecs'.
+    "The quicksort version"
+    time := Time
+                millisecondsToRun: [sorted := SortedCollection withAll: array.
+    1
+        to: n
+        do: [:i |
+            sorted removeFirst.
+            sorted add: rnd next]].
+    Transcript cr; show: 'Time for SortedCollection: ' , time printString , ' msecs'
+</code></pre>
+
+<p>Axapta:
+
+<pre><code>class ExchRateLoadBatch extends RunBaseBatch
+{
+    ExchRateLoad rbc;
+    container currencies;
+    boolean actual;
+    boolean overwrite;
+    date beg;
+    date end;
+
+    #define.CurrentVersion(5)
+
+    #localmacro.CurrentList
+        currencies,
+        actual,
+        beg,
+        end
+    #endmacro
+}
+
+public boolean unpack(container packedClass)
+{
+    container       base;
+    boolean         ret;
+    Integer         version    = runbase::getVersion(packedClass);
+
+    switch (version)
+    {
+        case #CurrentVersion:
+            [version, #CurrentList] = packedClass;
+            return true;
+        default:
+            return false;
+    }
+    return ret;
+}
+</code></pre>
+
+<p>And this is a russian enterpise system "1С":
+
+<pre><code class="1c">
+#Если Клиент Тогда
+Перем СимвольныйКодКаталога = "ля-ля-ля"; //комментарий
+Функция Сообщить(Знач ТекстСообщения, ТекстСообщения2) Экспорт //комментарий к функции
+	x=ТекстСообщения+ТекстСообщения2+"
+	|строка1
+	|строка2
+	|строка3";
+КонецФункции
+#КонецЕсли
+
+////////////////////////////////////////////////////////////////////////////////
+// ОБРАБОТЧИКИ СОБЫТИЙ
+// 
+
+// Процедура ПриНачалеРаботыСистемы
+// 
+Процедура ПриНачалеРаботыСистемы()
+
+	Обработки.Помощник.ПолучитьФорму("Форма").Открыть();
+
+КонецПроцедуры
 </code></pre>
 
 <hr>
