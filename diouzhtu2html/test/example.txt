@@ -78,6 +78,10 @@ Another test with an url http://url_in_text in text
 
 A test with (http://an.url)
 
+A test with http://an)url)
+
+A test with ("An Url":http://an.url)
+
 And another http://url.to.test.
 
 code(diouzhtu).
