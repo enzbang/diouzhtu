@@ -132,11 +132,12 @@ package body Wiki_Website.Callbacks is
       Simple_Name : constant String := Get_Filename (Get_URI);
       Filename    : constant String :=
                       Wiki_Text_Dir (Name) & "/" & Simple_Name;
+      Author      : constant String := "peer"  & Status.Peername (Request);
 
       Text_Plain : Unbounded_String;
       Text_File  : File_Type;
 
-      Wait_Lock  : Duration;
+      Wait_Lock  : Duration := 0.0;
 
    begin
 
@@ -164,15 +165,15 @@ package body Wiki_Website.Callbacks is
             return;
          end if;
 
-         --  Claim lock
+         --  Claim lock if needed
 
-         Lock.Manager.Claim (Filename     => Filename,
-                             User         => "wikiauthor",
-                             Time_To_Wait => Wait_Lock);
+         if not Lock.Manager.Check (Filename, Author) then
+            Lock.Manager.Claim (Filename     => Filename,
+                                User         => Author,
+                                Time_To_Wait => Wait_Lock);
+         end if;
 
-         if Wait_Lock > 0.0
-           or else not VCS_Engine.Lock (Filename => Filename)
-         then
+         if Wait_Lock > 0.0 then
             Templates.Insert
               (Translations,
                Templates.Assoc
@@ -266,9 +267,8 @@ package body Wiki_Website.Callbacks is
       Wiki_Filename : constant String := Get_Filename (Get_URI);
       Filename      : constant String :=
                         Wiki_Text_Dir (Name) & "/" & Wiki_Filename;
-
+      Author        : constant String := "peer" & Status.Peername (Request);
    begin
-
       Templates.Insert
         (Translations,
          Templates.Assoc (Template_Defs.Top.WIKI_NAME, String (Name)));
@@ -284,7 +284,7 @@ package body Wiki_Website.Callbacks is
       --  Check Lock
 
       if Exists (Filename)
-        and not Lock.Manager.Check (Filename, "wikiauthor")
+        and not Lock.Manager.Check (Filename, Author)
       then
          Templates.Insert
            (Translations,
@@ -297,22 +297,17 @@ package body Wiki_Website.Callbacks is
          Save_Preview :
          declare
             Text_File   : File_Type;
-            Initial_Rev : Boolean := False;
             Lock_Delay  : Duration;
-         begin
 
-            if Exists (Filename) and then
-              Kind (Filename) = Ordinary_File then
+            procedure Overwrite_File;
+            --  Overwrite the file
 
-               Delete_File (Filename);
-            else
-               Create_Path (Containing_Directory (Filename));
-               Initial_Rev := True;
-            end if;
+            --------------------
+            -- Overwrite_File --
+            --------------------
 
-            if Text_Plain /= "" then
-               --  Do not create empty file
-
+            procedure Overwrite_File is
+            begin
                Create (File => Text_File,
                        Mode => Out_File,
                        Name => Filename);
@@ -321,65 +316,118 @@ package body Wiki_Website.Callbacks is
                     Item => Text_Plain);
 
                Close (File => Text_File);
+            end Overwrite_File;
 
-               if Initial_Rev then
+         begin
 
-                  --  Lock the file before adding it
+            if Exists (Filename) and then
+              Kind (Filename) = Ordinary_File then
 
-                  Wiki_Website.Lock.Manager.Claim
-                    (Filename     => Filename,
-                     User         => "wikiauthor",
-                     Time_To_Wait => Lock_Delay);
+               Delete_File (Filename);
 
-                  if Lock_Delay = 0.0
-                    and then not VCS_Engine.Add (Filename => Filename,
-                                                 Author   => "wikiauthor")
-                  then
-                     Templates.Insert
-                       (Translations,
-                        Templates.Assoc
-                          (Template_Defs.Edit.ERROR,
-                           "<p>Add Failed !</p>"));
+               if Text_Plain = "" then
 
-                     --  Unlock the file
+                  --  ???  What to do ?
 
-                     Wiki_Website.Lock.Manager.Release
-                       (Filename     => Filename,
-                        User         => "wikiauthor");
-
-                     return;
-                  end if;
-               else
-                  if not VCS_Engine.Commit (Filename => Filename,
-                                            Message  => "wiki commit",
-                                            Author   => "wikiauthor") then
-                     Templates.Insert
-                       (Translations,
-                        Templates.Assoc
-                          (Template_Defs.Edit.ERROR,
-                           "<p>Commit Failed !</p>"));
-                     return;
-                  end if;
-
-                  if Ada.Directories.Exists
-                    (Wiki_HTML_Dir (Name) & "/" & Wiki_Filename) then
-                     Ada.Directories.Delete_File
-                       (Wiki_HTML_Dir (Name) & "/" & Wiki_Filename);
-                  end if;
+                  return;
                end if;
 
-               Templates.Insert
-                 (Translations,
-                  Templates.Assoc (Template_Defs.Preview.HAS_BEEN_SAVED,
-                    Wiki_Filename));
+               --  Get Lock
 
-               --  Release the file lock
+               if not VCS_Engine.Lock (Filename => Filename) then
+                  Ada.Text_IO.Put_Line ("not lock");
+                  Templates.Insert
+                    (Translations,
+                     Templates.Assoc
+                       (Template_Defs.Edit.ERROR,
+                        "<p>Lock Failed !</p>"));
+                  return;
+               end if;
 
-               Wiki_Website.Lock.Manager.Release
+               --  Write changes
+
+               Overwrite_File;
+
+               --  Commit changes
+
+               if not VCS_Engine.Commit
+                 (Filename => Filename,
+                  Message  => "wiki commit",
+                  Author   => Author)
+               then
+                  Templates.Insert
+                    (Translations,
+                     Templates.Assoc
+                       (Template_Defs.Edit.ERROR,
+                        "<p>Commit Failed !</p>"));
+                  --  Release the file lock
+
+                  Wiki_Website.Lock.Manager.Release
+                    (Filename     => Filename,
+                     User         => Author);
+                  return;
+               end if;
+
+               if Ada.Directories.Exists
+                 (Wiki_HTML_Dir (Name) & "/" & Wiki_Filename) then
+                  Ada.Directories.Delete_File
+                    (Wiki_HTML_Dir (Name) & "/" & Wiki_Filename);
+               end if;
+            else
+               if Text_Plain = "" then
+                  --  Do not create empty file
+                  --  ??? raise an error ?
+                  return;
+               end if;
+
+               Create_Path (Containing_Directory (Filename));
+
+               --  Claim lock before adding it
+
+               Wiki_Website.Lock.Manager.Claim
                  (Filename     => Filename,
-                  User         => "wikiauthor");
+                  User         => Author,
+                  Time_To_Wait => Lock_Delay);
 
+               if Lock_Delay > 0.0 then
+                  Templates.Insert
+                    (Translations,
+                     Templates.Assoc
+                       (Template_Defs.Edit.ERROR,
+                        "<p>Lock Failed !</p>"));
+                  return;
+               end if;
+
+               Overwrite_File;
+
+               if not VCS_Engine.Add
+                 (Filename => Filename, Author => Author) then
+                  Templates.Insert
+                    (Translations,
+                     Templates.Assoc
+                       (Template_Defs.Edit.ERROR,
+                        "<p>Add Failed !</p>"));
+
+                  --  Unlock the file
+
+                  Wiki_Website.Lock.Manager.Release
+                    (Filename     => Filename,
+                     User         => Author);
+                  return;
+               end if;
             end if;
+
+            Templates.Insert
+              (Translations,
+               Templates.Assoc (Template_Defs.Preview.HAS_BEEN_SAVED,
+                 Wiki_Filename));
+
+            --  Release the file lock
+
+            Wiki_Website.Lock.Manager.Release
+              (Filename     => Filename,
+               User         => Author);
+
          end Save_Preview;
       else
          Generate_Preview :
