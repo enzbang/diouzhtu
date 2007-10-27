@@ -35,6 +35,7 @@ with Gwiad.Web.Virtual_Host;
 with Wiki_Interface;
 
 with Wiki_Website.Config;
+with Wiki_Website.Lock;
 with Wiki_Website.Service;
 with Wiki_Website.Template_Defs.Top;
 with Wiki_Website.Template_Defs.Edit;
@@ -135,6 +136,8 @@ package body Wiki_Website.Callbacks is
       Text_Plain : Unbounded_String;
       Text_File  : File_Type;
 
+      Wait_Lock  : Duration;
+
    begin
 
       Templates.Insert
@@ -158,6 +161,23 @@ package body Wiki_Website.Callbacks is
                     (Directory_Name => Filename,
                      Request        => Request)));
             end if;
+            return;
+         end if;
+
+         --  Claim lock
+
+         Lock.Manager.Claim (Filename     => Filename,
+                             User         => "wikiauthor",
+                             Time_To_Wait => Wait_Lock);
+
+         if Wait_Lock > 0.0
+           or else not VCS_Engine.Lock (Filename => Filename)
+         then
+            Templates.Insert
+              (Translations,
+               Templates.Assoc
+                 (Template_Defs.Edit.ERROR,
+                  "<p>File is currently locked</p>"));
             return;
          end if;
 
@@ -244,6 +264,8 @@ package body Wiki_Website.Callbacks is
       Get_URI       : constant String := Status.URI (Request);
       Name          : constant Wiki_Name := Get_Wiki_Name (Request);
       Wiki_Filename : constant String := Get_Filename (Get_URI);
+      Filename      : constant String :=
+                        Wiki_Text_Dir (Name) & "/" & Wiki_Filename;
 
    begin
 
@@ -259,13 +281,24 @@ package body Wiki_Website.Callbacks is
          return;
       end if;
 
+      --  Check Lock
+
+      if Exists (Filename)
+        and not Lock.Manager.Check (Filename, "wikiauthor")
+      then
+         Templates.Insert
+           (Translations,
+            Templates.Assoc
+              (Template_Defs.Preview.ERROR, "<p>Your lock has expired</p>"));
+         return;
+      end if;
+
       if Save /= "" then
          Save_Preview :
          declare
-            Filename    : constant String :=
-                            Wiki_Text_Dir (Name) & "/" & Wiki_Filename;
             Text_File   : File_Type;
             Initial_Rev : Boolean := False;
+            Lock_Delay  : Duration;
          begin
 
             if Exists (Filename) and then
@@ -280,16 +313,6 @@ package body Wiki_Website.Callbacks is
             if Text_Plain /= "" then
                --  Do not create empty file
 
-               if not Initial_Rev and then
-                 not VCS_Engine.Lock (Filename => Filename) then
-                  Templates.Insert
-                    (Translations,
-                     Templates.Assoc
-                       (Template_Defs.Edit.ERROR,
-                        "<p>File is currently locked</p>"));
-                  return;
-               end if;
-
                Create (File => Text_File,
                        Mode => Out_File,
                        Name => Filename);
@@ -300,19 +323,36 @@ package body Wiki_Website.Callbacks is
                Close (File => Text_File);
 
                if Initial_Rev then
-                  if not VCS_Engine.Add (Filename => Filename,
-                                         Author   => "wiki author") then
+
+                  --  Lock the file before adding it
+
+                  Wiki_Website.Lock.Manager.Claim
+                    (Filename     => Filename,
+                     User         => "wikiauthor",
+                     Time_To_Wait => Lock_Delay);
+
+                  if Lock_Delay = 0.0
+                    and then not VCS_Engine.Add (Filename => Filename,
+                                                 Author   => "wikiauthor")
+                  then
                      Templates.Insert
                        (Translations,
                         Templates.Assoc
                           (Template_Defs.Edit.ERROR,
                            "<p>Add Failed !</p>"));
+
+                     --  Unlock the file
+
+                     Wiki_Website.Lock.Manager.Release
+                       (Filename     => Filename,
+                        User         => "wikiauthor");
+
                      return;
                   end if;
                else
                   if not VCS_Engine.Commit (Filename => Filename,
                                             Message  => "wiki commit",
-                                            Author   => "wiki author") then
+                                            Author   => "wikiauthor") then
                      Templates.Insert
                        (Translations,
                         Templates.Assoc
@@ -332,6 +372,13 @@ package body Wiki_Website.Callbacks is
                  (Translations,
                   Templates.Assoc (Template_Defs.Preview.HAS_BEEN_SAVED,
                     Wiki_Filename));
+
+               --  Release the file lock
+
+               Wiki_Website.Lock.Manager.Release
+                 (Filename     => Filename,
+                  User         => "wikiauthor");
+
             end if;
          end Save_Preview;
       else
