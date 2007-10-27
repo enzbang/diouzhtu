@@ -261,6 +261,9 @@ package body Wiki_Website.Callbacks is
       P             : constant Parameters.List := Status.Parameters (Request);
       Save          : constant String          :=
                         Parameters.Get (P, Template_Defs.Preview.HTTP.save);
+      Preview         : constant String        :=
+                          Parameters.Get (P,
+                                          Template_Defs.Preview.HTTP.preview);
       Text_Plain    : constant String          :=
                         Parameters.Get (P,
                                         Template_Defs.Preview.HTTP.text_plain);
@@ -274,6 +277,18 @@ package body Wiki_Website.Callbacks is
       Templates.Insert
         (Translations,
          Templates.Assoc (Template_Defs.Top.WIKI_NAME, String (Name)));
+      Templates.Insert
+        (Translations,
+         Templates.Assoc
+           (Template_Defs.Preview.FILENAME, Wiki_Filename));
+
+      if Preview = "" and then Save = "" then
+         --  Redirect to view page ???
+         Templates.Insert
+           (Translations,
+            Templates.Assoc (Template_Defs.Preview.SET_REDIRECT, "T"));
+         return;
+      end if;
 
       if not Gwiad.Plugins.Services.Registry.Exists (Wiki_Service_Name) then
          Templates.Insert
@@ -453,10 +468,6 @@ package body Wiki_Website.Callbacks is
          Templates.Insert
            (Translations,
             Templates.Assoc (Template_Defs.Preview.TEXT_PLAIN, Text_Plain));
-         Templates.Insert
-           (Translations,
-            Templates.Assoc
-              (Template_Defs.Preview.FILENAME, Wiki_Filename));
       end if;
    end Preview_Page;
 

@@ -1,11 +1,16 @@
 @@IF@@ @_FILENAME_@ /= ""
-   @@INCLUDE@@ top.thtml "Preview : @_REPLACE_ALL((.*\/)/):FILENAME_@" preview_page
+   @@IF@@ @_SET_REDIRECT_@ /= ""
+     @@INCLUDE@@ top.thtml "Error - Redirect" preview_page @_WIKI_WEB_ROOT_@/@_FILENAME_@
+   @@ELSE@@
+     @@INCLUDE@@ top.thtml "Preview : @_REPLACE_ALL((.*\/)/):FILENAME_@" preview_page
+   @@END_IF@@
    </div>
 @@ELSE@@
    @@INCLUDE@@ top.thtml "Error" preview_page
    </div>
 @@END_IF@@
 
+@@IF@@ @_SET_REDIRECT_@ = ""
 @@IF@@ @_HAS_BEEN_SAVED_@ /= ""
 <div id="hasbeensaved">
 <h1>Thanks !</h1>
@@ -35,17 +40,16 @@
    <div id="edit_zone">
    <form method="post" action="@_WIKI_WEB_ROOT_@/preview/@_FILENAME_@">
      <p>
-      <input type="submit" name="save" value="save"/>
-      <input type="submit" value="preview" />
     </p>
      <textarea rows="40" cols="80"
               name="text_plain" id="text_plain">@_TEXT_PLAIN_@</textarea>
     <p>
       <input type="submit" name="save" value="save"/>
-      <input type="submit" value="preview" />
+      <input type="submit" name="preview" value="preview" />
     </p>
   </form>
 </div>
+@@END_IF@@
 @@END_IF@@
 
 @@INCLUDE@@ bottom.thtml

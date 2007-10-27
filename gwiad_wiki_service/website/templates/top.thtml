@@ -1,5 +1,6 @@
 @@SET@@ PAGE_TITLE = $1
 @@SET@@ BODY_CLASS = $2
+@@SET@@ REDIRECT_URL = $3
 @@--
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
@@ -14,6 +15,10 @@
     <meta name="generator" content="diouzhtu" />
     <meta http-equiv="Content-Type"
           content="text/html; charset=utf-8" />
+    @@IF@@ @_REDIRECT_URL_@ /= ""
+    <meta http-equiv="REFRESH" content="0;url=@_REDIRECT_URL_@"></HEAD>
+    @@END_IF@@
+
     <link rel="stylesheet" title="screen" type="text/css"
           href="@_WIKI_WEB_ROOT_@/css/screen.css" media="screen" />
 @@--

@@ -12,10 +12,11 @@
 
 @@IF@@ @_FILENAME_@ /= ""
 <form method="post" action="@_WIKI_WEB_ROOT_@/preview/@_FILENAME_@">
-  <p><input type="submit" name="submit_top" value="Preview"/></p>
-  <textarea 
+
+  <textarea
             name="text_plain" id="text_plain">@_TEXT_PLAIN_@</textarea>
-  <p><input type="submit" name="submit"  value="Preview"/></p>
+  <p><input type="submit" name="preview"  value="Preview"/></p>
+  <p><input type="hidden" name="isediting"  value="True" /></p>
 </form>
 @@ELSE@@
 @@IF@@ @_URI_@ /= ""
