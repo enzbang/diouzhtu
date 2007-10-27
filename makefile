@@ -162,6 +162,19 @@ gwiad_plugin_distrib:
 	$(CP) gwiad_wiki_service/lib/*wiki_service$(SOEXT) $(PLUGIN_DISTRIB)/
 	$(CP) gwiad_wiki_service/plugin/install.sh $(PLUGIN_DISTRIB)/
 	$(CP) $(INSTALL)/lib/diouzhtu/*$(SOEXT) $(PLUGIN_DISTRIB)/
+	$(MKDIR) $(PLUGIN_DISTRIB)/example/templates/
+	$(MKDIR) $(PLUGIN_DISTRIB)/example/css
+	$(MKDIR) $(PLUGIN_DISTRIB)/example/js
+	$(CP) gwiad_wiki_service/website/config/config.ini \
+		$(PLUGIN_DISTRIB)/example/
+	$(CP) gwiad_wiki_service/website/templates/*.thtml \
+		$(PLUGIN_DISTRIB)/example/templates/
+	$(CP) gwiad_wiki_service/website/css/*.css \
+		$(PLUGIN_DISTRIB)/example/css/
+	$(CP) external_libraries/highlight/*.js	\
+		$(PLUGIN_DISTRIB)/example/js/
+	$(CP) -r external_libraries/highlight/languages	\
+		$(PLUGIN_DISTRIB)/example/js/
 	$(TAR_DIR) $(PLUGIN_DISTRIB).tgz $(PLUGIN_DISTRIB)
 	$(RM) -r $(PLUGIN_DISTRIB)
 

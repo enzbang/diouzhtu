@@ -19,86 +19,81 @@
 ##  Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.       ##
 ##############################################################################
 
-# Installer for Gwiad plugin
-# Use: install.sh
+#  Installer for Gwiad plugin
 
-if [ -z $GWIAD_DIR ]; then
-    echo usage: GWIAD_DIR=/opt/gwiad install.sh all service website
-    echo $GWIAD_DIR
+if [ -z $ARGWIAD_ROOT ]; then
+    echo usage: ARGWIAD_ROOT=/opt/gwiad install.sh all service website
+    echo ARGWIAD_ROOT=$ARGWIAD_ROOT
     exit 1
 fi
-
-if [ -z $GWIAD_HOST ]; then
-    echo Set \$GWIAD_HOST to localhost:8080
-    GWIAD_HOST=http://localhost:8080
-fi
-
-if [ -z $GWIAD_UNREGISTER_SCRIPT ]; then
-    GWIAD_UNREGISTER_SCRIPT=$GWIAD_DIR/scripts/unregister
-    echo Set \$GWIAD_UNREGISTER_SCRIPT to $GWIAD_UNREGISTER_SCRIPT
-    if [ ! -x $GWIAD_UNREGISTER_SCRIPT ]; then
-	echo Aborting... Gwiad unregister script not found !
-	echo Please set \$GWIAD_UNREGISTER_SCRIPT
-	exit 1
-    fi
-fi
-
-function service_unregister
-{
-    echo Unregister service
-    $GWIAD_UNREGISTER_SCRIPT $GWIAD_HOST service wiki_service
-}
-
-function website_unregister
-{
-    echo Unregister website
-    $GWIAD_UNREGISTER_SCRIPT $GWIAD_HOST website $GWIAD_DIR/lib/libwiki_website.so
-}
 
 function interface_copy
 {
     echo "Installing interface"
-    cp libwiki_interface.so $GWIAD_DIR/bin
+    cp libwiki_interface.so $ARGWIAD_ROOT/bin
 }
 
 function service_copy
 {
     echo "Installing service"
-    echo cp libdiouzhtu.so $GWIAD_DIR/bin
-    cp libdiouzhtu.so $GWIAD_DIR/bin
-    echo cp libwiki_service.so $GWIAD_DIR/lib
-    cp libwiki_service.so $GWIAD_DIR/lib
+    echo cp -f libdiouzhtu.so $ARGWIAD_ROOT/bin
+    cp libdiouzhtu.so $ARGWIAD_ROOT/bin
+    echo cp -f libwiki_service.so $ARGWIAD_ROOT/lib
+    cp -f libwiki_service.so $ARGWIAD_ROOT/lib
 }
 
 function website_copy
 {
     echo "Installing website"
-    cp libwiki_website.so $GWIAD_DIR/lib
+    cp -f libwiki_website.so $ARGWIAD_ROOT/lib
+}
 
+function example_copy
+{
+    mkdir -p $ARGWIAD_ROOT/plugins/wiki_website/example/templates/
+    mkdir -p $ARGWIAD_ROOT/plugins/wiki_website/example/css
+    mkdir -p $ARGWIAD_ROOT/plugins/wiki_website/example/js
+    cp example/config.ini \
+	$ARGWIAD_ROOT/plugins/wiki_website/example/
+    cp -r example/templates/ \
+	$ARGWIAD_ROOT/plugins/wiki_website/example/
+    cp -r example/css/ \
+	$ARGWIAD_ROOT/plugins/wiki_website/example/
+    cp -r example/js	\
+	$ARGWIAD_ROOT/plugins/wiki_website/example/
 }
 
 if [ "$1" = "install_all" ]; then
-    service_unregister;
-    website_unregister;
     interface_copy;
     service_copy;
     website_copy;
 elif [ "$1" = "install_service" ]; then
-    service_unregister;
     service_copy;
 elif [ "$1" = "install_website" ]; then
-    website_unregister;
     website_copy;
+elif [ "$1" = "install_example" ]; then
+    example_copy;
 else
+    echo "******************************************"
     echo Welcome to the GWIAD Wiki plugin installer
-    echo 
+    echo "******************************************"
+    echo
     echo usage: install.sh install_all
-    echo 
+    echo
     echo If you only want to install or reinstall service
     echo install.sh install_service
-    echo 
+    echo
     echo or install.sh install_website to install... the website !
-    echo 
+    echo
+    echo You can also install the example website with
+    echo install.sh install_example
+    echo Or you can modify it and put the directory
+    echo into $ARGWIAD_ROOT/plugins/wiki_website/
+    echo
+    echo ----------------------------------------------------
+    echo Note that you will need to reload or restart argwiad
+    echo You can use :
+    echo   argwiadctl restart \(or argwiadctl reload\)
+    echo ----------------------------------------------------
+    echo
 fi
-
-
