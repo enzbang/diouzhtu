@@ -147,6 +147,8 @@ install_gwiad_website:
 		$(GWIAD_DIR)/plugins/wiki_website/example/css/
 	$(CP) external_libraries/highlight/*.js	\
 		$(GWIAD_DIR)/plugins/wiki_website/example/js/
+	$(CP) -r external_libraries/highlight/languages	\
+		$(GWIAD_DIR)/plugins/wiki_website/example/js/
 	$(CP) gwiad_wiki_service/lib/*wiki_website$(SOEXT) $(GWIAD_WEBSITES)
 
 install_gwiad_all: install_gwiad_interface install_gwiad_service \
