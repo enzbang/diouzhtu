@@ -49,8 +49,8 @@ package body Wiki_Website.Lock is
          Time_To_Wait := 0.0;
 
          if Map.Contains (Filename) then
-            declare
-               O        : Object := Map.Element (Filename);
+            Claim_Lock : declare
+               O        : constant Object   := Map.Element (Filename);
                Lifetime : constant Duration := Clock - O.Timestamp;
             begin
                if Lifetime > Validity then
@@ -61,7 +61,7 @@ package body Wiki_Website.Lock is
                else
                   Time_To_Wait := Validity - Lifetime;
                end if;
-            end;
+            end Claim_Lock;
          else
             Map.Insert (Filename, Object'(Timestamp => Clock, User => +User));
          end if;

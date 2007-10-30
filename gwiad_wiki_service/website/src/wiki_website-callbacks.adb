@@ -301,7 +301,7 @@ package body Wiki_Website.Callbacks is
       --  Check Lock
 
       if Exists (Filename)
-        and not Lock.Manager.Check (Filename, Author)
+        and then not Lock.Manager.Check (Filename, Author)
       then
          Templates.Insert
            (Translations,

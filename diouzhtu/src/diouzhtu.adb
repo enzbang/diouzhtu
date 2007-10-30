@@ -39,7 +39,6 @@ package body Diouzhtu is
       "="          => "=");
    use Callbacks;
 
-
    Blocks  : Vector := Empty_Vector;
    Inlines : Vector := Empty_Vector;
 

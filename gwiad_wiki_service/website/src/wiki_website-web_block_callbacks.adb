@@ -175,7 +175,7 @@ package body Wiki_Website.Web_Block_Callbacks is
 
          --  Selected directory is the directory containing a file
 
-         declare
+         Get_Selected_Directory : declare
             First_Filename : constant String :=
                                Directories.Get_First_Filename
                                  (Relative_Selected_Dir);
@@ -186,7 +186,7 @@ package body Wiki_Website.Web_Block_Callbacks is
                  (Current_Directory & Directory_Separator
                   & Ada.Directories.Containing_Directory (First_Filename));
             end if;
-         end;
+         end Get_Selected_Directory;
       else
          Sel_Dir :=  To_Unbounded_String
            (Current_Directory & Directory_Separator & Relative_Selected_Dir);

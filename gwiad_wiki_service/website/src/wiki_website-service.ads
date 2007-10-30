@@ -38,5 +38,4 @@ private package Wiki_Website.Service is
    procedure Unregister (Name : in Website_Name);
    --  Unregister a website
 
-
 end Wiki_Website.Service;

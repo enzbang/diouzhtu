@@ -219,7 +219,7 @@ package body Diouzhtu.Block is
             Level := Level + 1;
             Append (Result, Indent (Level)
                       & '<' & Get_Element & '>' & ASCII.Lf);
-            Parse_Line (Wiki, Line, Level, Line_Level, True);
+            Parse_Line (Wiki, Line, Level, Line_Level, First_Line => True);
          elsif Line_Level < Level then
             Append (Result, ASCII.Lf & Indent (Level) & Indentation
                     & "</li>" & ASCII.Lf & Indent (Level)

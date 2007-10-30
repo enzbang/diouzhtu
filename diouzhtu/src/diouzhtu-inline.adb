@@ -594,4 +594,3 @@ package body Diouzhtu.Inline is
    end Strong;
 
 end Diouzhtu.Inline;
-

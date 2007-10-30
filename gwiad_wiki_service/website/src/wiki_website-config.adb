@@ -177,7 +177,8 @@ package body Wiki_Website.Config is
    ---------------
 
    function Wiki_Host (Name : in Wiki_Name) return String is
-      Element : Wiki_Data := Wiki_Data (Configs.Element (String (Name)));
+      Element : constant Wiki_Data :=
+        Wiki_Data (Configs.Element (String (Name)));
    begin
       return To_String (Element.Host_Name);
    end Wiki_Host;
