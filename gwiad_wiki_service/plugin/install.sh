@@ -36,16 +36,14 @@ function interface_copy
 function service_copy
 {
     echo "Installing service"
-    echo cp -f libdiouzhtu.so $ARGWIAD_ROOT/bin
     cp libdiouzhtu.so $ARGWIAD_ROOT/bin
-    echo cp -f libwiki_service.so $ARGWIAD_ROOT/lib
-    cp -f libwiki_service.so $ARGWIAD_ROOT/lib
+    cp -f libwiki_service.so $ARGWIAD_ROOT/services/lib
 }
 
 function website_copy
 {
     echo "Installing website"
-    cp -f libwiki_website.so $ARGWIAD_ROOT/lib
+    cp -f libwiki_website.so $ARGWIAD_ROOT/websites/lib
 }
 
 function example_copy
