@@ -23,15 +23,11 @@ all:
 ifeq ($(shell ls tsrc/ | wc -l), 0)
 	$(error "Please run 'make setup'")
 endif
-# Workaround for GNAT bug with Ali_Directory
-	chmod -R a+w lib/
-##  When building without cleaning first. Build failed to delete old ALI files
-	gnat make -XPRJ_BUILD=$(MODE) -Pwiki_website
-	gnat make -XPRJ_BUILD=$(MODE) -Pwiki_website
+	$(GNATMAKE) -XPRJ_BUILD=$(MODE) -Pwiki_website
+	$(GNATMAKE) -XPRJ_BUILD=$(MODE) -Pwiki_website
 
 setup:
-	mkdir -p lib obj tsrc
-	-$(MKDIR) gen
+	-$(MKDIR) gen tsrc
 	templates2ada -r -d templates -o gen/templates.cds \
 		-t templates/templates.tads
 	gnat chop -wpq gen/templates.cds tsrc/
@@ -39,7 +35,7 @@ setup:
 	$(RM) -r gen
 
 clean:
-	-gnat clean -r -Pwiki_website
+	-$(GNATCLEAN) -r -Pwiki_website
 
 check:
-	gnat check -dd -Pwiki_website -rules -from=../../diouzhtu.check
+	$(GNATCHECK) -Pwiki_website -rules -from=../../diouzhtu.check

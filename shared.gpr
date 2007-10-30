@@ -55,7 +55,7 @@ project Shared is
    --------------
 
    Common_Options  :=
-     ("-gnat05", "-gnatwcfijkmruv", "-gnaty3abcefhiklmnoprstx", "-Wall");
+     ("-gnat05", "-gnatwa", "-gnaty3Aabcdefhiklmnoprstux", "-Wall");
    --  Common options used for the Debug and Release modes
 
    Debug_Options   :=
@@ -81,10 +81,10 @@ project Shared is
    package Binder is
       case Build is
          when "Debug" | "Profile" =>
-            for Default_Switches ("Ada") use ("-E", "-g");
+            for Default_Switches ("Ada") use ("-E", "-s", "-g");
 
          when "Release" =>
-            for Default_Switches ("Ada") use ("-E");
+            for Default_Switches ("Ada") use ("-E", "-s");
       end case;
    end Binder;
 

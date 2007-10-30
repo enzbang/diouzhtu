@@ -20,13 +20,13 @@
 ##############################################################################
 
 all:
-	mkdir -p obj lib
-	gnat make -XPRJ_BUILD=$(MODE) -Pwiki_interface
-	gnat make -XPRJ_BUILD=$(MODE) -Pwiki_interface
+	$(GNATMAKE) -XPRJ_BUILD=$(MODE) -Pwiki_interface
+	$(GNATMAKE) -XPRJ_BUILD=$(MODE) -Pwiki_interface
 
 clean:
-	-gnat clean -r -Pwiki_interface
+	-$(GNATCLEAN) -r -Pwiki_interface
 
 check:
-	gnat check -dd -Pwiki_interface -rules -from=../../diouzhtu.check
+	$(GNATCHECK) -Pwiki_interface -rules -from=../../diouzhtu.check
+
 setup:

@@ -20,16 +20,13 @@
 ##############################################################################
 
 all:
-	mkdir -p lib/ obj/
-# Workaround for GNAT bug with ali directory
-	chmod -R a+w lib/
-##  When building without cleaning first. Build failed to delete old ALI files
-	gnat make -XPRJ_BUILD=$(MODE) -Pwiki_service
-	gnat make -XPRJ_BUILD=$(MODE) -Pwiki_service
+	$(GNATMAKE) -XPRJ_BUILD=$(MODE) -Pwiki_service
+	$(GNATMAKE) -XPRJ_BUILD=$(MODE) -Pwiki_service
 
 clean:
-	-gnat clean -r -Pwiki_service
+	-$(GNATCLEAN) -r -Pwiki_service
 
 check:
-	gnat check -dd -Pwiki_service -rules -from=../../diouzhtu.check
+	$(GNATCHECK) -Pwiki_service -rules -from=../../diouzhtu.check
+
 setup:

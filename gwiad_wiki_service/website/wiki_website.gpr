@@ -45,6 +45,22 @@ Project Wiki_Website is
    for Library_Kind use "dynamic";
    for Library_Auto_Init use "false";
 
+   case Shared.Build is
+      when "Debug" =>
+         for Object_Dir use "../../.build/debug/wweb/obj";
+         for Library_Ali_Dir use "../../.build/debug/wweb/lib";
+         for Library_Dir use "../../.build/debug/slib/websites/";
+      when "Profile" =>
+         for Object_Dir use "../../.build/profile/wweb/obj";
+         for Library_Ali_Dir use "../../.build/profile/wweb/lib";
+         for Library_Dir use "../../.build/profile/slib/websites/";
+         for Library_Options use Project'Library_Options & ("-fprofile-arcs");
+      when "Release" =>
+         for Object_Dir use "../../.build/release/wweb/obj";
+         for Library_Ali_Dir use "../../.build/release/wweb/lib";
+         for Library_Dir use "../../.build/release/slib/websites/";
+   end case;
+
    case Shared.OS is
       when "Windows_NT" =>
          --  ??? for linker library ordering
@@ -52,6 +68,12 @@ Project Wiki_Website is
       when others =>
          null;
    end case;
+
+   ------------
+   -- Binder --
+   ------------
+
+   package Binder renames Shared.Binder;
 
    --------------
    -- Compiler --

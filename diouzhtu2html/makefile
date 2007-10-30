@@ -20,16 +20,15 @@
 ##############################################################################
 
 all:
-	mkdir -p obj bin
-	gnat make -XPRJ_BUILD=$(MODE) -XPRJ_LIB_KIND=$(LIB_KIND) -Pdiouzhtu2html
-	gnat make -XPRJ_BUILD=$(MODE) -XPRJ_LIB_KIND=$(LIB_KIND) -Pdiouzhtu2html
+	$(GNATMAKE) -XPRJ_BUILD=$(MODE) -XPRJ_LIB_KIND=$(LIB_KIND) -Pdiouzhtu2html
+	$(GNATMAKE) -XPRJ_BUILD=$(MODE) -XPRJ_LIB_KIND=$(LIB_KIND) -Pdiouzhtu2html
 
 clean:
 	-$(RM) -r gen src/v2p-template_defs*
-	-gnat clean -r -Pdiouzhtu2html
+	-$(GNATCLEAN) -r -Pdiouzhtu2html
 
 check:
-	gnat check -dd -Pdiouzhtu2html -rules -from=../diouzhtu.check
+	$(GNATCHECK) -Pdiouzhtu2html -rules -from=../diouzhtu.check
 
 regtests:
 	make -C test

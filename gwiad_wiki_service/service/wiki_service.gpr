@@ -28,13 +28,26 @@ with "../interface/wiki_interface";
 Project Wiki_Service is
 
    for Source_Dirs use ("src");
-   for Object_Dir use "obj";
-   for Library_Ali_Dir use "lib";
-   for Library_Dir use "../lib";
    for Library_Name use "wiki_service";
    for Library_Interface use ("wiki_service");
    for Library_Kind use "dynamic";
    for Library_Auto_Init use "false";
+
+   case Shared.Build is
+      when "Debug" =>
+         for Object_Dir use "../../.build/debug/ws/obj";
+         for Library_Ali_Dir use "../../.build/debug/ws/lib";
+         for Library_Dir use "../../.build/debug/slib/services/";
+      when "Profile" =>
+         for Object_Dir use "../../.build/profile/ws/obj";
+         for Library_Ali_Dir use "../../.build/profile/ws/lib";
+         for Library_Dir use "../../.build/profile/slib/services/";
+         for Library_Options use Project'Library_Options & ("-fprofile-arcs");
+      when "Release" =>
+         for Object_Dir use "../../.build/release/ws/obj";
+         for Library_Ali_Dir use "../../.build/release/ws/lib";
+         for Library_Dir use "../../.build/release/slib/services/";
+   end case;
 
    case Shared.OS is
       when "Windows_NT" =>
@@ -43,6 +56,12 @@ Project Wiki_Service is
       when others =>
          null;
    end case;
+
+   ------------
+   -- Binder --
+   ------------
+
+   package Binder renames Shared.Binder;
 
    --------------
    -- Compiler --
