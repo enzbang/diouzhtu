@@ -59,6 +59,8 @@ $(error "Wrong install path : empty INSTALL var")
 endif
 endif
 
+BUILD_DIR=".build/$(shell echo $(MODE) | tr [[:upper:]] [[:lower:]])"
+
 # Targets
 
 all: $(MODULES_BUILD)
@@ -99,6 +101,9 @@ ${MODULES_CHECK}:
 install_clean:
 	$(RM) -fr $(I_INC)
 	$(RM) -fr $(I_LIB_D)
+	$(RM) -fr $(I_LIB_W)
+	$(RM) -fr $(I_INC_W)
+	$(RM) -fr $(I_DLIB)
 	$(RM) -f $(I_GPR)/diouzhtu.gpr
 
 install_dirs: install_clean
@@ -111,17 +116,18 @@ install_dirs: install_clean
 	$(MKDIR) $(I_DLIB)
 
 install: install_dirs
-	$(CP) diouzhtu/lib/* $(I_LIB_D)
+	$(CP) $(BUILD_DIR)/d/lib/* $(I_LIB_D)
 	for library in `ls $(I_LIB_D)/*$(SOEXT)`; do \
 		$(LN) $$library $(I_LIB); \
 	done
-	$(CP) gwiad_wiki_service/interface/lib/*$(SOEXT) $(I_LIB_W)
+	$(CP) $(BUILD_DIR)/wi/lib/* $(I_LIB_W)
 	for library in `ls $(I_LIB_W)/*$(SOEXT)`; do \
 		$(LN) $$library $(I_LIB); \
 	done
 	$(CP) diouzhtu/src/*.ad[sb] $(I_INC)
 	$(CP) gwiad_wiki_service/interface/src/*.ads $(I_INC_W)
-	$(CP) gwiad_wiki_service/lib/*$(SOEXT) $(I_DLIB)
+	$(CP) $(BUILD_DIR)/slib/services/*$(SOEXT) $(I_DLIB)
+	$(CP) $(BUILD_DIR)/slib/websites/*$(SOEXT) $(I_DLIB)
 	$(CP) config/projects/diouzhtu.gpr $(I_GPR)
 	$(CP) config/projects/wiki_interface.gpr $(I_GPR)
 
