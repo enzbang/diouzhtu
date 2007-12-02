@@ -66,11 +66,22 @@ BUILD_DIR=".build/$(shell echo $(MODE) | tr [[:upper:]] [[:lower:]])"
 
 all: $(MODULES_BUILD)
 
-setup: $(MODULES_SETUP)
+setup: global_setup $(MODULES_SETUP)
 
-clean: $(MODULES_CLEAN)
+clean: $(MODULES_CLEAN) global_clean
 
-check :$(MODULES_CHECK)
+check: $(MODULES_CHECK)
+
+global_setup:
+	$(MKDIR) -p $(BUILD_DIR)/d
+	$(MKDIR) -p $(BUILD_DIR)/d2h
+	$(MKDIR) -p $(BUILD_DIR)/wi
+	$(MKDIR) -p $(BUILD_DIR)/ws
+	$(MKDIR) -p $(BUILD_DIR)/slib
+	$(MKDIR) -p $(BUILD_DIR)/wweb
+
+global_clean:
+	$(RM) -fr $(BUILD_DIR)
 
 # Install directories
 

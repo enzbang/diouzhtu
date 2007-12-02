@@ -37,10 +37,7 @@ all: $(MODULES_BUILD)
 
 clean: $(MODULES_CLEAN)
 
-create_directories:
-	mkdir -p lib
-
-setup: create_directories $(MODULES_SETUP)
+setup: $(MODULES_SETUP)
 
 check :$(MODULES_CHECK)
 
