@@ -77,7 +77,20 @@ project Wiki_Website is
    -- Compiler --
    --------------
 
-   package Compiler renames Shared.Compiler;
+   COPT := Shared.Common_Options & ("-gnatyN", "-gnaty3Aabcefhiklmnoprstux");
+
+   package Compiler is
+      for Default_Switches ("Ada") use Shared.Compiler'Default_Switches ("Ada");
+      for Switches ("wiki_website-template_defs-block_menu") use COPT;
+      for Switches ("wiki_website-template_defs-block_view") use COPT;
+      for Switches ("wiki_website-template_defs-bottom.ads") use COPT;
+      for Switches ("wiki_website-template_defs-edit.ads") use COPT;
+      for Switches ("wiki_website-template_defs-preview.ads") use COPT;
+      for Switches ("wiki_website-template_defs-top.ads") use COPT;
+      for Switches ("wiki_website-template_defs-view.ads") use COPT;
+      for Switches ("wiki_website-template_defs-welcome.ads") use COPT;
+      for Switches ("wiki_website-template_defs.adb") use COPT;
+   end Compiler;
 
    ---------
    -- Ide --
