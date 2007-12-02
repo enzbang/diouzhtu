@@ -28,13 +28,11 @@ with "gwiad-web";
 with "morzhol";
 with "../interface/wiki_interface";
 
-Project Wiki_Website is
+project Wiki_Website is
 
-   for Languages use
-     ("Ada", "HTML Template", "Ada Template");
+   for Languages use ("Ada", "HTML Template", "Ada Template");
 
-   for Source_Dirs use
-     ("src", "tsrc", "templates");
+   for Source_Dirs use ("src", "tsrc", "templates");
    for Object_Dir use "obj";
    for Library_Ali_Dir use "lib";
    for Library_Dir use "../lib";

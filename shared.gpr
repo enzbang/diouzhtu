@@ -38,9 +38,7 @@ project Shared is
    -------------
 
    package Builder is
-
       case Build is
-
          when "Release" | "Debug" =>
             for Default_Switches ("ada") use ("-m", "-s");
 
