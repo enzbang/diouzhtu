@@ -52,7 +52,8 @@ Project Wiki_Service is
    case Shared.OS is
       when "Windows_NT" =>
          --  ??? for linker library ordering
-         for Library_Options use ("-laws", "-laws_win32", "-lws2_32");
+         for Library_Options use
+	    ("-lgnarl", "-laws", "-laws_win32", "-lws2_32");
       when others =>
          null;
    end case;
