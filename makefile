@@ -144,13 +144,12 @@ install: install_dirs
 	$(CP) config/projects/wiki_interface.gpr $(I_GPR)
 
 install_gwiad_interface:
-	$(CP) gwiad_wiki_service/interface/lib/*wiki_interface$(SOEXT) \
-		$(GWIAD_DIR)/bin/
+	$(CP) $(BUILD_DIR)/wi/lib/*wiki_interface$(SOEXT) $(GWIAD_DIR)/bin/
 
 install_gwiad_service:
 	$(RM) $(GWIAD_SERVICES)/libwiki_service.so
 	$(CP) $(INSTALL)/lib/diouzhtu/*$(SOEXT) $(GWIAD_DIR)/bin/
-	$(CP) gwiad_wiki_service/lib/*wiki_service$(SOEXT) $(GWIAD_SERVICES)
+	$(CP) $(BUILD_DIR)/slib/services/*wiki_service$(SOEXT) $(GWIAD_SERVICES)
 
 install_gwiad_website:
 	$(RM) $(GWIAD_WEBSITES)/*wiki_website$(SOEXT)
@@ -167,7 +166,7 @@ install_gwiad_website:
 		$(GWIAD_DIR)/plugins/wiki_website/example/js/
 	$(CP) -r external_libraries/highlight/languages	\
 		$(GWIAD_DIR)/plugins/wiki_website/example/js/
-	$(CP) gwiad_wiki_service/lib/*wiki_website$(SOEXT) $(GWIAD_WEBSITES)
+	$(CP) $(BUILD_DIR)/slib/websites/*wiki_website$(SOEXT) $(GWIAD_WEBSITES)
 
 install_gwiad_all: install_gwiad_interface install_gwiad_service \
 	install_gwiad_website
@@ -176,8 +175,10 @@ gwiad_plugin_distrib:
 	$(MKDIR) -p $(PLUGIN_DISTRIB)
 	$(CP) gwiad_wiki_service/interface/lib/*wiki_interface$(SOEXT) \
 		$(PLUGIN_DISTRIB)/
-	$(CP) gwiad_wiki_service/lib/*wiki_website$(SOEXT) $(PLUGIN_DISTRIB)/
-	$(CP) gwiad_wiki_service/lib/*wiki_service$(SOEXT) $(PLUGIN_DISTRIB)/
+	$(CP) $(BUILD_DIR)/slib/websites/*wiki_website$(SOEXT) \
+		$(PLUGIN_DISTRIB)/
+	$(CP) $(BUILD_DIR)/slib/services/*wiki_service$(SOEXT) \
+		$(PLUGIN_DISTRIB)/
 	$(CP) gwiad_wiki_service/plugin/install.sh $(PLUGIN_DISTRIB)/
 	$(CP) $(INSTALL)/lib/diouzhtu/*$(SOEXT) $(PLUGIN_DISTRIB)/
 	$(MKDIR) $(PLUGIN_DISTRIB)/example/templates/
