@@ -48,23 +48,21 @@ all: build
 
 include mk.modules
 
-ifeq ("$(INSTALL)", "..")
-$(error "Wrong install path : INSTALL='$(INSTALL)'")
-else
-ifeq ("$(INSTALL)", "")
-$(error "Wrong install path : empty INSTALL var")
-endif
+mkinstall: force
+ifneq ($(INSTALL), "")
+# Write INSTALL target into mk.install (see install target)
+	$(shell echo INSTALL = $(INSTALL) > mk.install)
 endif
 
 BUILD_DIR=".build/$(shell echo $(MODE) | tr [[:upper:]] [[:lower:]])"
 
 # Targets
 
-build: build-default
+build: mkinstall build-default
 
-setup: global-setup setup-default
+setup: global_setup setup-default
 
-clean: global-clean clean-default
+clean: global_clean clean-default
 
 check: check-default
 
@@ -110,6 +108,8 @@ install_dirs: install_clean
 	$(MKDIR) $(I_LIB_W)
 	$(MKDIR) $(I_GPR)
 	$(MKDIR) $(I_DLIB)
+
+-include mk.install
 
 install: install_dirs
 	$(CP) $(BUILD_DIR)/d/lib/* $(I_LIB_D)
