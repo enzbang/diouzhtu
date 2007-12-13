@@ -19,7 +19,7 @@
 ##  Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.       ##
 ##############################################################################
 
-all:
+build:
 ifeq ($(shell ls tsrc/ | wc -l), 0)
 	$(error "Please run 'make setup'")
 endif

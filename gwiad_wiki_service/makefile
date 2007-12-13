@@ -23,32 +23,15 @@
 
 MODULES = interface service website
 
-MODULES_BUILD = ${MODULES:%=%_build}
+all: build
 
-MODULES_SETUP = ${MODULES:%=%_setup}
+include ../mk.modules
 
-MODULES_CLEAN = ${MODULES:%=%_clean}
+build: build-default
 
-MODULES_CHECK = ${MODULES:%=%_check}
+clean: clean-default
 
-# Targets
+setup: setup-default
 
-all: $(MODULES_BUILD)
+check: check-default
 
-clean: $(MODULES_CLEAN)
-
-setup: $(MODULES_SETUP)
-
-check :$(MODULES_CHECK)
-
-${MODULES_BUILD}:
-	${MAKE} -C ${@:%_build=%} $(OPTIONS)
-
-${MODULES_SETUP}:
-	${MAKE} -C ${@:%_setup=%} setup $(OPTIONS)
-
-${MODULES_CLEAN}:
-	${MAKE} -C ${@:%_clean=%} clean $(OPTIONS)
-
-${MODULES_CHECK}:
-	${MAKE} -C ${@:%_check=%} check $(OPTIONS)

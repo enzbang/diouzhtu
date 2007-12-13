@@ -44,13 +44,9 @@ endif
 
 MODULES = diouzhtu diouzhtu2html gwiad_wiki_service
 
-MODULES_BUILD = ${MODULES:%=%_build}
+all: build
 
-MODULES_SETUP = ${MODULES:%=%_setup}
-
-MODULES_CLEAN = ${MODULES:%=%_clean}
-
-MODULES_CHECK = ${MODULES:%=%_check}
+include mk.modules
 
 ifeq ("$(INSTALL)", "..")
 $(error "Wrong install path : INSTALL='$(INSTALL)'")
@@ -64,13 +60,13 @@ BUILD_DIR=".build/$(shell echo $(MODE) | tr [[:upper:]] [[:lower:]])"
 
 # Targets
 
-all: $(MODULES_BUILD)
+build: build-default
 
-setup: global_setup $(MODULES_SETUP)
+setup: global-setup setup-default
 
-clean: $(MODULES_CLEAN) global_clean
+clean: global-clean clean-default
 
-check: $(MODULES_CHECK)
+check: check-default
 
 global_setup:
 	$(MKDIR) -p $(BUILD_DIR)/d
@@ -97,18 +93,6 @@ I_DLIB  = $(INSTALL)/share/diouzhtu/dlib
 PLUGIN_DISTRIB = gwiad_wiki_plugin
 GWIAD_SERVICES = $(GWIAD_DIR)/lib/services
 GWIAD_WEBSITES = $(GWIAD_DIR)/lib/websites
-
-${MODULES_BUILD}:
-	${MAKE} -C ${@:%_build=%} $(OPTIONS)
-
-${MODULES_SETUP}:
-	${MAKE} -C ${@:%_setup=%} setup $(OPTIONS)
-
-${MODULES_CLEAN}:
-	${MAKE} -C ${@:%_clean=%} clean $(OPTIONS)
-
-${MODULES_CHECK}:
-	${MAKE} -C ${@:%_check=%} check $(OPTIONS)
 
 install_clean:
 	$(RM) -fr $(I_INC)
