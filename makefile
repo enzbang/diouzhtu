@@ -40,6 +40,18 @@ EXEEXT=
 LN=ln -sf
 endif
 
+VERSION     = $(shell git describe --abbrev=0 2>/dev/null)
+VERSION_ALL = $(shell git describe 2>/dev/null)
+
+ifeq ($(OS),Windows_NT)
+DISTRIB_OS = win32-$(shell uname -m)
+else
+DISTRIB_OS = $(shell uname -s | tr [[:upper:]] [[:lower:]])-$(shell uname -m)
+endif
+
+DISTRIB = $(shell pwd)/v2p-$(DISTRIB_OS)-$(VERSION_ALL)
+
+
 # Modules support
 
 MODULES = diouzhtu diouzhtu2html gwiad_wiki_service
@@ -89,8 +101,8 @@ I_GPR	= $(INSTALL)/lib/gnat
 I_DLIB  = $(INSTALL)/share/diouzhtu/dlib
 
 PLUGIN_DISTRIB = gwiad_wiki_plugin
-GWIAD_SERVICES = $(GWIAD_DIR)/lib/services
-GWIAD_WEBSITES = $(GWIAD_DIR)/lib/websites
+GWIAD_SERVICES = $(GWIAD_ROOT)/lib/services
+GWIAD_WEBSITES = $(GWIAD_ROOT)/lib/websites
 
 install_clean:
 	$(RM) -fr $(I_INC)
@@ -128,58 +140,56 @@ install: install_dirs
 	$(CP) config/projects/wiki_interface.gpr $(I_GPR)
 
 install_gwiad_interface:
-	$(CP) $(BUILD_DIR)/wi/lib/*wiki_interface$(SOEXT) $(GWIAD_DIR)/bin/
+	echo $(GWIAD_ROOT)
+ifeq ("$(GWIAD_ROOT)", "")
+	$(error "Empty GWIAD_ROOT var")
+endif
+	$(MKDIR) $(GWIAD_ROOT)/bin/
+	$(CP) $(BUILD_DIR)/wi/lib/*wiki_interface$(SOEXT) $(GWIAD_ROOT)/bin/
 
 install_gwiad_service:
 	$(RM) $(GWIAD_SERVICES)/libwiki_service.so
-	$(CP) $(INSTALL)/lib/diouzhtu/*$(SOEXT) $(GWIAD_DIR)/bin/
+	$(MKDIR) $(GWIAD_SERVICES)
+	$(CP) $(INSTALL)/lib/diouzhtu/*$(SOEXT) $(GWIAD_ROOT)/bin/
 	$(CP) $(BUILD_DIR)/slib/services/*wiki_service$(SOEXT) $(GWIAD_SERVICES)
 
 install_gwiad_website:
 	$(RM) $(GWIAD_WEBSITES)/*wiki_website$(SOEXT)
-	$(MKDIR) $(GWIAD_DIR)/plugins/wiki_website/example/templates/
-	$(MKDIR) $(GWIAD_DIR)/plugins/wiki_website/example/css
-	$(MKDIR) $(GWIAD_DIR)/plugins/wiki_website/example/js
+	$(MKDIR) $(GWIAD_WEBSITES)
+	$(MKDIR) $(GWIAD_ROOT)/plugins/wiki_website/example/templates/
+	$(MKDIR) $(GWIAD_ROOT)/plugins/wiki_website/example/css
+	$(MKDIR) $(GWIAD_ROOT)/plugins/wiki_website/example/js
 	$(CP) gwiad_wiki_service/website/config/config.ini \
-		$(GWIAD_DIR)/plugins/wiki_website/example/
+		$(GWIAD_ROOT)/plugins/wiki_website/example/
 	$(CP) gwiad_wiki_service/website/templates/*.thtml \
-		$(GWIAD_DIR)/plugins/wiki_website/example/templates/
+		$(GWIAD_ROOT)/plugins/wiki_website/example/templates/
 	$(CP) gwiad_wiki_service/website/css/*.css \
-		$(GWIAD_DIR)/plugins/wiki_website/example/css/
+		$(GWIAD_ROOT)/plugins/wiki_website/example/css/
 	$(CP) external_libraries/highlight/*.js	\
-		$(GWIAD_DIR)/plugins/wiki_website/example/js/
+		$(GWIAD_ROOT)/plugins/wiki_website/example/js/
 	$(CP) -r external_libraries/highlight/languages	\
-		$(GWIAD_DIR)/plugins/wiki_website/example/js/
+		$(GWIAD_ROOT)/plugins/wiki_website/example/js/
 	$(CP) $(BUILD_DIR)/slib/websites/*wiki_website$(SOEXT) $(GWIAD_WEBSITES)
 
 install_gwiad_all: install_gwiad_interface install_gwiad_service \
 	install_gwiad_website
 
-gwiad_plugin_distrib:
-	$(MKDIR) -p $(PLUGIN_DISTRIB)
-	$(CP) gwiad_wiki_service/interface/lib/*wiki_interface$(SOEXT) \
-		$(PLUGIN_DISTRIB)/
-	$(CP) $(BUILD_DIR)/slib/websites/*wiki_website$(SOEXT) \
-		$(PLUGIN_DISTRIB)/
-	$(CP) $(BUILD_DIR)/slib/services/*wiki_service$(SOEXT) \
-		$(PLUGIN_DISTRIB)/
-	$(CP) gwiad_wiki_service/plugin/install.sh $(PLUGIN_DISTRIB)/
-	$(CP) $(INSTALL)/lib/diouzhtu/*$(SOEXT) $(PLUGIN_DISTRIB)/
-	$(MKDIR) $(PLUGIN_DISTRIB)/example/templates/
-	$(MKDIR) $(PLUGIN_DISTRIB)/example/css
-	$(MKDIR) $(PLUGIN_DISTRIB)/example/js
-	$(CP) gwiad_wiki_service/website/config/config.ini \
-		$(PLUGIN_DISTRIB)/example/
-	$(CP) gwiad_wiki_service/website/templates/*.thtml \
-		$(PLUGIN_DISTRIB)/example/templates/
-	$(CP) gwiad_wiki_service/website/css/*.css \
-		$(PLUGIN_DISTRIB)/example/css/
-	$(CP) external_libraries/highlight/*.js	\
-		$(PLUGIN_DISTRIB)/example/js/
-	$(CP) -r external_libraries/highlight/languages	\
-		$(PLUGIN_DISTRIB)/example/js/
-	$(TAR_DIR) $(PLUGIN_DISTRIB).tgz $(PLUGIN_DISTRIB)
-	$(RM) -r $(PLUGIN_DISTRIB)
+install-gwiad-distrib: clean-distrib create-plugin-dist-dir
+	(cd $(DISTRIB)/dist; $(TAR_DIR) ../dist.tgz .)
+	$(RM) -r $(DISTRIB)/dist
+	$(CP) gwiad_wiki_service/scripts/do-install.sh $(DISTRIB)
+	$(TAR_DIR) $(shell basename $(DISTRIB)).tgz $(shell basename $(DISTRIB))
+#	$(RM) -r $(DISTRIB)
+
+create-plugin-dist-dir: GWIAD_ROOT = $(DISTRIB)/dist
+create-plugin-dist-dir: install_gwiad_all
+
+clean-distrib:
+ifeq ("$(DISTRIB)", "")
+	$(error Empty DISTRIB var)
+endif
+	$(RM) -r $(DISTRIB)
+
 
 gcov_analyse:
 	(cd diouzhtu/obj/; gcov -abfu ../src/*)
