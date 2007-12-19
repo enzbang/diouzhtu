@@ -49,7 +49,7 @@ else
 DISTRIB_OS = $(shell uname -s | tr [[:upper:]] [[:lower:]])-$(shell uname -m)
 endif
 
-DISTRIB = $(shell pwd)/v2p-$(DISTRIB_OS)-$(VERSION_ALL)
+DISTRIB = $(shell pwd)/diouzhtu-$(DISTRIB_OS)-$(VERSION_ALL)
 
 
 # Modules support
