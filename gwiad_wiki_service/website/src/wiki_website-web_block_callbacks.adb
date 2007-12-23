@@ -21,6 +21,7 @@
 
 with GNAT.Calendar.Time_IO;
 
+with Ada.Containers.Indefinite_Ordered_Maps;
 with Ada.Strings.Unbounded;
 
 with Wiki_Website.Config;
@@ -51,6 +52,9 @@ package body Wiki_Website.Web_Block_Callbacks is
 
    use Wiki_Website;
    use Wiki_Website.Config;
+
+   package Ordered_Filename is new
+     Ada.Containers.Indefinite_Ordered_Maps (String, String);
 
    ----------
    -- Menu --
@@ -87,6 +91,9 @@ package body Wiki_Website.Web_Block_Callbacks is
       is
          S : Search_Type;
          D : Directory_Entry_Type;
+
+         Filename_Map : Ordered_Filename.Map;
+
          use type Templates.Vector_Tag;
       begin
          Filenames    := Filenames
@@ -99,54 +106,64 @@ package body Wiki_Website.Web_Block_Callbacks is
                        Filter    => Filter_Type'(Directory     => True,
                                                  Ordinary_File => True,
                                                  Special_File  => False));
+
          while More_Entries (S) loop
             Get_Next_Entry (S, D);
-            Add_To_Menu :
-            declare
-               Name      : constant String := Simple_Name (D);
-               Full_Name : constant String := Ada.Directories.Full_Name (D);
-            begin
-               if Name /= "." and then Name /= ".." then
-                  if Kind (D) = Directory  then
-
-                     Filenames    := Filenames
-                       & (Full_Name (Full_Name'First + Root'Length
-                       .. Full_Name'Last) & '/');
-
-                     Simple_Names := Simple_Names & String'(Name & '/');
-
-                     if Full_Name'Length <= Selected_Dir'Length
-                       and then
-                         Full_Name = Selected_Dir
-                           (Selected_Dir'First ..
-                                  Selected_Dir'First + Full_Name'Length - 1)
-                     then
-                        --  This directory is contained into
-                        --  Selected_HTML_Directory. We want subdirs to be in
-                        --  menu too.
-
-                        Menu (From         => Full_Name,
-                              Root         => Root,
-                              Selected_Dir => Selected_Dir,
-                              Filenames    => Filenames,
-                              Simple_Names => Simple_Names);
-                     end if;
-                  else
-
-                     Filenames := Filenames
-                       & Full_Name
-                       (Full_Name'First + Root'Length .. Full_Name'Last);
-
-                     Simple_Names := Simple_Names & Name;
-                  end if;
-               end if;
-            end Add_To_Menu;
+            Filename_Map.Insert
+              (Key      => Full_Name (D),
+               New_Item => Simple_Name (D));
          end loop;
+
+         To_Vector_Tag : declare
+            Position : Ordered_Filename.Cursor := Filename_Map.First;
+         begin
+            while Ordered_Filename.Has_Element (Position) loop
+               Add_Dir : declare
+                  Full_Name : constant String :=
+                                Ordered_Filename.Key (Position);
+                  Name      : constant String :=
+                                Ordered_Filename.Element (Position);
+               begin
+                  if Name /= "." and then Name /= ".." then
+                     if Kind (Full_Name) = Directory  then
+                        Filenames := Filenames
+                          & (Full_Name (Full_Name'First + Root'Length
+                                       .. Full_Name'Last) & '/');
+                        Simple_Names := Simple_Names & String'(Name & '/');
+
+                        if Full_Name'Length <= Selected_Dir'Length
+                          and then Full_Name = Selected_Dir
+                            (Selected_Dir'First ..
+                                 Selected_Dir'First + Full_Name'Length - 1)
+                        then
+
+                           --  This directory is contained into
+                           --  Selected_HTML_Directory.
+                           --  We want subdirs to be in
+                           --  menu too.
+
+                           Menu (From         => Full_Name,
+                                 Root         => Root,
+                                 Selected_Dir => Selected_Dir,
+                                 Filenames    => Filenames,
+                                 Simple_Names => Simple_Names);
+                        end if;
+                     else
+                        Filenames := Filenames
+                          & Full_Name (Full_Name'First + Root'Length
+                                       .. Full_Name'Last);
+                        Simple_Names := Simple_Names & Name;
+                     end if;
+                  end if;
+               end Add_Dir;
+
+               Ordered_Filename.Next (Position);
+            end loop;
+         end To_Vector_Tag;
 
          Filenames    := Filenames
            & Template_Defs.Block_Menu.Set.SET_END_BLOCK;
          Simple_Names := Simple_Names & "";
-
       end Menu;
 
       Get_URI   : constant String    := URI (Request);
