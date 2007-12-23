@@ -20,8 +20,6 @@
 ------------------------------------------------------------------------------
 
 with Ada.Strings.Unbounded;
-with Ada.Strings.Fixed;
-with Ada.Strings.Maps;
 with Ada.Text_IO;
 with Ada.Exceptions;
 with Ada.Directories;
@@ -324,21 +322,23 @@ package body Wiki_Website.Callbacks is
             --------------------
 
             procedure Overwrite_File is
-               CR         : constant String := (1 => ASCII.CR);
-               Clean_Text : constant String :=
-                              Strings.Fixed.Trim
-                                (Strings.Fixed.Translate
-                                   (Text_Plain,
-                                    Strings.Maps.To_Mapping
-                                      (From => CR,
-                                       To   => " ")),
-                                 Strings.Right);
+               Clean_Text : Unbounded_String;
+               Start      : Positive := Text_Plain'First;
             begin
+               for K in Text_Plain'Range loop
+                  if Text_Plain (K) = ASCII.CR then
+                     Append (Clean_Text, Text_Plain (Start .. K - 1));
+                     Start := K + 1;
+                  end if;
+               end loop;
+
+               Append (Clean_Text, Text_Plain (Start .. Text_Plain'Last));
+
                Create (File => Text_File,
                        Mode => Out_File,
                        Name => Filename);
                Put (File => Text_File,
-                    Item => Clean_Text);
+                    Item => To_String (Clean_Text));
                Close (File => Text_File);
             end Overwrite_File;
 
