@@ -209,8 +209,7 @@ package body Wiki_Website.Callbacks is
    function Image_Callback (Request : in Status.Data) return Response.Data is
       URI  : constant String := Status.URI (Request);
       Name : constant Wiki_Name := Get_Wiki_Name (Request);
-      File : constant String := Wiki_Data_Root (Name)
-        & "/" & Wiki_Image_Dir (Name) & "/"
+      File : constant String := Wiki_Image_Dir (Name) & "/"
         & URI (URI'First + Wiki_Web_Image'Length + 2 .. URI'Last);
    begin
       if Ada.Directories.Exists (File) then
