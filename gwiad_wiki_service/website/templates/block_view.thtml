@@ -1,5 +1,4 @@
 @@IF@@ @_VIEW_@ /= ""
-   <h1 class="title">@_REPLACE_ALL((.*\/)/):FILENAME_@</h1>
    @_VIEW_@
 @@ELSIF@@ @_FILENAME_@ /= ""
    <h1 class="title">@_REPLACE_ALL((.*\/)/):FILENAME_@</h1>

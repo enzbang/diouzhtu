@@ -39,14 +39,12 @@
    @@END_IF@@
    <div id="edit_zone">
    <form method="post" action="@_WIKI_WEB_ROOT_@/preview/@_FILENAME_@">
-     <p>
-    </p>
-     <textarea rows="40" cols="80"
-              name="text_plain" id="text_plain">@_TEXT_PLAIN_@</textarea>
     <p>
       <input type="submit" name="save" value="save"/>
       <input type="submit" name="preview" value="preview" />
     </p>
+     <textarea rows="40" cols="80"
+              name="text_plain" id="text_plain">@_TEXT_PLAIN_@</textarea>
   </form>
 </div>
 @@END_IF@@
