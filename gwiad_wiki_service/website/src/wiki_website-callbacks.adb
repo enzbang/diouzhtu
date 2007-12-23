@@ -352,6 +352,11 @@ package body Wiki_Website.Callbacks is
 
                   --  ???  What to do ?
 
+                  if Ada.Directories.Exists
+                    (Wiki_HTML_Dir (Name) & "/" & Wiki_Filename) then
+                     Ada.Directories.Delete_File
+                       (Wiki_HTML_Dir (Name) & "/" & Wiki_Filename);
+                  end if;
                   return;
                end if;
 
