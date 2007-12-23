@@ -19,12 +19,16 @@
 --  Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.       --
 ------------------------------------------------------------------------------
 
+with Ada.Containers.Indefinite_Ordered_Maps;
 with Ada.Directories;
 with Ada.Strings.Fixed;
 
 package body Wiki_Website.Directories is
 
    use Ada;
+
+   package Ordered_Filename is new
+     Ada.Containers.Indefinite_Ordered_Maps (String, String);
 
    ------------------------
    -- Get_First_Filename --
@@ -34,6 +38,8 @@ package body Wiki_Website.Directories is
       use Ada.Directories;
       S : Search_Type;
       D : Directory_Entry_Type;
+
+      Filename_Map : Ordered_Filename.Map;
    begin
 
       Start_Search (Search    => S,
@@ -44,10 +50,16 @@ package body Wiki_Website.Directories is
                                               Special_File  => False));
 
       if More_Entries (S) then
-         Get_Next_Entry (S, D);
+         while More_Entries (S) loop
+            Get_Next_Entry (S, D);
+            Filename_Map.Insert
+              (Key      => Full_Name (D),
+               New_Item => Simple_Name (D));
+         end loop;
+
          In_Current_Directory :
          declare
-            Full_Name : constant String := Ada.Directories.Full_Name (D);
+            Full_Name : constant String := Filename_Map.First_Key;
          begin
             return Strings.Fixed.Delete (Source  => Full_Name,
                                          From    => Full_Name'First,
@@ -64,25 +76,29 @@ package body Wiki_Website.Directories is
                     Filter    => Filter_Type'(Ordinary_File => False,
                                               Directory     => True,
                                               Special_File  => False));
+
       while More_Entries (S) loop
          Get_Next_Entry (S, D);
-         Search_In_Subdirs :
-         declare
-            SN : constant String := Simple_Name (D);
-         begin
-            if SN (SN'First) /= '.' then
-               Check_If_Non_Empty :
-               declare
-                  First_Filename : constant String
-                    := Get_First_Filename (Ada.Directories.Full_Name (D));
-               begin
-                  if First_Filename /= "" then
-                     return First_Filename;
-                  end if;
-               end Check_If_Non_Empty;
-            end if;
-         end Search_In_Subdirs;
+         Filename_Map.Insert
+           (Key      => Full_Name (D),
+            New_Item => Simple_Name (D));
       end loop;
+
+      Search_In_Subdirs : declare
+         SN : constant String := Filename_Map.First_Element;
+      begin
+         if SN (SN'First) /= '.' then
+            Check_If_Non_Empty :
+            declare
+               First_Filename : constant String
+                 := Get_First_Filename (Filename_Map.First_Key);
+            begin
+               if First_Filename /= "" then
+                  return First_Filename;
+               end if;
+            end Check_If_Non_Empty;
+         end if;
+      end Search_In_Subdirs;
 
       --  No files found.
 
