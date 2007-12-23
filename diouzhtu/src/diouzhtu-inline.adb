@@ -282,7 +282,7 @@ package body Diouzhtu.Inline is
       Extract  : constant Pattern_Matcher
         := Compile
           (Expression =>
-               "!(\([\w-_]+?\))??((http://)??[\w._-]+?)(\([\w-_]+?\))??!",
+               "!(\([\w-_]+?\))??((http://)??[^ \s\[\]]+)(\([\w-_]+?\))??!",
            Flags => Case_Insensitive);
 
       Matches  : Match_Array (0 .. 5);
