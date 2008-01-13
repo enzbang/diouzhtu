@@ -140,10 +140,6 @@ install: install_dirs
 	$(CP) config/projects/wiki_interface.gpr $(I_GPR)
 
 install_gwiad_interface:
-	echo $(GWIAD_ROOT)
-ifeq ("$(GWIAD_ROOT)", "")
-	$(error "Empty GWIAD_ROOT var")
-endif
 	$(MKDIR) $(GWIAD_ROOT)/bin/
 	$(CP) $(BUILD_DIR)/wi/lib/*wiki_interface$(SOEXT) $(GWIAD_ROOT)/bin/
 
@@ -174,15 +170,18 @@ install_gwiad_website:
 install_gwiad_all: install_gwiad_interface install_gwiad_service \
 	install_gwiad_website
 
-install-gwiad-distrib: clean-distrib create-plugin-dist-dir
+install-gwiad-distrib: clean-distrib install_gwiad_all
 	(cd $(DISTRIB)/dist; $(TAR_DIR) ../dist.tgz .)
 	$(RM) -r $(DISTRIB)/dist
 	$(CP) gwiad_wiki_service/scripts/do-install.sh $(DISTRIB)
 	$(TAR_DIR) $(shell basename $(DISTRIB)).tgz $(shell basename $(DISTRIB))
-#	$(RM) -r $(DISTRIB)
+	$(RM) -r $(DISTRIB)
 
-create-plugin-dist-dir: GWIAD_ROOT = $(DISTRIB)/dist
-create-plugin-dist-dir: install_gwiad_all
+install-distrib: GWIAD_ROOT=$(DISTRIB)/dist
+install-distrib: install-gwiad-distrib
+
+install-distrib-show-name:
+	@echo $(DISTRIB)
 
 clean-distrib:
 ifeq ("$(DISTRIB)", "")
