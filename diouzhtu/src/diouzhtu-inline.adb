@@ -341,7 +341,7 @@ package body Diouzhtu.Inline is
          end if;
 
          Append
-           (Result, '>');
+           (Result, "/>");
          Current := Matches (0).Last + 1;
       end loop Extract_All;
 
