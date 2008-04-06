@@ -1,7 +1,7 @@
 ------------------------------------------------------------------------------
 --                               Diouzhtu                                   --
 --                                                                          --
---                           Copyright (C) 2007                             --
+--                        Copyright (C) 2007-2008                           --
 --                            Olivier Ramonat                               --
 --                                                                          --
 --  This library is free software; you can redistribute it and/or modify    --
@@ -175,7 +175,7 @@ package body Diouzhtu.Inline is
          else
             case S (I) is
                when '-' =>
-                  if S'First < I + 1 and then I < S'Last - 2 then
+                  if S'First < I and then I < S'Last - 2 then
                      if S (I - 1 .. I + 1) = " - " then
                         Append_To_Result ("&ndash;", Last, I - 1);
                         To_Skip := 1;
