@@ -220,6 +220,7 @@ package body Diouzhtu.Block is
             Append (Result, Indent (Level)
                       & '<' & Get_Element & '>' & ASCII.LF);
             Parse_Line (Wiki, Line, Level, Line_Level, First_Line => True);
+
          elsif Line_Level < Level then
             Append (Result, ASCII.LF & Indent (Level) & Indentation
                     & "</li>" & ASCII.LF & Indent (Level)
@@ -228,6 +229,7 @@ package body Diouzhtu.Block is
                Level := Level - 1;
                Parse_Line (Wiki, Line, Level, Line_Level);
             end if;
+
          else
             if Line /= "" then
                if not First_Line then
@@ -374,6 +376,10 @@ package body Diouzhtu.Block is
       procedure Get_Dimension;
       --  Get maximum of cols and number of rows
 
+      -------------------
+      -- Get_Dimension --
+      -------------------
+
       procedure Get_Dimension is
          Line_Nb_Cols  : Natural := 0;
       begin
@@ -417,10 +423,11 @@ package body Diouzhtu.Block is
       Get_Dimension;
 
       if Nb_Cols = 0 or else Nb_Rows = 0 then
-         return Parse (Wiki    => Wiki,
-                       Level   => Block_Level,
-                       Content => Table_Block,
-                       Index   => Index);
+         return Parse
+           (Wiki    => Wiki,
+            Level   => Block_Level,
+            Content => Table_Block,
+            Index   => Index);
       end if;
 
       Parse_Lines :
@@ -436,6 +443,7 @@ package body Diouzhtu.Block is
                      Table_Block (Last_Position + 2 .. K - 2)));
                   Append (Result, "</td>" & ASCII.LF);
                end if;
+
                if Line_Cols < Nb_Cols - 1 then
                   Append (Result, "<td>");
                end if;
@@ -454,6 +462,7 @@ package body Diouzhtu.Block is
                              (Nb_Empty_Cols - 1) * Empty_Col);
                   end Adds_Empty_Cols;
                end if;
+
                if K /= Table_Block'Last then
                   Append (Result, "</tr>" & ASCII.LF & "<tr>" & ASCII.LF);
                else

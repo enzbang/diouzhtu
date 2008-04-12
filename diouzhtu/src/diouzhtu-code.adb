@@ -127,7 +127,6 @@ package body Diouzhtu.Code is
       end Begin_Code;
 
    begin
-
       Result := Null_Unbounded_String;
 
       if not Is_Code_Block then
