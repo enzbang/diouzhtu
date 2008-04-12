@@ -46,7 +46,7 @@ package body Diouzhtu.Code is
       end if;
 
       if Block'First < Matches (1).First - 1 then
-         if Block (Matches (1).First - 1) = ASCII.Lf then
+         if Block (Matches (1).First - 1) = ASCII.LF then
             --  Skip the last Lf when end code. at the end of a block
             Append (Result, Block (Block'First .. Matches (1).First - 2));
          else
@@ -54,10 +54,10 @@ package body Diouzhtu.Code is
          end if;
       else
          --  This is a new block. Adds the missing blank line
-         Append (Result, ASCII.Lf & ASCII.Lf);
+         Append (Result, ASCII.LF & ASCII.LF);
       end if;
 
-      return To_String (Result) & "</code></pre></p>" & ASCII.Lf;
+      return To_String (Result) & "</code></pre></p>" & ASCII.LF;
    end End_Code;
 
    -----------
@@ -141,7 +141,7 @@ package body Diouzhtu.Code is
                Is_Code_Block := False;
                Append (Result, End_Code_Block);
             else
-               Append (Result, ASCII.Lf & ASCII.Lf & Block);
+               Append (Result, ASCII.LF & ASCII.LF & Block);
             end if;
          end End_Of_Block;
       end if;

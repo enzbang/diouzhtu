@@ -72,10 +72,10 @@ package body Diouzhtu.To_HTML is
    begin
 
       for K in Text'Range loop
-         if Text (K) = ASCII.Lf then
+         if Text (K) = ASCII.LF then
             if Last < K - 1 then
                if Content /= Null_Unbounded_String then
-                  Append (Content, ASCII.Lf);
+                  Append (Content, ASCII.LF);
                end if;
                Append (Content, Web_Escape (Text (Last .. K - 1)));
             else
@@ -121,7 +121,7 @@ package body Diouzhtu.To_HTML is
 
       while not End_Of_File (Diouzhtu_File) loop
          Append (Result, Get_Line (Diouzhtu_File));
-         Append (Result, ASCII.Lf);
+         Append (Result, ASCII.LF);
       end loop;
 
       Close (Diouzhtu_File);

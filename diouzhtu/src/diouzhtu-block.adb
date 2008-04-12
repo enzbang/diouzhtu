@@ -1,7 +1,7 @@
 ------------------------------------------------------------------------------
 --                               Diouzhtu                                   --
 --                                                                          --
---                           Copyright (C) 2007                             --
+--                        Copyright (C) 2007-2008                           --
 --                            Olivier Ramonat                               --
 --                                                                          --
 --  This library is free software; you can redistribute it and/or modify    --
@@ -88,7 +88,7 @@ package body Diouzhtu.Block is
            (Result, "><p>" &
             Parse (Wiki, Inline_Level,
               Block (Matches (Count).First .. Matches (Count).Last)) &
-            "</p></blockquote>" & ASCII.Lf);
+            "</p></blockquote>" & ASCII.LF);
       end if;
       return To_String (Result);
 
@@ -136,7 +136,7 @@ package body Diouzhtu.Block is
                    Parse (Wiki, Inline_Level,
                           Block (Matches
                                    (Count).First .. Matches (Count).Last)) &
-                   "</h" & Header & ">" & ASCII.Lf);
+                   "</h" & Header & ">" & ASCII.LF);
       end if;
 
       return To_String (Result);
@@ -214,15 +214,15 @@ package body Diouzhtu.Block is
       begin
          if Line_Level > Level then
             if Line_Level > 1 then
-               Append (Result, ASCII.Lf);
+               Append (Result, ASCII.LF);
             end if;
             Level := Level + 1;
             Append (Result, Indent (Level)
-                      & '<' & Get_Element & '>' & ASCII.Lf);
+                      & '<' & Get_Element & '>' & ASCII.LF);
             Parse_Line (Wiki, Line, Level, Line_Level, First_Line => True);
          elsif Line_Level < Level then
-            Append (Result, ASCII.Lf & Indent (Level) & Indentation
-                    & "</li>" & ASCII.Lf & Indent (Level)
+            Append (Result, ASCII.LF & Indent (Level) & Indentation
+                    & "</li>" & ASCII.LF & Indent (Level)
                     & "</" & Get_Element & '>');
             if Level > 1 then
                Level := Level - 1;
@@ -231,8 +231,8 @@ package body Diouzhtu.Block is
          else
             if Line /= "" then
                if not First_Line then
-                  Append (Result, ASCII.Lf & Indent (Level) & Indentation
-                          & "</li>" & ASCII.Lf);
+                  Append (Result, ASCII.LF & Indent (Level) & Indentation
+                          & "</li>" & ASCII.LF);
                end if;
                Append (Result, Indent (Level) & Indentation);
                Append_Last_Content :
@@ -241,7 +241,7 @@ package body Diouzhtu.Block is
                                     Line'First + Natural (Level) + 1;
                   Content_Last  : Positive := Line'Last;
                begin
-                  if Line (Content_Last) = ASCII.Lf then
+                  if Line (Content_Last) = ASCII.LF then
                      Content_Last := Content_Last - 1;
                   end if;
                   Append
@@ -282,7 +282,7 @@ package body Diouzhtu.Block is
       begin
          for K in Block'Range loop
             if K = Block'Last
-              or else (Block (K) = ASCII.Lf and then Block (K + 1) = Get_Tag)
+              or else (Block (K) = ASCII.LF and then Block (K + 1) = Get_Tag)
             then
                Parse_Current_Line :
                declare
@@ -302,7 +302,7 @@ package body Diouzhtu.Block is
                      Level      => Last_Level,
                      Line_Level => 0);
       end Parse_Lines;
-      return To_String (Result) & ASCII.Lf;
+      return To_String (Result) & ASCII.LF;
    end List;
 
    ---------------
@@ -323,7 +323,7 @@ package body Diouzhtu.Block is
    begin
       Match (Extract, Block, Matches);
       if Matches (0) = No_Match then
-         return "<p>" & Parse (Wiki, Inline_Level, Block) & "</p>" & ASCII.Lf;
+         return "<p>" & Parse (Wiki, Inline_Level, Block) & "</p>" & ASCII.LF;
       end if;
 
       Result := To_Unbounded_String ("<p");
@@ -339,7 +339,7 @@ package body Diouzhtu.Block is
            (Result, ">" &
               Parse (Wiki, Inline_Level,
                      Block (Matches (Count).First .. Matches (Count).Last))
-              & "</p>" & ASCII.Lf);
+              & "</p>" & ASCII.LF);
       end if;
       return To_String (Result);
    end Paragraph;
@@ -379,7 +379,7 @@ package body Diouzhtu.Block is
       begin
          Main_Loop :
          for I in Table_Block'Range loop
-            if Table_Block (I) = ASCII.Lf then
+            if Table_Block (I) = ASCII.LF then
                if I > Table_Block'First + 1
                  and then Table_Block (I - 2 .. I - 1) /= " |" then
                   --  A table line MUST end with |
@@ -400,10 +400,10 @@ package body Diouzhtu.Block is
             if Table_Block (I) = '|' then
                if (I = Table_Block'First or else
                      Table_Block (I - 1) = ' ' or else
-                       Table_Block (I - 1) = ASCII.Lf) and then
+                       Table_Block (I - 1) = ASCII.LF) and then
                  (I = Table_Block'Last or else
                     Table_Block (I + 1) = ' ' or else
-                      Table_Block (I + 1) = ASCII.Lf)
+                      Table_Block (I + 1) = ASCII.LF)
                then
                   Line_Nb_Cols := Line_Nb_Cols + 1;
                else
@@ -434,7 +434,7 @@ package body Diouzhtu.Block is
                   Append
                     (Result, Parse (Wiki, Inline_Level,
                      Table_Block (Last_Position + 2 .. K - 2)));
-                  Append (Result, "</td>" & ASCII.Lf);
+                  Append (Result, "</td>" & ASCII.LF);
                end if;
                if Line_Cols < Nb_Cols - 1 then
                   Append (Result, "<td>");
@@ -442,28 +442,30 @@ package body Diouzhtu.Block is
                Line_Cols := Line_Cols + 1;
                Last_Position := K;
             end if;
-            if Table_Block (K) = ASCII.Lf or else K = Table_Block'Last then
+
+            if Table_Block (K) = ASCII.LF or else K = Table_Block'Last then
                if Line_Cols < Nb_Cols then
                   Adds_Empty_Cols :
                   declare
                      Nb_Empty_Cols : constant Natural := Nb_Cols - Line_Cols;
-                     Empty_Col     : constant String := "<td></td>" & ASCII.Lf;
+                     Empty_Col     : constant String := "<td></td>" & ASCII.LF;
                   begin
-                     Append (Result, "</td>" & ASCII.Lf &
+                     Append (Result, "</td>" & ASCII.LF &
                              (Nb_Empty_Cols - 1) * Empty_Col);
                   end Adds_Empty_Cols;
                end if;
                if K /= Table_Block'Last then
-                  Append (Result, "</tr>" & ASCII.Lf & "<tr>" & ASCII.Lf);
+                  Append (Result, "</tr>" & ASCII.LF & "<tr>" & ASCII.LF);
                else
-                  Append (Result, "</tr>" & ASCII.Lf);
+                  Append (Result, "</tr>" & ASCII.LF);
                end if;
                Line_Cols := 0;
             end if;
          end loop;
       end Parse_Lines;
-      return "<table>" & ASCII.Lf & "<tr>" & ASCII.Lf
-        & To_String (Result) & "</table>" & ASCII.Lf;
+
+      return "<table>" & ASCII.LF & "<tr>" & ASCII.LF
+        & To_String (Result) & "</table>" & ASCII.LF;
    end Table;
 
 end Diouzhtu.Block;
