@@ -51,6 +51,7 @@ endif
 
 DISTRIB = $(shell pwd)/diouzhtu-$(DISTRIB_OS)-$(VERSION_ALL)
 
+export LIBRARY_TYPE=relocatable
 
 # Modules support
 
