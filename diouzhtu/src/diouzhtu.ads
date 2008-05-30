@@ -1,7 +1,7 @@
 ------------------------------------------------------------------------------
 --                               Diouzhtu                                   --
 --                                                                          --
---                           Copyright (C) 2007                             --
+--                         Copyright (C) 2007-2008                          --
 --                            Olivier Ramonat                               --
 --                                                                          --
 --  This library is free software; you can redistribute it and/or modify    --
