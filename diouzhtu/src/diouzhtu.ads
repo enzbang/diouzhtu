@@ -25,6 +25,11 @@ package Diouzhtu is
 
    type Wiki_Information is private;
 
+   type Converter is access
+        function (Wiki  : in Wiki_Information;
+                  Index : in Positive;
+                  Block : in String) return String;
+
    function Initialize
      (Base_URL     : in String;
       Img_Base_URL   : in String;
@@ -36,11 +41,7 @@ package Diouzhtu is
 
    procedure Register
      (Level   : in Register_Level;
-      To_HTML : access
-        function
-          (Wiki  : in Wiki_Information;
-           Index : in Positive;
-           Content : in String) return String);
+      To_HTML : Converter);
    --  Register a new recursive callback
 
 private
@@ -53,11 +54,7 @@ private
 
    procedure Internal_Register
      (Level   : in Register_Level;
-      To_HTML : access
-        function
-          (Wiki  : in Wiki_Information;
-           Index : in Positive;
-           Content : in String) return String);
+      To_HTML : in Converter);
    --  Register a new recursive callback
 
    function Parse

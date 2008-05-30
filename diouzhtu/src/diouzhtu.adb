@@ -27,10 +27,7 @@ package body Diouzhtu is
    use Ada.Strings.Unbounded;
 
    type Callback is record
-      To_HTML : access
-        function (Wiki  : in Wiki_Information;
-                  Index : in Positive;
-                  Block : in String) return String;
+      To_HTML : Converter;
    end record;
 
    package Callbacks is new Containers.Vectors
@@ -64,11 +61,7 @@ package body Diouzhtu is
 
    procedure Internal_Register
      (Level   : in Register_Level;
-      To_HTML : access
-        function
-        (Wiki   : in Wiki_Information;
-         Index   : in Positive;
-         Content : in String) return String)
+      To_HTML : in Converter)
    is
       Register_Callback : Callback;
    begin
@@ -120,11 +113,7 @@ package body Diouzhtu is
 
    procedure Register
      (Level   : in Register_Level;
-      To_HTML : access
-        function
-        (Wiki    : in Wiki_Information;
-         Index   : in Positive;
-         Content : in String) return String)
+      To_HTML : Converter)
    is
       Register_Callback : Callback;
    begin
