@@ -89,6 +89,7 @@ global_setup:
 
 global_clean:
 	$(RM) -fr $(BUILD_DIR)
+	$(RM) -f mk.install
 
 # Install directories
 
