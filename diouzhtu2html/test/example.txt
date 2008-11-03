@@ -64,6 +64,8 @@ Test "http://url_with_scripts":http://url_with_scripts
 
 An image !diouzhtu.png! in png format
 
+A test with !!! inside !
+
 code.
 @code@
 end code.
