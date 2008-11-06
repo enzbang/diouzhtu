@@ -376,6 +376,9 @@ package body Diouzhtu.Inline is
       Matches  : Match_Array (0 .. 6);
       Current  : Natural := S'First;
       Result   : Unbounded_String := Null_Unbounded_String;
+
+      End_Content : Character;
+      Treat_End   : Boolean := False;  -- Do a special case for end_content ?
    begin
       Extract_All :
       loop
@@ -397,20 +400,32 @@ package body Diouzhtu.Inline is
 
          Extract_Link :
          declare
-            URL         : constant String :=
-                             S (Matches (4).First .. Matches (4).Last);
             Http_Prefix : constant String := "http://";
+            Last        : Positive        := Matches (4).Last;
          begin
-            if URL'Length >= Http_Prefix'Length and then
-              URL (URL'First ..
-                     URL'First + Http_Prefix'Length - 1) = Http_Prefix then
-               Append (Result, "<a href='" & URL & "'");
-            elsif URL (URL'First) = '#' then
-               Append (Result, "<a href='" & URL & "'");
-            else
-               Append (Result, "<a href='"
-                       & Wiki.Base_URL & "/" & URL & "'");
+            End_Content := S (Matches (4).Last);
+
+            if not Characters.Handling.Is_Alphanumeric (End_Content) then
+               Treat_End := True;
+               Last      := Last - 1;
             end if;
+
+            --  Try to fix url
+
+            With_Url : declare
+               U : constant String := S (Matches (4).First .. Last);
+            begin
+               if U'Length >= Http_Prefix'Length and then
+                 U (U'First ..
+                      U'First + Http_Prefix'Length - 1) = Http_Prefix then
+                  Append (Result, "<a href='" & U & "'");
+               elsif U (U'First) = '#' then
+                  Append (Result, "<a href='" & U & "'");
+               else
+                  Append (Result, "<a href='"
+                          & Wiki.Base_URL & "/" & U & "'");
+               end if;
+            end With_Url;
          end Extract_Link;
 
          if Matches (1) /= No_Match then
@@ -432,7 +447,13 @@ package body Diouzhtu.Inline is
                         Level   => Inline_Level,
                         Content => S (Matches (2).First .. Matches (2).Last),
                         Index   => Index + 1)
-               & "</a> ");
+              & "</a>");
+
+            if Treat_End then
+               Append (Result, End_Content);
+            end if;
+
+            Append (Result, " ");
          end if;
          Current := Matches (0).Last + 1;
       end loop Extract_All;
