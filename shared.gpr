@@ -30,9 +30,6 @@ project Shared is
    type OS_Type is ("UNIX", "Windows_NT");
    OS : OS_Type := external ("OS", "UNIX");
 
-   type Lib_Type is ("Static", "Dynamic");
-   Lib_Kind : Lib_Type := External ("PRJ_LIB_KIND", "Dynamic");
-
    -------------
    -- Builder --
    -------------

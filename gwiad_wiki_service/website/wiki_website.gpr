@@ -1,7 +1,7 @@
 ------------------------------------------------------------------------------
---                                  Gwiad                                   --
+--                                Diouzhtu                                  --
 --                                                                          --
---                           Copyright (C) 2007                             --
+--                         Copyright (C) 2007-2008                          --
 --                            Olivier Ramonat                               --
 --                                                                          --
 --  This library is free software; you can redistribute it and/or modify    --
@@ -32,7 +32,6 @@ project Wiki_Website is
 
    for Languages use ("Ada", "HTML Template", "Ada Template");
 
-   for Source_Dirs use ("src", "tsrc", "templates");
    for Library_Name use "wiki_website";
    for Library_Interface use ("wiki_website",
                               "wiki_website.config",
@@ -45,15 +44,21 @@ project Wiki_Website is
          for Object_Dir use "../../.build/debug/wweb/obj";
          for Library_Ali_Dir use "../../.build/debug/wweb/lib";
          for Library_Dir use "../../.build/debug/slib/websites/";
+         for Source_Dirs use ("src",
+                             "../../.build/debug/wweb/tsrc", "templates");
       when "Profile" =>
          for Object_Dir use "../../.build/profile/wweb/obj";
          for Library_Ali_Dir use "../../.build/profile/wweb/lib";
          for Library_Dir use "../../.build/profile/slib/websites/";
          for Library_Options use Project'Library_Options & ("-fprofile-arcs");
+         for Source_Dirs use ("src",
+                              "../../.build/profile/wweb/tsrc", "templates");
       when "Release" =>
          for Object_Dir use "../../.build/release/wweb/obj";
          for Library_Ali_Dir use "../../.build/release/wweb/lib";
          for Library_Dir use "../../.build/release/slib/websites/";
+         for Source_Dirs use ("src",
+                              "../../.build/release/wweb/tsrc", "templates");
    end case;
 
    case Shared.OS is
@@ -77,7 +82,8 @@ project Wiki_Website is
    COPT := Shared.Common_Options & ("-gnatyN", "-gnaty3Aabcefhiklmnoprstux");
 
    package Compiler is
-      for Default_Switches ("Ada") use Shared.Compiler'Default_Switches ("Ada");
+      for Default_Switches ("Ada")
+        use Shared.Compiler'Default_Switches ("Ada");
       for Switches ("wiki_website-template_defs-block_menu") use COPT;
       for Switches ("wiki_website-template_defs-block_view") use COPT;
       for Switches ("wiki_website-template_defs-bottom.ads") use COPT;
