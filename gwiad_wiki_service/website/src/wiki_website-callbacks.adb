@@ -158,9 +158,9 @@ package body Wiki_Website.Callbacks is
             if Kind (Filename) = Directory then
                Templates.Insert
                  (Translations,
-                  Templates.To_Set (AWS.Services.Directory.Browse
+                  AWS.Services.Directory.Browse
                     (Directory_Name => Filename,
-                     Request        => Request)));
+                     Request        => Request));
             end if;
             return;
          end if;
