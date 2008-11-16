@@ -38,6 +38,10 @@ ifeq (,$(prefix))
 	prefix = $(shell cat $(BUILD_DIR)/gnat.root 2>/dev/null)
 endif
 
+ifeq (,$(ARGWIAD_ROOT))
+	ARGWIAD_ROOT = $(shell echo $$ARGWIAD_ROOT)
+endif
+
 # Add GPR Library_Kind for AWS (force to shared)
 GNATMAKE_OPTIONS += -XLIBRARY_TYPE=relocatable
 
