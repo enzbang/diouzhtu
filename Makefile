@@ -91,7 +91,7 @@ DISTRIB = $(shell pwd)/diouzhtu-$(DISTRIB_OS)-$(VERSION_ALL)
 
 bin/diouzhtu2html : bld-diouzhtu2html/diouzhtu2html
 	@$(RM) $@
-	@$(LN) $(BUILD_DIR)/d2h/obj/diouzhtu2html $@
+	-@$(LN) $(BUILD_DIR)/d2h/obj/diouzhtu2html $@
 
 wiki_service : bld-gwiad_wiki_service/service/wiki_service
 wiki_website : $(BUILD_DIR)/wweb/tsrc/wiki_website-template_defs.ads \
