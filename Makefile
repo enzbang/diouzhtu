@@ -184,11 +184,11 @@ install_dirs: install_clean
 install: install_dirs
 	$(CP) $(BUILD_DIR)/d/lib/* $(I_LIB_D)
 	for library in `ls $(I_LIB_D)/*$(LIBEXT)`; do \
-		$(LN) $$library $(I_LIB); \
+		$(LN) $$library $(I_BIN); \
 	done
 	$(CP) $(BUILD_DIR)/wi/lib/* $(I_LIB_W)
 	for library in `ls $(I_LIB_W)/*$(LIBEXT)`; do \
-		$(LN) $$library $(I_LIB); \
+		$(LN) $$library $(I_BIN); \
 	done
 	$(CP) diouzhtu/src/*.ad[sb] $(I_INC)
 	$(CP) gwiad_wiki_service/interface/src/*.ads $(I_INC_W)
