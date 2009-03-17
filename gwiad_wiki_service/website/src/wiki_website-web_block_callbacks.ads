@@ -28,8 +28,8 @@ private package Wiki_Website.Web_Block_Callbacks is
    use AWS;
 
    procedure Menu
-     (Request      : in     Status.Data;
-      Context      : access AWS.Services.Web_Block.Context.Object;
+     (Request      : in Status.Data;
+      Context      : not null access AWS.Services.Web_Block.Context.Object;
       Translations : in out Templates.Translate_Set);
    --  Display the menu
 
@@ -37,8 +37,8 @@ private package Wiki_Website.Web_Block_Callbacks is
    --  Returns the menu template corresponding to the wiki website
 
    procedure View
-     (Request      : in     Status.Data;
-      Context      : access AWS.Services.Web_Block.Context.Object;
+     (Request      : in Status.Data;
+      Context      : not null access AWS.Services.Web_Block.Context.Object;
       Translations : in out Templates.Translate_Set);
    --  View a wiki page
 

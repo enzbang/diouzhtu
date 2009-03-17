@@ -119,8 +119,8 @@ package body Wiki_Website.Callbacks is
    ---------------
 
    procedure Edit_Page
-     (Request      : in     Status.Data;
-      Context      : access AWS.Services.Web_Block.Context.Object;
+     (Request      : in Status.Data;
+      Context      : not null access AWS.Services.Web_Block.Context.Object;
       Translations : in out Templates.Translate_Set)
    is
       use AWS.Status;
@@ -249,8 +249,8 @@ package body Wiki_Website.Callbacks is
    ------------------
 
    procedure Preview_Page
-     (Request      : in     Status.Data;
-      Context      : access AWS.Services.Web_Block.Context.Object;
+     (Request      : in Status.Data;
+      Context      : not null access AWS.Services.Web_Block.Context.Object;
       Translations : in out Templates.Translate_Set)
    is
       use Ada.Directories;

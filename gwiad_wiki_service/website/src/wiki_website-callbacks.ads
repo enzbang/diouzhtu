@@ -41,14 +41,14 @@ private package Wiki_Website.Callbacks is
    --  Javascript callback
 
    procedure Edit_Page
-     (Request      : in     Status.Data;
-      Context      : access AWS.Services.Web_Block.Context.Object;
+     (Request      : in Status.Data;
+      Context      : not null access AWS.Services.Web_Block.Context.Object;
       Translations : in out Templates.Translate_Set);
    --  Edit a page
 
    procedure Preview_Page
-     (Request      : in     Status.Data;
-      Context      : access AWS.Services.Web_Block.Context.Object;
+     (Request      : in Status.Data;
+      Context      : not null access AWS.Services.Web_Block.Context.Object;
       Translations : in out Templates.Translate_Set);
    --  Preview a page (uses wiki service)
 

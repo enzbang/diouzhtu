@@ -61,8 +61,8 @@ package body Wiki_Website.Web_Block_Callbacks is
    ----------
 
    procedure Menu
-     (Request      : in     Status.Data;
-      Context      : access AWS.Services.Web_Block.Context.Object;
+     (Request      : in Status.Data;
+      Context      : not null access AWS.Services.Web_Block.Context.Object;
       Translations : in out Templates.Translate_Set)
    is
       pragma Unreferenced (Context);
@@ -242,8 +242,8 @@ package body Wiki_Website.Web_Block_Callbacks is
    ----------
 
    procedure View
-     (Request      : in     Status.Data;
-      Context      : access AWS.Services.Web_Block.Context.Object;
+     (Request      : in Status.Data;
+      Context      : not null access AWS.Services.Web_Block.Context.Object;
       Translations : in out Templates.Translate_Set)
    is
       pragma Unreferenced (Context);
