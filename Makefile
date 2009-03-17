@@ -144,7 +144,8 @@ $(BUILD_DIR)/wweb/tsrc/wiki_website-template_defs.ads :
 
 clean: $(CLN_GPR)
 
-clean_all: $(RM) -rf $(BUILD_DIR)
+clean_all:
+	$(RM) -rf $(BUILD_DIR)
 
 $(CLEAN_PROJECTS): clean-% :
 	$(GNATCLEAN) $*
