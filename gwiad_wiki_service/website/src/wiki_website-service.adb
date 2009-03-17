@@ -1,7 +1,7 @@
 ------------------------------------------------------------------------------
 --                               Diouzhtu                                   --
 --                                                                          --
---                           Copyright (C) 2007                             --
+--                        Copyright (C) 2007-2009                           --
 --                            Olivier Ramonat                               --
 --                                                                          --
 --  This library is free software; you can redistribute it and/or modify    --
@@ -180,6 +180,10 @@ package body Wiki_Website.Service is
          raise;
    end Get;
 
+   --------------
+   -- Register --
+   --------------
+
    procedure Register
      (Virtual_Host : in String; Name : in Wiki_Name; Description : in String)
    is
@@ -255,8 +259,8 @@ package body Wiki_Website.Service is
 
    exception
       when E : others =>
-         Ada.Text_IO.Put_Line ("registering fails : " &
-                               Exception_Information (E));
+         Ada.Text_IO.Put_Line
+           ("registering fails : " & Exception_Information (E));
    end Register;
 
    ------------
@@ -276,7 +280,7 @@ package body Wiki_Website.Service is
    ----------------
 
    procedure Unregister (Name : in Website_Name) is
-      Host     : constant String := Wiki_Host (Wiki_Name (String (Name)));
+      Host : constant String := Wiki_Host (Wiki_Name (String (Name)));
    begin
       Gwiad.Web.Virtual_Host.Unregister (Hostname => Host);
    end Unregister;
