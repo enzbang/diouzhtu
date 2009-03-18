@@ -1,7 +1,7 @@
 ------------------------------------------------------------------------------
 --                                Diouzhtu                                  --
 --                                                                          --
---                         Copyright (C) 2007-2008                          --
+--                         Copyright (C) 2007-2009                          --
 --                            Olivier Ramonat                               --
 --                                                                          --
 --  This library is free software; you can redistribute it and/or modify    --
@@ -59,14 +59,6 @@ project Wiki_Website is
          for Library_Dir use "../../.build/release/slib/websites/";
          for Source_Dirs use ("src",
                               "../../.build/release/wweb/tsrc", "templates");
-   end case;
-
-   case Shared.OS is
-      when "Windows_NT" =>
-         --  ??? for linker library ordering
-         for Library_Options use ("-laws", "-laws_win32", "-lws2_32");
-      when others =>
-         null;
    end case;
 
    ------------

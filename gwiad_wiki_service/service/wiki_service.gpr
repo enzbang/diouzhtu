@@ -1,7 +1,7 @@
 ------------------------------------------------------------------------------
 --                                  Gwiad                                   --
 --                                                                          --
---                           Copyright (C) 2007                             --
+--                        Copyright (C) 2007-2009                           --
 --                            Olivier Ramonat                               --
 --                                                                          --
 --  This library is free software; you can redistribute it and/or modify    --
@@ -47,15 +47,6 @@ Project Wiki_Service is
          for Object_Dir use "../../.build/release/ws/obj";
          for Library_Ali_Dir use "../../.build/release/ws/lib";
          for Library_Dir use "../../.build/release/slib/services/";
-   end case;
-
-   case Shared.OS is
-      when "Windows_NT" =>
-         --  ??? for linker library ordering
-         for Library_Options use
-	    ("-lgnarl", "-laws", "-laws_win32", "-lws2_32");
-      when others =>
-         null;
    end case;
 
    ------------
