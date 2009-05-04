@@ -80,6 +80,10 @@ Another test with an url http://url_in_text in text
 
 A test with (http://an.url)
 
+A test with (http://an.url).
+
+A test with (http://an.url); and some text.
+
 A test with http://an)url)
 
 A test with ("An Url":http://an.url)
