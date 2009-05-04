@@ -126,6 +126,9 @@ regtests:
 	$(MKDIR) $(BUILD_DIR)/test
 	@$(VALGRIND) bin/diouzhtu2html diouzhtu2html/test/example.txt \
 		 $(BUILD_DIR)/test/example.html
+ifeq ($(OS),Windows_NT)
+	dos2unix $(BUILD_DIR)/test/example.html
+endif
 	diff $(BUILD_DIR)/test/example.html \
 		diouzhtu2html/test/example.html
 	@echo "diouzhtu2html regression test OK !"
