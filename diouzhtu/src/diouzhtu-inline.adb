@@ -368,6 +368,7 @@ package body Diouzhtu.Inline is
      (Wiki : in Wiki_Information; Index : in Positive; S : in String)
       return String
    is
+      Http_Prefix : constant String := "http://";
       Extract  : constant Pattern_Matcher :=
         Compile (Expression => """(\([\w-_]+?\))??([^\(\)]+?)(\(.*\))??"":" &
                  "((http://)??[^ \s\[\]]+)(\s|$)",
@@ -378,7 +379,7 @@ package body Diouzhtu.Inline is
       Result   : Unbounded_String := Null_Unbounded_String;
 
       End_Content : Character;
-      Treat_End   : Boolean := False;  -- Do a special case for end_content ?
+      Last        : Natural;
    begin
       Extract_All :
       loop
@@ -398,35 +399,31 @@ package body Diouzhtu.Inline is
                       Index   => Index));
          end if;
 
-         Extract_Link :
-         declare
-            Http_Prefix : constant String := "http://";
-            Last        : Positive        := Matches (4).Last;
-         begin
-            End_Content := S (Matches (4).Last);
-
-            if not Characters.Handling.Is_Alphanumeric (End_Content) then
-               Treat_End := True;
-               Last      := Last - 1;
+         Last := Matches (4).Last;
+         Get_Last : while Last > Matches (4).First loop
+            End_Content := S (Last);
+            if Characters.Handling.Is_Alphanumeric (End_Content) then
+               exit Get_Last;
             end if;
+            Last      := Last - 1;
+         end loop Get_Last;
 
-            --  Try to fix url
+         --  Try to fix url
 
-            With_Url : declare
-               U : constant String := S (Matches (4).First .. Last);
-            begin
-               if U'Length >= Http_Prefix'Length and then
-                 U (U'First ..
-                      U'First + Http_Prefix'Length - 1) = Http_Prefix then
-                  Append (Result, "<a href='" & U & "'");
-               elsif U (U'First) = '#' then
-                  Append (Result, "<a href='" & U & "'");
-               else
-                  Append (Result, "<a href='"
-                          & Wiki.Base_URL & "/" & U & "'");
-               end if;
-            end With_Url;
-         end Extract_Link;
+         With_Url : declare
+            U : constant String := S (Matches (4).First .. Last);
+         begin
+            if U'Length >= Http_Prefix'Length and then
+              U (U'First ..
+                   U'First + Http_Prefix'Length - 1) = Http_Prefix then
+               Append (Result, "<a href='" & U & "'");
+            elsif U (U'First) = '#' then
+               Append (Result, "<a href='" & U & "'");
+            else
+               Append (Result, "<a href='"
+                       & Wiki.Base_URL & "/" & U & "'");
+            end if;
+         end With_Url;
 
          if Matches (1) /= No_Match then
             Append
@@ -449,10 +446,9 @@ package body Diouzhtu.Inline is
                         Index   => Index + 1)
               & "</a>");
 
-            if Treat_End then
-               Append (Result, End_Content);
+            if Last < Matches (4).Last then
+               Append (Result, S (Last + 1 .. Matches (4).Last));
             end if;
-
             Append (Result, " ");
          end if;
          Current := Matches (0).Last + 1;
@@ -510,6 +506,7 @@ package body Diouzhtu.Inline is
       Matches : Match_Array (0 .. 2);
       Current : Natural := S'First;
       Result  : Unbounded_String := Null_Unbounded_String;
+      Last    : Natural;
    begin
       Extract_All :
       loop
@@ -529,25 +526,21 @@ package body Diouzhtu.Inline is
                       Index   => Index));
          end if;
 
-         Extract_Single_Link :
-         declare
-            End_Content : constant Character := S (Matches (1).Last);
-            In_Content : constant String :=
-              S (Matches (1).First .. Matches (1).Last);
-         begin
-            if not Characters.Handling.Is_Alphanumeric (End_Content) then
-               --  Try to fix url
-               Append (Result, "<a href="""
-                       & In_Content (In_Content'First .. In_Content'Last - 1)
-                       & """>"
-                       & In_Content (In_Content'First .. In_Content'Last - 1)
-                       & "</a>" & End_Content);
-            else
-               Append (Result, "<a href="""
-                       & In_Content & """>" & In_Content & "</a> ");
+         Last := Matches (1).Last;
+
+         Get_Last : while Last > Matches (1).First loop
+            if Characters.Handling.Is_Alphanumeric (S (Last)) then
+               exit Get_Last;
             end if;
-         end Extract_Single_Link;
-         Current := Matches (1).Last + 2;
+            Last := Last - 1;
+         end loop Get_Last;
+
+         Append (Result, "<a href="""
+                 & S (Matches (1).First .. Last)
+                 & """>"
+                 & S (Matches (1).First .. Last)
+                 & "</a>" & S (Last + 1 .. Matches (1).Last));
+         Current := Matches (1).Last + 1;
       end loop Extract_All;
 
       Append (Result,
