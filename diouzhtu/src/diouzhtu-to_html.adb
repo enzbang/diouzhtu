@@ -65,11 +65,16 @@ package body Diouzhtu.To_HTML is
       Content       : Unbounded_String := Null_Unbounded_String;
       Parse_Result  : Unbounded_String := Null_Unbounded_String;
       Result        : Unbounded_String := Null_Unbounded_String;
-      Last          : Positive := Text'First;
+      Last          : Positive;
 
       In_Code_Block  : Boolean := False;
 
    begin
+      if Text = "" then
+         return "";
+      end if;
+
+      Last := Text'First;
 
       for K in Text'Range loop
          if Text (K) = ASCII.LF then
