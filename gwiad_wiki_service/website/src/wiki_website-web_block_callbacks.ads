@@ -23,7 +23,7 @@ with AWS.Status;
 with AWS.Templates;
 with AWS.Services.Web_Block.Context;
 
-private package Wiki_Website.Web_Block_Callbacks is
+package Wiki_Website.Web_Block_Callbacks is
 
    use AWS;
 

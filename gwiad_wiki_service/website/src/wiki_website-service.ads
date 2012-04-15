@@ -38,4 +38,10 @@ private package Wiki_Website.Service is
    procedure Unregister (Name : in Website_Name);
    --  Unregister a website
 
+   procedure Discover_Wiki_Websites;
+   --  Search wiki website on plugin root path
+
+   procedure Reload;
+   --  Reload configuration
+
 end Wiki_Website.Service;

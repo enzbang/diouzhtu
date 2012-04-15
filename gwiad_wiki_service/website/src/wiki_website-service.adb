@@ -73,12 +73,6 @@ package body Wiki_Website.Service is
 
    package Conf is new Morzhol.Iniparser (Parameter_Name => Attribute);
 
-   procedure Discover_Wiki_Websites;
-   --  Search wiki website on plugin root path
-
-   procedure Reload;
-   --  Reload configuration
-
    ----------------------------
    -- Discover_Wiki_Websites --
    ----------------------------
@@ -284,10 +278,5 @@ package body Wiki_Website.Service is
    begin
       Gwiad.Web.Virtual_Host.Unregister (Hostname => Host);
    end Unregister;
-
-begin  --  Wiki_Website.Service : Load all wiki websites
-
-   Discover_Wiki_Websites;
-   Gwiad.Plugins.Set_Reload_CB (Reload'Access);
 
 end Wiki_Website.Service;
